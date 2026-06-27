@@ -27,13 +27,18 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] **Fase 0:** Inicializado Proyecto Base Frontend (Angular 22, Bootstrap 5, layouts public/admin, lazy loading, home con smoke test al backend, build prod verificado).
 - [x] Rename UniEvents → Convoca en toda la documentación.
 - [ ] PR del Proyecto Base a `main` en ambos repos. **Habilita el inicio de Fase 1 al mergearse.**
-- [ ] Esperar resultado de Claude Design → crear `docs/DISEÑO.md`, `src/styles/_variables.scss` y aplicar paleta + tipografía + logo en layouts.
+- [x] Esperar resultado de Claude Design → crear `docs/DISEÑO.md`, `src/styles/_variables.scss` y aplicar paleta + tipografía + logo en layouts.
+- [x] Remover archivos binarios pesados (mockups) del repositorio Git y referenciarlos en un README.md hacia Drive para evitar bloat.
 - [ ] Crear Bot de Telegram y Bot de Discord (Fase 3).
 - [ ] Configurar Google OAuth en Google Cloud Console (Fase 3).
 - [ ] Configurar cuenta de Resend (necesario para Fase 1, dominio Notificaciones).
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-06-27 (Sesión 8):** Integración de diseño y limpieza de binarios.
+    *   **Diseño:** Seleccionada la paleta "Arctic Reflection" (azules elegantes con accent ámbar). Creados los tokens de diseño y variables SCSS en el frontend, importadas las Google Fonts (Space Grotesk + Inter) y aplicados los estilos a los layouts público y administrativo. Creado `docs/DISEÑO.md` con las especificaciones del Design System.
+    *   **Limpieza:** Eliminados los archivos binarios pesados de los mockups (PNGs y PDF) del repositorio Git para evitar sobrecarga de historial. Agregado `mockup/README.md` con la referencia al Google Drive compartido.
+    *   **Estado:** Todo compilado, build de producción limpio (0 warnings) y cambios subidos a la rama remota `chore/proyecto-base` en ambos repositorios.
 *   **2026-06-27 (Sesión 7):** Proyecto rebrandeado de "UniEvents" a **Convoca** en toda la documentación. **Construido el Proyecto Base** completo:
     *   **Backend:** Express + Sequelize + Postgres (Neon) con estructura MVC + capa de servicios. Endpoint `GET /api/health` operativo. Migración inicial de tabla `Usuarios` corrida exitosamente. Middlewares CORS, Helmet, sanitización y error handler. Configuración `.sequelizerc`, ESLint, `.env.example` completo.
     *   **Frontend:** Angular 22 con standalone components, Bootstrap 5, layouts `public-layout` y `admin-layout` (esqueletos), `environments/` configurados, página demo `home` que consume backend. Build y pruebas unitarias corregidas y verificadas.
