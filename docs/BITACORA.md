@@ -26,7 +26,7 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] **Fase 0:** Inicializado Proyecto Base Backend (Express, Sequelize, MVC, `GET /api/health` probado contra Neon).
 - [x] **Fase 0:** Inicializado Proyecto Base Frontend (Angular 22, Bootstrap 5, layouts public/admin, lazy loading, home con smoke test al backend, build prod verificado).
 - [x] Rename UniEvents → Convoca en toda la documentación.
-- [ ] PR del Proyecto Base a `main` en ambos repos. **Habilita el inicio de Fase 1 al mergearse.**
+- [x] PR del Proyecto Base a `main` en ambos repos. **Habilita el inicio de Fase 1 al mergearse.**
 - [x] Esperar resultado de Claude Design → crear `docs/DISEÑO.md`, `src/styles/_variables.scss` y aplicar paleta + tipografía + logo en layouts.
 - [x] Remover archivos binarios pesados (mockups) del repositorio Git y referenciarlos en un README.md hacia Drive para evitar bloat.
 - [ ] Crear Bot de Telegram y Bot de Discord (Fase 3).
