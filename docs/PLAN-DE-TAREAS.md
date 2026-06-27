@@ -1,43 +1,57 @@
 # Plan de Tareas — Convoca (Grupo G02)
 
-> **Documento vivo.** Se actualiza cada vez que se asigna, completa, modifica o agrega una tarea. Lectura obligatoria antes de tomar trabajo nuevo.
+> **Documento vivo.** Mapeo de fases y asignación de tareas del proyecto.
 
 ## Cómo Usar Este Documento
+1.  Elegí una tarea `LIBRE` de la fase activa.
+2.  Avisá al equipo por el grupo de comunicación. **No hace falta editar este archivo para asignártela.**
+3.  Seguí las reglas de ramas y Conventional Commits en `docs/FLUJO_DE_TRABAJO.md`.
+4.  Al terminar: subí tu rama, abrí un PR a `main` y avisá para revisión.
 
-1.  Elegí una tarea de la fase actual cuyo **Estado** sea `LIBRE`.
-2.  Avisá al equipo (canal del grupo) que la tomás. Cambiá el campo **Asignado** a tu nombre.
-3.  Leé `docs/FLUJO_DE_TRABAJO.md` y `docs/CONVENCIONES.md` antes de empezar.
-4.  Creá la rama exactamente con el nombre indicado en **Rama**.
-5.  Tocá **solo los archivos listados** en "Archivos a crear" y "Archivos a tocar". Si necesitás tocar uno fuera de esa lista, coordiná con el equipo.
-6.  Hacé commits atómicos siguiendo Conventional Commits (ver `FLUJO_DE_TRABAJO.md` §4).
-7.  Al terminar: push + abrir PR a `main` + avisar.
+---
 
-## Estados de Tarea
+## 📋 Resumen y Vista Previa de Tareas
 
-| Estado | Significado |
-|---|---|
-| `LIBRE` | Disponible para tomar. |
-| `EN PROGRESO` | Alguien la tomó, en desarrollo. |
-| `EN REVISIÓN` | PR abierto, esperando merge. |
-| `HECHA` | Mergeada en `main` vía PR aprobado. |
-| `BLOQUEADA` | No se puede avanzar (dependencia no resuelta o duda pendiente). |
+### Fase 0 — Proyecto Base (Scaffolding)
+*   [x] **T-00-BACK** — Scaffolding Backend (`HECHA`) ➔ [Ver detalle](#t-00-back--scaffolding-backend)
+*   [x] **T-00-FRONT** — Scaffolding Frontend (`HECHA`) ➔ [Ver detalle](#t-00-front--scaffolding-frontend)
+
+### Fase 1 — Asistente MVP (En Curso)
+*   **Dominio 1: Auth & Seguridad**
+    *   [ ] **T-01-1** — Modelo Usuario completo + migración (`LIBRE`) ➔ [Ver detalle](#t-01-1--modelo-usuario-completo--migración)
+    *   [ ] **T-01-2** — Registro + Login + JWT (backend) (`LIBRE`) ➔ [Ver detalle](#t-01-2--registro--login--jwt-backend)
+    *   [ ] **T-01-3** — Login + Registro (frontend) (`LIBRE`) ➔ [Ver detalle](#t-01-3--login--registro-frontend)
+*   **Dominio 2: Eventos & Categorías**
+    *   [ ] **T-02-1** — Modelos Evento + Categoria + EventoCategoria (`LIBRE`) ➔ [Ver detalle](#t-02-1--modelos-evento-categoria--eventocategoria)
+    *   [ ] **T-02-2** — Listar y Detalle (backend) (`LIBRE`) ➔ [Ver detalle](#t-02-2--listar-y-detalle-de-eventos-backend)
+    *   [ ] **T-02-3** — Catálogo y Detalle (frontend) (`LIBRE`) ➔ [Ver detalle](#t-02-3--catálogo-y-detalle-frontend)
+*   **Dominio 3: Inscripciones & Check-in**
+    *   [ ] **T-03-1** — Modelo Inscripcion + migración (`LIBRE`) ➔ [Ver detalle](#t-03-1--modelo-inscripcion--migración)
+    *   [ ] **T-03-2** — Inscribirse y Cancelar (backend) (`LIBRE`) ➔ [Ver detalle](#t-03-2--inscribirse-y-cancelar-backend)
+    *   [ ] **T-03-3** — Botón "Inscribirme" + estado (frontend) (`LIBRE`) ➔ [Ver detalle](#t-03-3--botón-inscribirme--estado-en-frontend)
+*   **Dominio 4: Notificaciones**
+    *   [ ] **T-04-1** — Modelo Notificacion + Resend (`LIBRE`) ➔ [Ver detalle](#t-04-1--modelo-notificacion--service-de-envío-con-resend)
+    *   [ ] **T-04-2** — Disparar Email al inscribirse (`LIBRE`) ➔ [Ver detalle](#t-04-2--disparar-email-al-inscribirse)
+*   **Dominio 5: Dashboard & Valoraciones (Fase 1)**
+    *   [ ] **T-05-1** — Modelos auxiliares (Auditoría/Valoración) (`LIBRE`) ➔ [Ver detalle](#t-05-1--modelos-valoracion--auditoria--historialacceso)
+    *   [ ] **T-05-2** — Middleware de auditoría (`LIBRE`) ➔ [Ver detalle](#t-05-2--middleware-de-auditoría)
+
+---
 
 ## Reglas de Conflicto sobre Archivos Compartidos
-
 Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.routes.ts`). Para evitar conflictos:
-
 *   **Solo agregar líneas al final**, nunca modificar las existentes.
 *   Si el archivo ya tiene las líneas que necesitás, no toques nada.
 *   Si necesitás cambiar algo existente, **avisá antes** al equipo.
 
 ---
 
+## Detalle de Tareas
+
 ## Fase 0 — Proyecto Base (Scaffolding)
 
-> **Responsable:** un único integrante construye toda la fase 0 y la pushea a `main` en ambos repos. Hasta que la Fase 0 esté `HECHA`, **nadie crea feature branches**.
-
 ### T-00-BACK — Scaffolding Backend
-*   **Estado:** `EN REVISIÓN` (pushed to branch, waiting PR merge).
+*   **Estado:** `HECHA` (Mergeado en `main`).
 *   **Asignado:** Equipo (asistido por IA).
 *   **Rama:** `chore/proyecto-base` (sobre el repo backend)
 *   **Archivos a crear:**
@@ -63,7 +77,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
     *   No hay credenciales hardcodeadas — todo desde `.env`.
 
 ### T-00-FRONT — Scaffolding Frontend
-*   **Estado:** `EN REVISIÓN` (pushed to branch, waiting PR merge).
+*   **Estado:** `HECHA` (Mergeado en `main`).
 *   **Asignado:** Equipo (asistido por IA).
 *   **Rama:** `chore/proyecto-base` (sobre el repo frontend)
 *   **Archivos a crear (via `ng new` y luego manual):**
