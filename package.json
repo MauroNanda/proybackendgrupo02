@@ -12,7 +12,8 @@
     "seed": "sequelize-cli db:seed:all",
     "seed:undo": "sequelize-cli db:seed:undo:all",
     "lint": "eslint .",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "prepare": "husky"
   },
   "keywords": [
     "convoca",
@@ -39,7 +40,12 @@
   "devDependencies": {
     "@eslint/js": "^9.16.0",
     "eslint": "^9.16.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "nodemon": "^3.1.7",
     "sequelize-cli": "^6.6.2"
+  },
+  "lint-staged": {
+    "*.js": "eslint --fix"
   }
 }
