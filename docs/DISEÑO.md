@@ -1,17 +1,18 @@
 # Diseño Visual — Convoca (Design System)
 
-> **Paleta:** "Arctic Reflection" adaptada con accent ámbar y colores semánticos.
+> **Paleta:** "Arctic Reflection" adaptada con gris slate, accent azul primary y semánticos.
 > **Tipografía:** Space Grotesk (headings) + Inter (body).
+> **Iconos:** Bootstrap Icons (sin emojis en templates).
 
 ## Paleta de Colores
 
 | Rol | Color | Hex | Uso |
 |-----|-------|-----|-----|
-| Primary | Azul medio | `#5289AD` | Botones principales, navbar, links activos |
+| Primary | Azul medio | `#5289AD` | Botones principales, logos, links activos |
 | Primary Dark | Azul profundo | `#243C4C` | Sidebar admin, fondos oscuros, hover states |
-| Accent / CTA | Ámbar cálido | `#E8A838` | Botones de acción ("Inscribirme"), badges destacados |
-| Background | Casi blanco | `#F4FCFB` | Fondo general de la app (light mode) |
-| Surface / Cards | Gris claro | `#E8F0F1` | Cards, contenedores, áreas agrupadas |
+| Accent / CTA | Ámbar cálido | `#E8A838` | Botones destacados secundariamente, badges |
+| Background | Slate ultra claro | `#F1F5F9` | Fondo general de la app (light mode) |
+| Surface / Cards | Slate / Gris frío | `#E2E8F0` | Fondo de hero, buscador, y áreas agrupadas |
 | Text Dark | Slate oscuro | `#1A2E38` | Texto principal (body, headings) |
 | Text Muted | Gris medio | `#698696` | Texto secundario, labels, captions |
 | Border | Gris borde | `#ACBCBF` | Bordes de inputs, separadores, divisores |
@@ -32,30 +33,28 @@ Base: 4px. Escala: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64`.
 
 ## Componentes Base
 
-*   **Cards:** `border-radius: 12px`, `box-shadow: 0 1px 3px rgba(0,0,0,.08)`, background `#FFFFFF`, borde `#ACBCBF`.
-*   **Botones primarios:** `bg: #5289AD`, `color: #fff`, `border-radius: 8px`, hover `#3F7394`.
-*   **Botones accent:** `bg: #E8A838`, `color: #1A2E38`, `border-radius: 8px`, hover `#D49530`.
-*   **Inputs:** `border: 1px solid #ACBCBF`, `border-radius: 8px`, focus `border-color: #5289AD`.
-*   **Badges/Tags:** `border-radius: 20px`, padding `4px 12px`, font-size `12px`.
+*   **Cards:** `border-radius: 12px`, `box-shadow: 0 1px 3px rgba(0,0,0,.04)`, background `#FFFFFF`, borde sutil.
+*   **Botones primarios:** `bg: #5289AD`, `color: #fff`, `border-radius: 8px`, hover color adjust.
+*   **Inputs:** `border: 1px solid #ACBCBF`, `border-radius: 8px`, focus box-shadow sutil.
+*   **Buscador central:** `bg: #E2E8F0` sin borde, input-group estilizado tipo Notion.
 
 ## Layouts
 
 ### Vista Asistente (public-layout)
-*   Navbar blanca con logo + búsqueda + campana + avatar.
-*   Footer institucional.
-*   Contenido centrado, max-width 1200px.
+*   Navbar blanca con logo, buscador central gris integrado con lupa, campana de notificaciones con dot rojo sutil, y botones de Ingresar/Registrarme.
+*   Footer institucional de color blanco, alineado de manera fija a la base del viewport.
 
 ### Vista Organizador (admin-layout)
-*   Sidebar izquierda fija (ancho 240px), fondo `#243C4C`, texto blanco.
-*   Área de contenido con fondo `#F4FCFB`.
-*   Items del sidebar: iconos + texto, estado activo con accent lateral.
+*   Sidebar izquierda fija (ancho 240px), fondo `#243C4C`, texto blanco, con subsecciones de navegación ("General", "Gestión", "Análisis") y avatar genérico en la base.
+*   Área de contenido principal con fondo `#F1F5F9`.
 
 ## Archivos del Design System
 
 | Archivo | Propósito |
 |---------|-----------|
 | `src/styles/_variables.scss` | Overrides de Bootstrap + tokens propios |
-| `src/styles.scss` | Import de variables + Bootstrap + globales |
+| `src/styles.scss` | Import de variables + Bootstrap + Bootstrap Icons + globales |
 | `src/index.html` | Link a Google Fonts |
 | `layouts/public-layout/` | Navbar + footer con diseño aplicado |
 | `layouts/admin-layout/` | Sidebar + header con diseño aplicado |
+

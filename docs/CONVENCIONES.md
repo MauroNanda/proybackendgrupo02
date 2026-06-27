@@ -5,7 +5,7 @@ Este documento define las reglas de estilo y patrones que **todo código** del p
 ## 1. Frontend (Angular 22)
 *   **Arquitectura:** Standalone Components. No usar `app.module.ts`.
 *   **Reactividad:** Uso de **Signals** (`signal`, `computed`, `effect`) donde sea posible. RxJS se permite para llamadas HTTP (`HttpClient`) y Observables complejos.
-*   **UI/UX:** Usar **Bootstrap 5** como sistema de estilos principal (exigido por la consigna). Grid system, componentes (Navbar, Cards, Modales, Dropdowns) y clases utilitarias de Bootstrap deben ser visibles en el HTML.
+*   **UI/UX:** Usar **Bootstrap 5** como sistema de estilos principal (exigido por la consigna). Grid system, componentes (Navbar, Cards, Modales, Dropdowns) y clases utilitarias de Bootstrap deben ser visibles en el HTML. Para los íconos de la interfaz, usar exclusivamente **Bootstrap Icons** (`<i class="bi bi-icon-name"></i>`), evitando el uso de emojis dentro de los templates.
 *   **Formularios:** Usar exclusivamente `ReactiveFormsModule` (exigido por la consigna). No usar template-driven forms. Los formularios deben tener validaciones personalizadas con feedback visual en tiempo real.
 *   **Componentes:** Mantenerlos pequeños y con responsabilidad única. Separar "Dumb components" (solo UI, reciben datos por `@Input`) de "Smart components" (contienen lógica, llaman servicios).
 *   **Diseño Responsivo:** Mobile-first (exigido por la consigna). Todo debe verse correctamente en móvil, tablet y desktop.
