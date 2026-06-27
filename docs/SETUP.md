@@ -73,14 +73,13 @@ La BD está alojada en la nube para que todos trabajemos sobre la misma base sin
 
 | Campo | Valor |
 |---|---|
-| **Host** | `ep-sweet-union-ack2eszl.sa-east-1.aws.neon.tech` |
+| **Host** | *(Ver archivo .env en Google Drive)* |
 | **Database** | `neondb` |
-| **Role (Usuario)** | `neondb_owner` |
-| **Password** | `npg_r3mnyL7UaGgS` |
-| **Pooler Host** | `ep-sweet-union-ack2eszl-pooler.sa-east-1.aws.neon.tech` |
-| **Connection String** | `postgresql://neondb_owner:npg_r3mnyL7UaGgS@ep-sweet-union-ack2eszl.sa-east-1.aws.neon.tech/neondb?sslmode=require` |
+| **Role (Usuario)** | *(Ver archivo .env en Google Drive)* |
+| **Password** | *(Ver archivo .env en Google Drive)* |
+| **Connection String** | *(Ver archivo .env en Google Drive)* |
 
-> Estos datos se pegan dentro del archivo `.env` en la variable `DATABASE_URL`.
+> Estos datos se copian del archivo `.env` del Drive y se pegan dentro de tu archivo `.env` local en la variable `DATABASE_URL`.
 
 ---
 

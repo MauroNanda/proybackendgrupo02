@@ -37,7 +37,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 > **Responsable:** un único integrante construye toda la fase 0 y la pushea a `main` en ambos repos. Hasta que la Fase 0 esté `HECHA`, **nadie crea feature branches**.
 
 ### T-00-BACK — Scaffolding Backend
-*   **Estado:** `HECHA` (pendiente push a `main`).
+*   **Estado:** `EN REVISIÓN` (pushed to branch, waiting PR merge).
 *   **Asignado:** Equipo (asistido por IA).
 *   **Rama:** `chore/proyecto-base` (sobre el repo backend)
 *   **Archivos a crear:**
@@ -63,7 +63,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
     *   No hay credenciales hardcodeadas — todo desde `.env`.
 
 ### T-00-FRONT — Scaffolding Frontend
-*   **Estado:** `HECHA` (estilos custom pendientes hasta resultado de diseño; pendiente push a `main`).
+*   **Estado:** `EN REVISIÓN` (pushed to branch, waiting PR merge).
 *   **Asignado:** Equipo (asistido por IA).
 *   **Rama:** `chore/proyecto-base` (sobre el repo frontend)
 *   **Archivos a crear (via `ng new` y luego manual):**
