@@ -31,3 +31,53 @@ Dado que es un Trabajo Final que debe ser defendido ante los profesores por un e
 *   **Variables y funciones:** `camelCase` (ej. `cupoMaximo`, `getEventosPublicados()`).
 *   **Tablas de BD (Sequelize):** `PascalCase` singular (ej. `Usuario`, `Evento`, `Inscripcion`).
 *   **Rutas API:** `kebab-case` plural (ej. `/api/eventos`, `/api/inscripciones`).
+
+## 5. Guía de Integración de Features (Evitar Conflictos)
+
+Para evitar conflictos de fusión en Git al trabajar en paralelo, el proyecto utiliza un esquema modular donde **no hace falta editar archivos compartidos centralizados** al agregar modelos y rutas en el backend, y se delegan las rutas en el frontend.
+
+### 5.1 Cómo agregar un Modelo (Backend)
+1. Creá tu archivo en `models/` con la extensión `.model.js` (ej. `models/categoria.model.js`).
+2. El cargador dinámico de `models/index.js` lo importará automáticamente.
+3. Si tu modelo tiene relaciones con otros, **declarálas dentro de su método estático `associate`** en el mismo archivo. Ejemplo:
+   ```javascript
+   static associate(models) {
+     this.belongsTo(models.Usuario, { foreignKey: 'organizadorId', as: 'organizador' });
+   }
+   ```
+
+### 5.2 Cómo agregar una Ruta (Backend)
+1. Creá tu archivo en `routes/` con la extensión `.routes.js` (ej. `routes/evento.routes.js`).
+2. Si tu ruta sigue el nombre plural convencional (ej. `/api/eventos`), exportá directamente el router:
+   ```javascript
+   // routes/evento.routes.js
+   module.exports = router;
+   ```
+3. Si querés un prefijo explícito (ej. `/api/auth` en vez de `/api/auths`), exportá un objeto con `prefix` y `router`:
+   ```javascript
+   // routes/auth.routes.js
+   module.exports = { prefix: '/auth', router };
+   ```
+4. El cargador dinámico de `routes/index.js` lo montará de manera automática en el servidor.
+
+### 5.3 Cómo integrar Rutas en el Frontend (Angular)
+Para evitar tocar `app.routes.ts` constantemente:
+1. Creá un archivo de rutas propio dentro de tu carpeta de feature (ej. `src/app/features/public/eventos.routes.ts` o `auth.routes.ts`).
+2. Exportá tu array de rutas desde ese archivo:
+   ```typescript
+   import { Routes } from '@angular/router';
+   export const authRoutes: Routes = [
+     { path: 'login', loadComponent: () => import('./login/login.component').then(m => m.LoginComponent) }
+   ];
+   ```
+3. En `app.routes.ts`, importá tus rutas usando `loadChildren` en el layout correspondiente:
+   ```typescript
+   // app.routes.ts (única línea que tocarás)
+   children: [
+     {
+       path: '',
+       loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes)
+     }
+   ]
+   ```
+

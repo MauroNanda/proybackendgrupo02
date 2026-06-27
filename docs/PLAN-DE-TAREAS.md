@@ -1,40 +1,26 @@
 # Plan de Tareas — Convoca (Grupo G02)
 
-> **Documento vivo.** Mapeo de fases y asignación de tareas del proyecto.
+> **Documento vivo.** Planificación, asignación y seguimiento de las tareas del proyecto.
 
 ## Cómo Usar Este Documento
-1.  Elegí una tarea `LIBRE` de la fase activa.
-2.  Avisá al equipo por el grupo de comunicación. **No hace falta editar este archivo para asignártela.**
-3.  Seguí las reglas de ramas y Conventional Commits en `docs/FLUJO_DE_TRABAJO.md`.
-4.  Al terminar: subí tu rama, abrí un PR a `main` y avisá para revisión.
+1.  **5 Integrantes = 5 Dominios:** Cada desarrollador toma **un dominio vertical completo** en la Fase 1.
+2.  Elegí una tarea `LIBRE` en el resumen de abajo.
+3.  Avisá al equipo por el grupo de comunicación cuál dominio vas a desarrollar. **No hace falta editar este archivo para asignártela.**
+4.  Desarrollá tanto la etapa de Backend como la de Frontend en la rama indicada.
+5.  Seguí las reglas de Conventional Commits y Pull Requests en `docs/FLUJO_DE_TRABAJO.md`.
 
 ---
 
-## 📋 Resumen y Vista Previa de Tareas
+## 📋 Resumen del Estado de Tareas (Fase 1)
 
-### Fase 0 — Proyecto Base (Scaffolding)
-*   [x] **T-00-BACK** — Scaffolding Backend (`HECHA`) ➔ [Ver detalle](#t-00-back--scaffolding-backend)
-*   [x] **T-00-FRONT** — Scaffolding Frontend (`HECHA`) ➔ [Ver detalle](#t-00-front--scaffolding-frontend)
-
-### Fase 1 — Asistente MVP (En Curso)
-*   **Dominio 1: Auth & Seguridad**
-    *   [ ] **T-01-1** — Modelo Usuario completo + migración (`LIBRE`) ➔ [Ver detalle](#t-01-1--modelo-usuario-completo--migración)
-    *   [ ] **T-01-2** — Registro + Login + JWT (backend) (`LIBRE`) ➔ [Ver detalle](#t-01-2--registro--login--jwt-backend)
-    *   [ ] **T-01-3** — Login + Registro (frontend) (`LIBRE`) ➔ [Ver detalle](#t-01-3--login--registro-frontend)
-*   **Dominio 2: Eventos & Categorías**
-    *   [ ] **T-02-1** — Modelos Evento + Categoria + EventoCategoria (`LIBRE`) ➔ [Ver detalle](#t-02-1--modelos-evento-categoria--eventocategoria)
-    *   [ ] **T-02-2** — Listar y Detalle (backend) (`LIBRE`) ➔ [Ver detalle](#t-02-2--listar-y-detalle-de-eventos-backend)
-    *   [ ] **T-02-3** — Catálogo y Detalle (frontend) (`LIBRE`) ➔ [Ver detalle](#t-02-3--catálogo-y-detalle-frontend)
-*   **Dominio 3: Inscripciones & Check-in**
-    *   [ ] **T-03-1** — Modelo Inscripcion + migración (`LIBRE`) ➔ [Ver detalle](#t-03-1--modelo-inscripcion--migración)
-    *   [ ] **T-03-2** — Inscribirse y Cancelar (backend) (`LIBRE`) ➔ [Ver detalle](#t-03-2--inscribirse-y-cancelar-backend)
-    *   [ ] **T-03-3** — Botón "Inscribirme" + estado (frontend) (`LIBRE`) ➔ [Ver detalle](#t-03-3--botón-inscribirme--estado-en-frontend)
-*   **Dominio 4: Notificaciones**
-    *   [ ] **T-04-1** — Modelo Notificacion + Resend (`LIBRE`) ➔ [Ver detalle](#t-04-1--modelo-notificacion--service-de-envío-con-resend)
-    *   [ ] **T-04-2** — Disparar Email al inscribirse (`LIBRE`) ➔ [Ver detalle](#t-04-2--disparar-email-al-inscribirse)
-*   **Dominio 5: Dashboard & Valoraciones (Fase 1)**
-    *   [ ] **T-05-1** — Modelos auxiliares (Auditoría/Valoración) (`LIBRE`) ➔ [Ver detalle](#t-05-1--modelos-valoracion--auditoria--historialacceso)
-    *   [ ] **T-05-2** — Middleware de auditoría (`LIBRE`) ➔ [Ver detalle](#t-05-2--middleware-de-auditoría)
+| Tarea | Dominio Vertical | Estado | Enlace al detalle |
+|---|---|---|---|
+| **T-00** | **Proyecto Base (Scaffolding)** | `HECHA` | [Ver detalle](#t-00--proyecto-base-scaffolding) |
+| **T-01** | **Auth & Seguridad (Completo)** | `LIBRE` | [Ver detalle](#t-01--auth--seguridad-completo) |
+| **T-02** | **Eventos & Categorías (Completo)** | `LIBRE` | [Ver detalle](#t-02--eventos--categorías-completo) |
+| **T-03** | **Inscripciones & Check-in (Completo)** | `LIBRE` | [Ver detalle](#t-03--inscripciones--check-in-completo) |
+| **T-04** | **Notificaciones (Completo)** | `LIBRE` | [Ver detalle](#t-04--notificaciones-completo) |
+| **T-05** | **Dashboard & Modelos Auxiliares** | `LIBRE` | [Ver detalle](#t-05--dashboard--modelos-auxiliares-completo) |
 
 ---
 
@@ -48,258 +34,133 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 
 ## Detalle de Tareas
 
-## Fase 0 — Proyecto Base (Scaffolding)
-
-### T-00-BACK — Scaffolding Backend
+### T-00 — Proyecto Base (Scaffolding)
 *   **Estado:** `HECHA` (Mergeado en `main`).
-*   **Asignado:** Equipo (asistido por IA).
-*   **Rama:** `chore/proyecto-base` (sobre el repo backend)
-*   **Archivos a crear:**
-    *   `package.json`, `package-lock.json`
-    *   `app.js` (punto de entrada)
-    *   `config/db.js` (Sequelize → Neon)
-    *   `models/index.js` (autoload de modelos, vacío al inicio)
-    *   `models/usuario.model.js` (modelo ejemplo, solo campos básicos: id, email, nombre)
-    *   `migrations/<timestamp>-create-usuario.js` (migración ejemplo)
-    *   `routes/index.js` (router central vacío)
-    *   `routes/health.routes.js` (`GET /api/health`)
-    *   `controllers/.gitkeep`, `services/.gitkeep`, `integrations/.gitkeep`, `seeders/.gitkeep`
-    *   `middlewares/error-handler.middleware.js`
-    *   `middlewares/sanitize.middleware.js` (esqueleto)
-    *   `.eslintrc.json` o `eslint.config.js`
-*   **Archivos a tocar:** `.gitignore` (verificar que ignora `node_modules`, `.env`).
-*   **Dependencias npm mínimas:** `express`, `sequelize`, `pg`, `pg-hstore`, `dotenv`, `cors`, `helmet`, `bcrypt`, `jsonwebtoken`, `express-validator`. **Dev:** `nodemon`, `sequelize-cli`.
-*   **Scripts npm:** `dev` (`nodemon app.js`), `start` (`node app.js`), `migrate`, `seed`.
-*   **Criterios de aceptación:**
-    *   `npm run dev` arranca sin errores.
-    *   `GET http://localhost:3000/api/health` responde `{ status: "ok" }`.
-    *   `npx sequelize-cli db:migrate` crea la tabla `Usuarios` en Neon.
-    *   No hay credenciales hardcodeadas — todo desde `.env`.
-
-### T-00-FRONT — Scaffolding Frontend
-*   **Estado:** `HECHA` (Mergeado en `main`).
-*   **Asignado:** Equipo (asistido por IA).
-*   **Rama:** `chore/proyecto-base` (sobre el repo frontend)
-*   **Archivos a crear (via `ng new` y luego manual):**
-    *   Proyecto Angular 22 standalone inicializado.
-    *   `src/environments/environment.ts`, `src/environments/environment.prod.ts`
-    *   `src/app/core/services/api.service.ts` (HttpClient base apuntando a `environment.apiUrl`)
-    *   `src/app/core/interceptors/jwt.interceptor.ts` (esqueleto)
-    *   `src/app/core/guards/auth.guard.ts` (esqueleto)
-    *   `src/app/core/guards/role.guard.ts` (esqueleto)
-    *   `src/app/layouts/public-layout/public-layout.component.ts` (navbar Bootstrap vacío)
-    *   `src/app/layouts/admin-layout/admin-layout.component.ts` (sidebar Bootstrap vacío)
-    *   `src/app/features/public/home/home.component.ts` (página demo que llama `GET /api/health`)
-    *   `src/app/app.routes.ts` (configurado con lazy loading)
-*   **Configuración:**
-    *   Bootstrap 5 instalado (`npm install bootstrap`) e importado en `styles.scss`.
-    *   Bootstrap Icons opcional.
-    *   `provideHttpClient(withInterceptors([jwtInterceptor]))` en `app.config.ts`.
-*   **Criterios de aceptación:**
-    *   `npm start` levanta Angular en `:4200`.
-    *   Página home muestra el resultado de `GET /api/health` del backend.
-    *   Bootstrap funciona (verificar con un `<button class="btn btn-primary">`).
-    *   No hay errores en consola.
+*   **Rama:** `chore/proyecto-base`
+*   **Backend:** Express + Sequelize con conexión a Neon. Estructura MVC, router central, middleware de error y sanitización, y modelo `Usuario` básico.
+*   **Frontend:** Angular 22 standalone, Bootstrap 5, Bootstrap Icons, layouts dinámicos (público y administrativo) con estilos aplicados, e interceptores HTTP.
 
 ---
 
-## Fase 1 — Asistente MVP (5 dominios en paralelo)
-
-> **Objetivo:** un Asistente puede registrarse, ver el catálogo, inscribirse a un evento, y recibir confirmación por Email. **Demo end-to-end.**
-
-> **Prerrequisito:** Fase 0 `HECHA` y mergeada a `main` en ambos repos.
-
-### Dominio 1 — Auth + Seguridad
-
-#### T-01-1 — Modelo Usuario completo + migración
+### T-01 — Auth & Seguridad (Completo)
 *   **Estado:** `LIBRE`
-*   **Asignado:** —
-*   **Rama:** `feature/modelo-usuario-completo` (backend)
-*   **Archivos a crear:**
-    *   Migración: `migrations/<timestamp>-extender-usuario.js` (agrega `password`, `rol`, `google_id`, `telegram_id`, `two_factor_enabled`, `avatar_url`).
-*   **Archivos a tocar:**
-    *   `models/usuario.model.js` → ampliar definición.
-*   **Dependencias:** T-00-BACK.
-*   **Criterios:** `npx sequelize-cli db:migrate` aplica cambios sin errores. Modelo cargado en `models/index.js`.
+*   **Rama:** `feature/auth-completo`
+*   **Descripción:** Implementar el registro, login y la seguridad JWT tanto en el servidor como en el cliente.
 
-#### T-01-2 — Registro + Login + JWT (backend)
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `migrations/<timestamp>-extender-usuario.js` (añadir `password`, `rol`, `google_id`, `telegram_id`, `two_factor_enabled`, `avatar_url` a la tabla `Usuarios`).
+    *   `models/usuario.model.js` (actualizar campos).
+    *   `utils/jwt.util.js` (firmar y verificar JWT).
+    *   `middlewares/auth.middleware.js` (verificar token en rutas).
+    *   `middlewares/role.middleware.js` (validar rol del usuario).
+    *   `services/auth.service.js` y `controllers/auth.controller.js` (lógica de login/registro).
+    *   `routes/auth.routes.js` (endpoints `POST /api/auth/registro` y `POST /api/auth/login`).
+*   **Criterios de aceptación:** Registro hashea con bcrypt. Login retorna un token JWT válido. Rutas protegidas bloquean accesos no autorizados con un 401.
+
+#### Etapa 2: Frontend
+*   **Archivos a crear/tocar:**
+    *   `src/app/core/services/auth.service.ts` (lógica de login/logout/registro usando Angular Signals).
+    *   `src/app/core/interceptors/jwt.interceptor.ts` (inyectar `Authorization: Bearer <token>`).
+    *   `src/app/core/guards/auth.guard.ts` (proteger rutas del cliente).
+    *   `src/app/features/auth/login/` (componente, HTML y estilos con formulario reactivo).
+    *   `src/app/features/auth/registro/` (componente, HTML y estilos con formulario reactivo).
+    *   `src/app/app.routes.ts` (cargar `authRoutes` vía `loadChildren`).
+*   **Criterios de aceptación:** Formulario reactivo con validaciones y feedback de error. Redirección automática tras inicio de sesión exitoso.
+
+---
+
+### T-02 — Eventos & Categorías (Completo)
 *   **Estado:** `LIBRE`
-*   **Rama:** `feature/auth-jwt`
-*   **Archivos a crear:**
-    *   `controllers/auth.controller.js`
-    *   `services/auth.service.js`
-    *   `routes/auth.routes.js` (POST `/api/auth/registro`, POST `/api/auth/login`)
-    *   `middlewares/auth.middleware.js` (verificar JWT)
-    *   `middlewares/role.middleware.js` (verificar rol)
-    *   `utils/jwt.util.js` (firmar/verificar tokens)
-*   **Archivos a tocar:**
-    *   `routes/index.js` → registrar `auth.routes.js` (solo agregar línea).
-*   **Dependencias:** T-01-1.
-*   **Criterios:** `POST /api/auth/registro` crea usuario con password bcryptado. `POST /api/auth/login` devuelve JWT válido. Middleware bloquea rutas sin token.
+*   **Rama:** `feature/eventos-completo`
+*   **Descripción:** Implementar los modelos de eventos y categorías, posibilitando su listado y visualización detallada en el catálogo.
 
-#### T-01-3 — Login + Registro (frontend)
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `models/evento.model.js`, `models/categoria.model.js` y `models/evento-categoria.model.js`.
+    *   Migraciones correspondientes para las tres tablas y sus claves foráneas.
+    *   `services/evento.service.js` y `controllers/evento.controller.js` (métodos de listar y detalle).
+    *   `routes/evento.routes.js` (`GET /api/eventos` y `GET /api/eventos/:id`).
+    *   `seeders/<timestamp>-eventos-demo.js` (crear 5 eventos en estado `PUBLICADO`).
+*   **Criterios de aceptación:** `GET /api/eventos` retorna solo eventos publicados. Permite filtrar por categorías. Relaciones de base de datos validadas.
+
+#### Etapa 2: Frontend
+*   **Archivos a crear/tocar:**
+    *   `src/app/core/services/evento.service.ts` (llamadas al catálogo y detalle).
+    *   `src/app/features/public/event-catalog/` (página de catálogo con filtros).
+    *   `src/app/features/public/event-detail/` (página de detalle del evento).
+    *   `src/app/shared/components/countdown/` (componente de cuenta regresiva basado en Signals).
+    *   `src/app/app.routes.ts` (cargar `eventosRoutes` vía `loadChildren`).
+*   **Criterios de aceptación:** El catálogo renderiza las tarjetas de eventos. El detalle carga dinámicamente y el contador muestra el tiempo restante en vivo.
+
+---
+
+### T-03 — Inscripciones & Check-in (Completo)
 *   **Estado:** `LIBRE`
-*   **Rama:** `feature/auth-frontend`
-*   **Archivos a crear:**
-    *   `src/app/features/auth/login/login.component.ts` (Reactive Form)
-    *   `src/app/features/auth/registro/registro.component.ts` (Reactive Form)
-    *   `src/app/core/services/auth.service.ts` (login/registro/logout, signal de usuario actual)
-    *   `src/app/core/guards/auth.guard.ts` (implementar lógica real)
-*   **Archivos a tocar:**
-    *   `src/app/app.routes.ts` → agregar rutas `/login`, `/registro` (solo append).
-    *   `src/app/core/interceptors/jwt.interceptor.ts` → implementar inyección de token.
-*   **Dependencias:** T-01-2 (necesita endpoints).
-*   **Criterios:** Login redirige a `/eventos` tras éxito. Token guardado en localStorage. Interceptor agrega `Authorization: Bearer <token>`.
+*   **Rama:** `feature/inscripciones-completo`
+*   **Descripción:** Permitir a los usuarios asistentes inscribirse o cancelar su participación en eventos, controlando el cupo disponible.
 
-### Dominio 2 — Eventos + Categorías
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `models/inscripcion.model.js` y su migración (campos: FK usuario, FK evento, `estado` enum, `qr_token` único).
+    *   `services/inscripcion.service.js` y `controllers/inscripcion.controller.js` (inscribirse y cancelar).
+    *   `routes/inscripcion.routes.js` (`POST /api/inscripciones` y `DELETE /api/inscripciones/:id`).
+*   **Criterios de aceptación:** Validar que el usuario esté autenticado. Controlar que no se exceda el cupo máximo del evento. Al cancelar, el estado cambia a `CANCELADO`.
 
-#### T-02-1 — Modelos Evento + Categoria + EventoCategoria
+#### Etapa 2: Frontend
+*   **Archivos a crear/tocar:**
+    *   `src/app/core/services/inscripcion.service.ts` (enviar inscripción o cancelación).
+    *   `src/app/features/public/event-detail/event-detail.component.ts` (agregar lógica al botón "Inscribirme" / "Cancelar").
+*   **Criterios de aceptación:** El botón reacciona al estado de inscripción actual del usuario (cambia texto e interacción). Muestra notificaciones tipo Toast al cambiar el estado.
+
+---
+
+### T-04 — Notificaciones (Completo)
 *   **Estado:** `LIBRE`
-*   **Rama:** `feature/modelos-evento-categoria`
-*   **Archivos a crear:**
-    *   `models/evento.model.js`, `models/categoria.model.js`, `models/evento-categoria.model.js`
-    *   Migraciones correspondientes.
-*   **Archivos a tocar:** ninguno (los modelos se autoregistran vía `models/index.js`).
-*   **Dependencias:** T-00-BACK.
-*   **Criterios:** Tablas creadas en Neon. Relaciones `Evento.belongsToMany(Categoria)` funcionales.
+*   **Rama:** `feature/notificaciones-completo`
+*   **Descripción:** Crear el sistema de envío de emails transaccionales al confirmarse una inscripción en el sistema usando Resend.
 
-#### T-02-2 — Listar y Detalle de Eventos (backend)
+#### Etapa 1: Backend (Configuración de Resend)
+*   **Archivos a crear/tocar:**
+    *   `models/notificacion.model.js` y su migración (auditoría de notificaciones enviadas).
+    *   `integrations/email.service.js` (servicio wrapper de Resend con función `enviarEmail(destinatario, asunto, html)`).
+    *   `integrations/templates/inscripcion-confirmada.html` (diseño responsivo del correo electrónico).
+*   **Criterios de aceptación:** Envío de correo real exitoso a una casilla de prueba. El log de la notificación se almacena en la base de datos.
+
+#### Etapa 2: Backend (Integración con Eventos)
+*   **Archivos a crear/tocar:**
+    *   `services/inscripcion.service.js` (llamar al servicio de email asincrónicamente tras una inscripción exitosa).
+*   **Criterios de aceptación:** Al inscribirse a un evento, el usuario recibe automáticamente el email HTML con la confirmación y los detalles del mismo.
+
+---
+
+### T-05 — Dashboard & Modelos Auxiliares (Completo)
 *   **Estado:** `LIBRE`
-*   **Rama:** `feature/eventos-listar-detalle`
-*   **Archivos a crear:**
-    *   `controllers/evento.controller.js` (solo métodos `listar` y `obtener`)
-    *   `services/evento.service.js` (solo métodos `listarPublicados`, `obtenerPorId`)
-    *   `routes/evento.routes.js` (GET `/api/eventos`, GET `/api/eventos/:id`)
-    *   `seeders/<timestamp>-eventos-demo.js` (5 eventos PUBLICADO de muestra)
-*   **Archivos a tocar:**
-    *   `routes/index.js` → registrar `evento.routes.js` (append).
-*   **Dependencias:** T-02-1.
-*   **Criterios:** GET devuelve solo eventos PUBLICADO. Filtros por categoría funcionan vía query string.
+*   **Rama:** `feature/dashboard-auxiliares-completo`
+*   **Descripción:** Sentar las bases del panel de administración instalando las tablas de auditoría de seguridad, historial de accesos y valoraciones de eventos.
 
-#### T-02-3 — Catálogo y Detalle (frontend)
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/catalogo-eventos`
-*   **Archivos a crear:**
-    *   `src/app/features/public/event-catalog/event-catalog.component.ts`
-    *   `src/app/features/public/event-detail/event-detail.component.ts`
-    *   `src/app/core/services/evento.service.ts`
-    *   `src/app/shared/components/countdown/countdown.component.ts` (Signal-based)
-*   **Archivos a tocar:**
-    *   `src/app/app.routes.ts` → agregar `/eventos`, `/eventos/:id` (append).
-*   **Dependencias:** T-02-2.
-*   **Criterios:** Catálogo lista eventos con filtros. Detalle muestra countdown vivo. Diseño responsivo Bootstrap.
-
-### Dominio 3 — Inscripciones + Check-in
-
-#### T-03-1 — Modelo Inscripcion + migración
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/modelo-inscripcion`
-*   **Archivos a crear:** `models/inscripcion.model.js`, migración.
-*   **Dependencias:** T-01-1, T-02-1.
-*   **Criterios:** FKs a Usuario y Evento. Estado enum `CONFIRMADO/ESPERA/CANCELADO/ASISTIO`. Campo `qr_token` único.
-
-#### T-03-2 — Inscribirse y Cancelar (backend)
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/inscripcion-crear-cancelar`
-*   **Archivos a crear:**
-    *   `controllers/inscripcion.controller.js`
-    *   `services/inscripcion.service.js` (validar cupo, generar `qr_token` con `crypto.randomUUID()`)
-    *   `routes/inscripcion.routes.js` (POST `/api/inscripciones`, DELETE `/api/inscripciones/:id`)
-*   **Archivos a tocar:** `routes/index.js` (append).
-*   **Dependencias:** T-03-1, T-01-2.
-*   **Criterios:** Solo usuarios logueados pueden inscribirse. Validación de cupo. Cancelar cambia estado a CANCELADO.
-
-#### T-03-3 — Botón "Inscribirme" + estado en frontend
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/inscripcion-frontend`
-*   **Archivos a crear:**
-    *   `src/app/core/services/inscripcion.service.ts`
-*   **Archivos a tocar:**
-    *   `src/app/features/public/event-detail/event-detail.component.ts` (agregar botón + lógica).
-*   **Dependencias:** T-03-2, T-02-3.
-*   **Criterios:** Botón muestra "Inscribirme"/"Cancelar" según estado. Confirmación visual.
-
-### Dominio 4 — Notificaciones (solo Email en Fase 1)
-
-#### T-04-1 — Modelo Notificacion + service de envío con Resend
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/notificaciones-email`
-*   **Archivos a crear:**
-    *   `models/notificacion.model.js`, migración.
-    *   `integrations/email.service.js` (función `enviarEmail(destinatario, asunto, html)`)
-    *   `integrations/templates/inscripcion-confirmada.html` (plantilla HTML)
-*   **Archivos a tocar:** ninguno (registro automático en `models/index.js`).
-*   **Dependencias:** T-00-BACK.
-*   **Criterios:** Llamada a Resend funciona. Envío real verificado a una cuenta de prueba.
-
-#### T-04-2 — Disparar Email al inscribirse
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/disparar-email-inscripcion`
-*   **Archivos a tocar:**
-    *   `services/inscripcion.service.js` → llamar a `email.service.js` tras inscripción exitosa.
-*   **Dependencias:** T-04-1, T-03-2.
-*   **Criterios:** Inscripción exitosa dispara email de confirmación con datos del evento.
-
-### Dominio 5 — Dashboard + Valoraciones (preparación, sin endpoints en Fase 1)
-
-#### T-05-1 — Modelos Valoracion + Auditoria + HistorialAcceso
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/modelos-auxiliares`
-*   **Archivos a crear:**
-    *   `models/valoracion.model.js`, migración.
-    *   `models/auditoria.model.js`, migración.
-    *   `models/historial-acceso.model.js`, migración.
-*   **Dependencias:** T-01-1, T-02-1.
-*   **Criterios:** Tablas creadas. Relaciones definidas.
-
-#### T-05-2 — Middleware de auditoría
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/middleware-auditoria`
-*   **Archivos a crear:**
-    *   `middlewares/audit.middleware.js`
-*   **Dependencias:** T-05-1.
-*   **Criterios:** Middleware registra acción en tabla `AuditoriaAccion` cuando se aplica a una ruta.
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `models/valoracion.model.js` y su migración.
+    *   `models/auditoria.model.js` y su migración.
+    *   `models/historial-acceso.model.js` y su migración.
+    *   `middlewares/audit.middleware.js` (middleware para registrar acciones de creación, edición y eliminación en la tabla `Auditoria`).
+*   **Criterios de aceptación:** Tablas y relaciones creadas en Neon. El middleware registra las acciones ejecutadas por los usuarios autenticados correctamente.
 
 ---
 
 ## Fase 2 — Organizador MVP
+> Se planifica al finalizar la Fase 1.
+> *   CRUD completo de Eventos y Categorías (Organizador).
+> *   Listado de inscriptos con DataTable.
+> *   Dashboard administrativo con gráficos (Chart.js) y KPIs.
+> *   Exportación a PDF y Excel.
+> *   Registro de asistencia manual (Check-in).
 
-> Se planifica al cerrar Fase 1. Bocetos:
-> *   T-02-4: CRUD Evento completo (POST/PUT/DELETE) + protección por rol ORGANIZADOR.
-> *   T-02-5: Frontend CRUD Eventos (`admin/event-manager`).
-> *   T-03-4: Endpoint listar inscriptos por evento.
-> *   T-03-5: Frontend `admin/attendee-list` con DataTable.
-> *   T-05-3: Endpoint estadísticas básicas (count por evento, tasa asistencia).
-> *   T-05-4: Frontend `admin/dashboard` con gráficos Chart.js.
-> *   T-05-5: Exportación PDF + Excel.
-> *   T-03-6: Endpoint marcar asistencia (`PUT /api/inscripciones/:id/check-in`).
-
-## Fase 3 — Integraciones avanzadas y extras
-
-> Bocetos:
-> *   T-04-3: Telegram Bot (notificaciones + 2FA).
-> *   T-04-4: Discord Bot (publicación de eventos nuevos).
-> *   T-04-5: Web Push API.
-> *   T-04-6: Google Calendar (link dinámico).
-> *   T-01-4: Google OAuth 2.0.
-> *   T-01-5: 2FA con email/Telegram.
-> *   T-02-6: Eventos recurrentes (lógica de generación).
-> *   T-03-7: QR scanner para check-in (frontend).
-> *   T-03-8: Certificados PDF.
-> *   T-03-9: Lista de espera (Waitlist).
-> *   T-05-6: Pantalla de valoraciones para el Organizador.
-> *   T-FRONT: PWA + Service Worker (opcional).
-
----
-
-## Checkpoints de Actualización
-
-Este documento se debe actualizar:
-*   **Al cerrar cada Fase** → revisar tareas pendientes y refinar la fase siguiente.
-*   **Cuando una tarea se toma** → cambiar Estado a `EN PROGRESO`, completar Asignado.
-*   **Cuando se abre PR** → Estado `EN REVISIÓN`.
-*   **Cuando se mergea** → Estado `HECHA`.
-*   **Cuando se descubre una tarea nueva** → agregarla a la fase correspondiente con ID disponible.
-*   **Cuando una tarea se bloquea** → Estado `BLOQUEADA` con nota explicando el bloqueante.
-
-> Las actualizaciones a este archivo se hacen por rama `docs/*` y PR (ver `FLUJO_DE_TRABAJO.md`).
+## Fase 3 — Integraciones Avanzadas
+> *   Bot de Telegram (Notificaciones + 2FA).
+> *   Bot de Discord (Anuncio de eventos).
+> *   Web Push API (Notificaciones nativas en el navegador).
+> *   Google Calendar Integration.
+> *   Google OAuth 2.0.
+> *   Autenticación de Dos Factores (2FA).
