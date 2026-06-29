@@ -1,9 +1,5 @@
 const { DataTypes } = require('sequelize');
 
-// Modelo Usuario — versión inicial (Fase 0).
-// Solo contiene los campos mínimos para validar el flujo Sequelize end-to-end.
-// La extensión completa (password, rol, google_id, telegram_id, 2FA, etc.)
-// se hace en la tarea T-01-1 del PLAN-DE-TAREAS.
 module.exports = (sequelize) => {
   const Usuario = sequelize.define(
     'Usuario',
@@ -23,9 +19,45 @@ module.exports = (sequelize) => {
         unique: true,
         validate: { isEmail: true },
       },
+      password: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      rol: {
+        type: DataTypes.ENUM('ORGANIZADOR', 'ASISTENTE'),
+        allowNull: false,
+        defaultValue: 'ASISTENTE',
+      },
+      google_id: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      telegram_id: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
+      two_factor_enabled: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+      avatar_url: {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+      },
     },
     {
       tableName: 'Usuarios',
+      defaultScope: {
+        attributes: {
+          exclude: ['password'],
+        },
+      },
+      scopes: {
+        conPassword: {
+          attributes: { include: ['password'] },
+        },
+      },
     }
   );
 
