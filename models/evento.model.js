@@ -45,5 +45,15 @@ module.exports = (sequelize) => {
     }
   );
 
+Evento.associate = (db) => {
+  Evento.belongsToMany(db.Categoria, {
+    through: db.EventoCategoria,
+    foreignKey: 'eventoId',
+    otherKey: 'categoriaId',
+  });
+};
+
+
+
   return Evento;
 };
