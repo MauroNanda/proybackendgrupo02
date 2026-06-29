@@ -20,6 +20,12 @@ module.exports = (sequelize) => {
       tableName: 'Categorias',
     }
   );
-
+  Categoria.associate = (db) => {
+  Categoria.belongsToMany(db.Evento, {
+    through: db.EventoCategoria,
+    foreignKey: 'categoriaId',
+    otherKey: 'eventoId',
+  });
+};
   return Categoria;
 };
