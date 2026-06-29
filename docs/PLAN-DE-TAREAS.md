@@ -18,7 +18,7 @@
 | **T-00** | **Proyecto Base (Scaffolding)** | `HECHA` | [Ver detalle](#t-00--proyecto-base-scaffolding) |
 | **T-01** | **Auth & Seguridad (Completo)** | `HECHA` | [Ver detalle](#t-01--auth--seguridad-completo) |
 | **T-02** | **Eventos & Categorías (Completo)** | `LIBRE` | [Ver detalle](#t-02--eventos--categorías-completo) |
-| **T-03** | **Inscripciones & Check-in (Completo)** | `LIBRE` | [Ver detalle](#t-03--inscripciones--check-in-completo) |
+| **T-03** | **Inscripciones & Check-in (Completo)** | `HECHA` | [Ver detalle](#t-03--inscripciones--check-in-completo) |
 | **T-04** | **Notificaciones (Completo)** | `LIBRE` | [Ver detalle](#t-04--notificaciones-completo) |
 | **T-05** | **Dashboard & Modelos Auxiliares** | `LIBRE` | [Ver detalle](#t-05--dashboard--modelos-auxiliares-completo) |
 
@@ -96,7 +96,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-03 — Inscripciones & Check-in (Completo)
-*   **Estado:** `LIBRE`
+*   **Estado:** `HECHA`
 *   **Rama:** `feature/inscripciones-completo`
 *   **Descripción:** Permitir a los usuarios asistentes inscribirse o cancelar su participación en eventos, controlando el cupo disponible.
 
