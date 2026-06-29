@@ -61,5 +61,12 @@ module.exports = (sequelize) => {
     }
   );
 
+  Usuario.associate = (models) => {
+    Usuario.hasMany(models.Inscripcion, {
+      foreignKey: 'usuarioId',
+      as: 'inscripciones',
+    });
+  };
+
   return Usuario;
 };
