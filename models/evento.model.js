@@ -9,7 +9,6 @@ module.exports = (sequelize) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-
       titulo: {
         type: DataTypes.STRING(200),
         allowNull: false,
@@ -37,7 +36,8 @@ module.exports = (sequelize) => {
 
       estado: {
         type: DataTypes.ENUM('BORRADOR', 'PUBLICADO', 'CANCELADO'),
-        defaultValue: 'PUBLICADO',
+        defaultValue: 'BORRADOR',
+        allowNull: false,
       },
     },
     {
@@ -45,15 +45,17 @@ module.exports = (sequelize) => {
     }
   );
 
-Evento.associate = (db) => {
-  Evento.belongsToMany(db.Categoria, {
-    through: db.EventoCategoria,
-    foreignKey: 'eventoId',
-    otherKey: 'categoriaId',
-  });
-};
-
-
+  Evento.associate = (models) => {
+    Evento.belongsToMany(models.Categoria, {
+      through: models.EventoCategoria,
+      foreignKey: 'eventoId',
+      otherKey: 'categoriaId',
+    });
+    Evento.hasMany(models.Inscripcion, {
+      foreignKey: 'eventoId',
+      as: 'inscripciones',
+    });
+  };
 
   return Evento;
 };
