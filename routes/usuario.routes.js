@@ -3,6 +3,9 @@ const router = express.Router();
 const { body, param } = require('express-validator');
 const usuarioController = require('../controllers/usuario.controller');
 const validate = require('../middlewares/validate.middleware');
+const authMiddleware = require('../middlewares/auth.middleware');
+
+router.use(authMiddleware);
 
 // Validaciones
 const validacionId = [
