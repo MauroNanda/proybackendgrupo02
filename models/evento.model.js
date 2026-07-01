@@ -10,14 +10,30 @@ module.exports = (sequelize) => {
         primaryKey: true,
       },
       titulo: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING(200),
         allowNull: false,
       },
+
+      descripcion: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+
+      fecha: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+
+      ubicacion: {
+        type: DataTypes.STRING(200),
+        allowNull: false,
+      },
+
       cupo_maximo: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 0,
       },
+
       estado: {
         type: DataTypes.ENUM('BORRADOR', 'PUBLICADO', 'CANCELADO'),
         defaultValue: 'BORRADOR',
@@ -30,6 +46,11 @@ module.exports = (sequelize) => {
   );
 
   Evento.associate = (models) => {
+    Evento.belongsToMany(models.Categoria, {
+      through: models.EventoCategoria,
+      foreignKey: 'eventoId',
+      otherKey: 'categoriaId',
+    });
     Evento.hasMany(models.Inscripcion, {
       foreignKey: 'eventoId',
       as: 'inscripciones',
