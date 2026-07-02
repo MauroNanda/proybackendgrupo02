@@ -20,7 +20,7 @@
 | **T-02** | **Eventos & Categorías (Completo)** | `HECHA` | [Ver detalle](#t-02--eventos--categorías-completo) |
 | **T-03** | **Inscripciones & Check-in (Completo)** | `HECHA` | [Ver detalle](#t-03--inscripciones--check-in-completo) |
 | **T-04** | **Notificaciones (Completo)** | `HECHA` | [Ver detalle](#t-04--notificaciones-completo) |
-| **T-05** | **Dashboard & Modelos Auxiliares** | `LIBRE` | [Ver detalle](#t-05--dashboard--modelos-auxiliares-completo) |
+| **T-05** | **Dashboard & Modelos Auxiliares** | `HECHA` | [Ver detalle](#t-05--dashboard--modelos-auxiliares-completo) |
 
 ---
 
@@ -135,7 +135,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-05 — Dashboard & Modelos Auxiliares (Completo)
-*   **Estado:** `LIBRE`
+*   **Estado:** `HECHA`
 *   **Rama:** `feature/dashboard-auxiliares-completo`
 *   **Descripción:** Sentar las bases del panel de administración instalando las tablas de auditoría de seguridad, historial de accesos y valoraciones de eventos.
 
