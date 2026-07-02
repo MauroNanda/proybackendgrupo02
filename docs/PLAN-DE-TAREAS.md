@@ -149,15 +149,99 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 
 ---
 
-## Fase 2 — Organizador MVP
-> Se planifica al finalizar la Fase 1.
-> *   CRUD completo de Eventos y Categorías (Organizador).
-> *   Listado de inscriptos con DataTable.
-> *   Dashboard administrativo con gráficos (Chart.js) y KPIs.
-> *   Exportación a PDF y Excel.
-> *   Registro de asistencia manual (Check-in).
+## 📋 Detalle de Tareas — Fase 2 (Organizador MVP)
 
-## Fase 3 — Integraciones Avanzadas
+### T-06 — Listado de Inscriptos & Check-in Manual
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/inscriptos-checkin-manual`
+*   **Descripción:** Permitir al organizador visualizar la lista de usuarios inscriptos a un evento y registrar su asistencia manualmente desde la interfaz administrativa.
+*   **Etapa 1: Backend**
+    *   **Archivos a crear/tocar:**
+        *   `routes/inscripcion.routes.js` y `controllers/inscripcion.controller.js`.
+        *   Crear endpoint: `GET /api/inscripciones/evento/:eventoId` (retorna lista de asistentes filtrada por estado y buscador de nombre/email).
+        *   Crear endpoint: `POST /api/inscripciones/:id/check-in-manual` (actualiza estado a `ASISTIO` sin requerir token QR).
+    *   **Consejos de Integración (Basado en errores de Fase 1):**
+        *   ⚠️ *Middleware:* Recordar que el usuario autenticado se inyecta en `req.usuario` (Gabriel/T-01) y **no** en `req.user`.
+        *   ⚠️ *Búsquedas:* Usar `Sequelize.Op.iLike` para la barra de búsqueda de texto de forma insensible a mayúsculas/minúsculas.
+        *   ⚠️ *Seguridad:* Proteger endpoints con `authMiddleware` y `roleMiddleware(['ORGANIZADOR'])`.
+*   **Etapa 2: Frontend**
+    *   **Archivos a crear/tocar:**
+        *   `src/app/core/services/inscripcion.service.ts` (métodos `obtenerPorEvento` y `checkInManual`).
+        *   `src/app/features/admin/attendees/` (tabla Bootstrap con buscadores, paginación y botón de asistencia).
+        *   `src/app/app.routes.ts` (registrar ruta `/admin/eventos/:id/inscriptos` protegida por Guards).
+    *   **Criterios de Aceptación:** Vista interactiva responsive usando Signals. El cambio de asistencia actualiza la fila al instante con feedback visual.
+
+---
+
+### T-07 — Exportación y Reportes (PDF y Excel)
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/exportacion-reportes`
+*   **Descripción:** Añadir servicios del lado del cliente para exportar la lista de inscriptos a Excel y descargar los pases confirmados (tickets) a PDF.
+*   **Etapa 1: Frontend**
+    *   **Archivos a crear/tocar:**
+        *   `src/app/core/services/export.service.ts` (métodos `exportarExcel(datos, filename)` usando `xlsx` y `descargarPdf(elementoHtmlId, filename)` usando `html2canvas` y `jspdf`).
+        *   `src/app/features/admin/test-export/test-export.component.ts` (pantalla aislada para depuración).
+        *   `src/app/app.routes.ts` (montar ruta `/admin/test-export` solo para testing).
+    *   **Consejos de Integración (Basado en errores de Fase 1):**
+        *   ⚠️ *Subida a Git:* Asegurarse de commitear todas las carpetas nuevas (`test-export/`) antes de abrir la PR para evitar compilar con archivos faltantes.
+        *   ⚠️ *Tip de jspdf/html2canvas:* Usar `scale: 2` en el renderizado de `html2canvas` para garantizar que los códigos QR no salgan borrosos en el PDF final.
+*   **Criterios de Aceptación:** Un clic descarga un Excel correcto con las cabeceras deseadas, y la descarga de PDF genera un pase con el diseño enterprise intacto.
+
+---
+
+### T-08 — ABM de Categorías
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/abm-categorias`
+*   **Descripción:** Crear el panel administrativo para que el organizador administre (lista, crea, edita, elimina) las categorías de eventos disponibles.
+*   **Etapa 1: Backend**
+    *   **Archivos a crear/tocar:**
+        *   Crear: `routes/categoria.routes.js`, `controllers/categoria.controller.js` y `services/categoria.service.js`.
+    *   **Consejos de Integración (Basado en errores de Fase 1):**
+        *   ⚠️ *Loader de Sequelize:* El archivo `models/index.js` pasa solo `(sequelize)`. **No** utilices `(sequelize, DataTypes)` en la definición de nuevos modelos. Importa `{ DataTypes } = require('sequelize')` al inicio del archivo.
+*   **Etapa 2: Frontend**
+    *   **Archivos a crear/tocar:**
+        *   `src/app/features/admin/categories/` (pantallas de listado y formularios modales de alta/edición).
+        *   `src/app/app.routes.ts` (registrar ruta `/admin/categorias`).
+    *   **Criterios de Aceptación:** CRUD 100% funcional. Si una categoría es borrada, no debe romper los eventos existentes (usar onDelete: SET NULL o validar que no tenga eventos vinculados).
+
+---
+
+### T-09 — ABM de Eventos
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/abm-eventos`
+*   **Descripción:** Implementar el panel administrativo para publicar, listar y modificar los eventos institucionales, incluyendo su vinculación con múltiples categorías.
+*   **Etapa 1: Backend**
+    *   **Archivos a crear/tocar:**
+        *   `services/evento.service.js` y `controllers/evento.controller.js` (agregar métodos de creación y edición vinculando categorías en la tabla intermedia).
+    *   **Consejos de Integración (Basado en errores de Fase 1):**
+        *   ⚠️ *Cuidado de Modelos:* El modelo `Evento` ya posee las relaciones `belongsToMany` con categorías y `hasMany` con inscripciones. Mantener el bloque `associate` intacto.
+*   **Etapa 2: Frontend**
+    *   **Archivos a crear/tocar:**
+        *   `src/app/features/admin/events/` (listado administrativo de eventos, formulario de alta con selectores de fecha, cupos y categorías).
+        *   `src/app/app.routes.ts` (rutas `/admin/eventos/crear` y `/admin/eventos/editar/:id`).
+    *   **Criterios de Aceptación:** Integridad completa de campos. Validación reactiva en el cliente previniendo cupos menores a 1 o fechas pasadas.
+
+---
+
+### T-10 — Dashboard Administrativo con KPIs & Gráficos
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/dashboard-kpis`
+*   **Descripción:** Reemplazar el placeholder administrativo por un panel integrado con KPIs y gráficos de rendimiento sobre las métricas del sistema.
+*   **Etapa 1: Backend**
+    *   **Archivos a crear/tocar:**
+        *   Crear `routes/dashboard.routes.js`, `controllers/dashboard.controller.js`, `services/dashboard.service.js`.
+        *   Endpoints: `GET /api/dashboard/kpis` (retorna total de usuarios, eventos registrados y promedio de valoraciones) y `GET /api/dashboard/charts` (datos formateados por mes o categoría).
+    *   **Consejos de Integración (Basado en errores de Fase 1):**
+        *   ⚠️ *Mapeo ORM:* El modelo `Valoracion` fue configurado con `timestamps: false` para coincidir con la migración. El modelo `Auditoria` usa la tabla física `'Auditoria'` con `created_at` mapeado.
+*   **Etapa 2: Frontend**
+    *   **Archivos a crear/tocar:**
+        *   `src/app/features/admin/dashboard/` (componente principal, renderizado de gráficos de barras y tortas usando `Chart.js` de manera reactiva).
+        *   `src/app/app.routes.ts` (conectar `/admin/dashboard` reemplazando el placeholder).
+    *   **Criterios de Aceptación:** Pantalla interactiva visualmente premium, con KPIs que muestren contadores animados y gráficos funcionales al cambiar el rango de fechas.
+
+---
+
+## 🚀 Fase 3 — Integraciones Avanzadas
 > *   Bot de Telegram (Notificaciones + 2FA).
 > *   Bot de Discord (Anuncio de eventos).
 > *   Web Push API (Notificaciones nativas en el navegador).
