@@ -4,7 +4,7 @@ const { AuditoriaAccion } = require('../models');
 const auditMiddleware = (entidadAfectada) => {
   return async (req, res, next) => {
     // Verificar si el usuario está autenticado
-    if (!req.user || !req.user.id) {
+    if (!req.usuario || !req.usuario.id) {
       return next();
     }
 
@@ -39,7 +39,7 @@ const auditMiddleware = (entidadAfectada) => {
 
           // 4. Guardamos en la base de datos usando el modelo y campos nuevos
           await AuditoriaAccion.create({
-            usuario_id: req.user.id,
+            usuario_id: req.usuario.id,
             accion: accionFinal,
             entidad: entidadAfectada, // ej: "Evento", "Inscripcion"
             entidad_id: recursoId,

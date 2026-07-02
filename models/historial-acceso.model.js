@@ -1,4 +1,6 @@
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const HistorialAcceso = sequelize.define('HistorialAcceso', {
     id: {
       type: DataTypes.UUID,

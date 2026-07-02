@@ -1,4 +1,6 @@
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const Valoracion = sequelize.define('Valoracion', {
     id: {
       type: DataTypes.UUID,
@@ -26,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'Valoracion',
-    timestamps: true
+    timestamps: false
   });
 // Relaciones leídas por el index.js
   Valoracion.associate = (models) => {

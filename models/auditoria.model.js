@@ -1,4 +1,6 @@
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const AuditoriaAccion = sequelize.define('AuditoriaAccion', {
     id: {
       type: DataTypes.UUID,
@@ -33,12 +35,13 @@ module.exports = (sequelize, DataTypes) => {
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-      field: 'created_at' // Fuerza a Sequelize a usar snake_case en la BD
+      defaultValue: DataTypes.NOW
     }
   }, {
-    tableName: 'AuditoriaAccion',
-    timestamps: true // Mantiene el manejo automático de fechas de Sequelize
+    tableName: 'Auditoria',
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updatedAt'
   });
 // Este bloque lo lee automáticamente tu index.js
   AuditoriaAccion.associate = (models) => {
