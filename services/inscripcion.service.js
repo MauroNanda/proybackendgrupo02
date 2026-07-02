@@ -138,6 +138,25 @@ class InscripcionService {
       if (siguienteEnEspera) {
         siguienteEnEspera.estado = 'CONFIRMADO';
         await siguienteEnEspera.save();
+
+        // Notificar al usuario promovido (Email + DB log)
+        try {
+          const usuarioPromovido = await Usuario.findByPk(siguienteEnEspera.usuarioId);
+          if (usuarioPromovido) {
+            await Notificacion.create({
+              usuario_id: siguienteEnEspera.usuarioId,
+              titulo: 'Inscripción Confirmada desde Lista de Espera',
+              mensaje: 'Se liberó un cupo y has sido promovido a la lista de confirmados.',
+              tipo: 'CUPO_LIBERADO'
+            });
+
+            const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
+            const htmlContent = fs.readFileSync(templatePath, 'utf8');
+            await enviarEmail(usuarioPromovido.email, '¡Tu inscripción ha sido confirmada!', htmlContent);
+          }
+        } catch (error) {
+          console.log('Error al notificar al usuario promovido:', error);
+        }
       }
     }
 
