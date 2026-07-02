@@ -17,9 +17,9 @@
 |---|---|---|---|
 | **T-00** | **Proyecto Base (Scaffolding)** | `HECHA` | [Ver detalle](#t-00--proyecto-base-scaffolding) |
 | **T-01** | **Auth & Seguridad (Completo)** | `HECHA` | [Ver detalle](#t-01--auth--seguridad-completo) |
-| **T-02** | **Eventos & Categorías (Completo)** | `LIBRE` | [Ver detalle](#t-02--eventos--categorías-completo) |
+| **T-02** | **Eventos & Categorías (Completo)** | `HECHA` | [Ver detalle](#t-02--eventos--categorías-completo) |
 | **T-03** | **Inscripciones & Check-in (Completo)** | `HECHA` | [Ver detalle](#t-03--inscripciones--check-in-completo) |
-| **T-04** | **Notificaciones (Completo)** | `LIBRE` | [Ver detalle](#t-04--notificaciones-completo) |
+| **T-04** | **Notificaciones (Completo)** | `HECHA` | [Ver detalle](#t-04--notificaciones-completo) |
 | **T-05** | **Dashboard & Modelos Auxiliares** | `LIBRE` | [Ver detalle](#t-05--dashboard--modelos-auxiliares-completo) |
 
 ---
@@ -71,7 +71,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-02 — Eventos & Categorías (Completo)
-*   **Estado:** `LIBRE`
+*   **Estado:** `HECHA`
 *   **Rama:** `feature/eventos-completo`
 *   **Descripción:** Implementar los modelos de eventos y categorías, posibilitando su listado y visualización detallada en el catálogo.
 
@@ -116,7 +116,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-04 — Notificaciones (Completo)
-*   **Estado:** `LIBRE`
+*   **Estado:** `HECHA`
 *   **Rama:** `feature/notificaciones-completo`
 *   **Descripción:** Crear el sistema de envío de emails transaccionales al confirmarse una inscripción en el sistema usando Resend.
 

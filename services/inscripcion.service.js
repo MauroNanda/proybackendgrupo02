@@ -1,6 +1,9 @@
-const { Inscripcion, Evento, Usuario } = require('../models');
+const { Notificacion, Inscripcion, Evento, Usuario } = require('../models');
 const HttpError = require('../utils/http-error');
 const crypto = require('crypto');
+const { enviarEmail } = require('../integrations/email.service');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Servicio para gestionar la lógica de negocio de Inscripciones.
@@ -52,22 +55,52 @@ class InscripcionService {
 
     const nuevoQrToken = crypto.randomUUID();
 
+    let inscripcionFinal;
+
     if (inscripcionExistente) {
       // Reutilizar el registro cancelado
       inscripcionExistente.estado = estadoFinal;
       inscripcionExistente.qr_token = nuevoQrToken;
       await inscripcionExistente.save();
-      return inscripcionExistente;
+      inscripcionFinal = inscripcionExistente;
     } else {
       // Crear nueva inscripción
-      return await Inscripcion.create({
+      inscripcionFinal = await Inscripcion.create({
         usuarioId,
         eventoId,
         estado: estadoFinal,
         qr_token: nuevoQrToken
       });
     }
+
+
+    // --- LÓGICA DE NOTIFICACIÓN  ---
+    try {
+      const usuario = await Usuario.findByPk(usuarioId);
+
+      // 1. Guardar en base de datos
+      await Notificacion.create({
+        usuario_id: usuarioId,
+        titulo: 'Confirmación de Inscripción',
+        mensaje: `Te has inscrito exitosamente al evento.`,
+        tipo: 'INSCRIPCION'
+      });
+
+      // 2. Enviar el email
+      if (estadoFinal === 'CONFIRMADO') {
+        const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
+        const htmlContent = fs.readFileSync(templatePath, 'utf8');
+        await enviarEmail(usuario.email, '¡Inscripción confirmada!', htmlContent);
+      }
+    } catch (error) {
+      console.log("Error al notificar al usuario:", error);
+    }
+
+    return inscripcionFinal;
   }
+
+
+
 
   /**
    * Cancela una inscripción y promueve al siguiente en lista de espera si corresponde.
@@ -105,6 +138,25 @@ class InscripcionService {
       if (siguienteEnEspera) {
         siguienteEnEspera.estado = 'CONFIRMADO';
         await siguienteEnEspera.save();
+
+        // Notificar al usuario promovido (Email + DB log)
+        try {
+          const usuarioPromovido = await Usuario.findByPk(siguienteEnEspera.usuarioId);
+          if (usuarioPromovido) {
+            await Notificacion.create({
+              usuario_id: siguienteEnEspera.usuarioId,
+              titulo: 'Inscripción Confirmada desde Lista de Espera',
+              mensaje: 'Se liberó un cupo y has sido promovido a la lista de confirmados.',
+              tipo: 'CUPO_LIBERADO'
+            });
+
+            const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
+            const htmlContent = fs.readFileSync(templatePath, 'utf8');
+            await enviarEmail(usuarioPromovido.email, '¡Tu inscripción ha sido confirmada!', htmlContent);
+          }
+        } catch (error) {
+          console.log('Error al notificar al usuario promovido:', error);
+        }
       }
     }
 
