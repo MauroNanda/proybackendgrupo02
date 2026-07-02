@@ -10,9 +10,11 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4
       },
       usuario_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: false,
-        references: { model: 'Usuarios', key: 'id' }
+        references: { model: 'Usuarios', key: 'id' },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       titulo: { type: Sequelize.STRING },
       mensaje: { type: Sequelize.TEXT },
@@ -26,7 +28,7 @@ module.exports = {
     });
   },
 
-  async down (queryInterface, Sequelize) {
+  async down (queryInterface) {
     await queryInterface.dropTable('Notificaciones');
   }
 };

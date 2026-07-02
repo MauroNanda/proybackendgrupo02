@@ -17,7 +17,7 @@ module.exports = (sequelize) => {
             primaryKey: true
         },
         usuario_id: {
-            type: DataTypes.INTEGER, // O UUID, dependiendo de cómo sea el ID de tu tabla Usuario
+            type: DataTypes.UUID,
             allowNull: false
         },
         titulo: DataTypes.STRING,
