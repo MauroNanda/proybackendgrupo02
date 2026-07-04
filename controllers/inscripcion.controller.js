@@ -70,6 +70,46 @@ class InscripcionController {
       next(err);
     }
   }
+
+  async obtenerInscriptosPorEvento(req, res, next) {
+    try {
+      const { eventoId } = req.params;
+      const { estado, search, limit, page } = req.query;
+
+      if (!eventoId) {
+        return res.status(400).json({ error: { message: 'El eventoId es obligatorio.' } });
+      }
+
+      const result = await inscripcionService.obtenerInscriptosPorEvento(eventoId, {
+        estado,
+        search,
+        limit,
+        page
+      });
+
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async checkInManual(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: { message: 'El id de inscripción es obligatorio.' } });
+      }
+
+      const inscripcion = await inscripcionService.checkInManual(id);
+      res.json({
+        message: 'Check-in manual realizado con éxito.',
+        inscripcion
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new InscripcionController();

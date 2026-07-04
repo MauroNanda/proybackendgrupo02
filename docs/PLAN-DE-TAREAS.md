@@ -152,8 +152,8 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ## 📋 Detalle de Tareas — Fase 2 (Organizador MVP)
 
 ### T-06 — Listado de Inscriptos & Check-in Manual
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/inscriptos-checkin-manual`
+*   **Estado:** `COMPLETO`
+*   **Rama:** `feature/diseno-inscriptos-corporativo`
 *   **Descripción:** Permitir al organizador visualizar la lista de usuarios inscriptos a un evento y registrar su asistencia manualmente desde la interfaz administrativa.
 *   **Etapa 1: Backend**
     *   **Archivos a crear/tocar:**
