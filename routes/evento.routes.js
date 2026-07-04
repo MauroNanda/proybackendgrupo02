@@ -11,5 +11,6 @@ router.get('/:id', eventoController.obtenerPorId);
 
 router.post('/', authMiddleware, roleMiddleware(['ORGANIZADOR']), eventoController.crear);
 router.put('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), eventoController.actualizar);
+router.delete('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), eventoController.eliminar);
 
 module.exports = router;

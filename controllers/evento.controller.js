@@ -3,9 +3,10 @@ const eventoService = require('../services/evento.service');
 class EventoController {
   async listar(req, res, next) {
     try {
-      const { categoria } = req.query;
+      const { categoria, todos } = req.query;
+      const mostrarTodos = todos === 'true' || todos === true;
 
-      const eventos = await eventoService.listar(categoria);
+      const eventos = await eventoService.listar(categoria, mostrarTodos);
 
       res.json(eventos);
     } catch (error) {
@@ -64,8 +65,19 @@ async crear(req, res, next) {
       next(err);
     }
   }
+
+  async eliminar(req, res, next) {
+    try {
+      await eventoService.eliminar(req.params.id);
+      res.json({ mensaje: 'Evento eliminado correctamente' });
+    } catch (err) {
+      if (err.message === 'Evento no encontrado') {
+        res.status(404).json({ mensaje: err.message });
+      } else {
+        next(err);
+      }
+    }
+  }
 }
-
-
 
 module.exports = new EventoController();

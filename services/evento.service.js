@@ -1,10 +1,15 @@
-const { Evento, Categoria } = require('../models');
+const { Evento, Categoria, Inscripcion, EventoCategoria } = require('../models');
 
 class EventoService {
-  async listar(categoria) {
-    const where = {
-      estado: 'PUBLICADO',
-    };
+  async listar(categoria, todos = false) {
+    const where = {};
+
+    if (!todos) {
+      const { Op } = require('sequelize');
+      where.estado = {
+        [Op.in]: ['PUBLICADO', 'CANCELADO'],
+      };
+    }
 
     const include = [
       {
@@ -72,14 +77,22 @@ async actualizar(id, datos) {
         through: { attributes: [] },
       },
     ],
-  });
-}
+    });
+  }
 
-
-
-
-
-
+  async eliminar(id) {
+    const evento = await Evento.findByPk(id);
+    if (!evento) {
+      throw new Error('Evento no encontrado');
+    }
+    // Delete registrations (Inscripcion) associated with this event
+    await Inscripcion.destroy({ where: { eventoId: id } });
+    // Delete category relations (EventoCategoria)
+    await EventoCategoria.destroy({ where: { eventoId: id } });
+    // Delete the event
+    await evento.destroy();
+    return true;
+  }
 }
 
 module.exports = new EventoService();
