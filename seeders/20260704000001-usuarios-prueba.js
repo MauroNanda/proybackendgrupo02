@@ -16,8 +16,8 @@ module.exports = {
       {},
     );
 
-    const adminHash = await bcrypt.hash('admin', ROUNDS);
-    const userHash = await bcrypt.hash('user123', ROUNDS);
+    const adminHash = await bcrypt.hash('admin123', ROUNDS);
+    const userHash = await bcrypt.hash('user1234', ROUNDS);
 
     const now = new Date();
 
