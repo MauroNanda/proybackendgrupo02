@@ -23,9 +23,9 @@ const validacionRegistro = [
 ];
 
 const validacionLogin = [
-  body('email')
-    .notEmpty().withMessage('El correo electrónico es obligatorio')
-    .isEmail().withMessage('Debe proveer un correo electrónico válido'),
+  body('username')
+    .notEmpty().withMessage('El usuario es obligatorio')
+    .isLength({ max: 160 }).withMessage('El usuario no debe superar los 160 caracteres'),
   body('password')
     .notEmpty().withMessage('La contraseña es obligatoria'),
   validate,
