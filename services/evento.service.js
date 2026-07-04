@@ -39,19 +39,40 @@ class EventoService {
 
 
 async crear(datos) {
-  return await Evento.create(datos);
+  const { categorias, ...datosEvento } = datos;
+
+  const evento = await Evento.create(datosEvento);
+
+  if (categorias && categorias.length > 0) {
+    await evento.setCategorias(categorias);
+  }
+
+  return evento;
 }
 
 async actualizar(id, datos) {
+  const { categorias, ...datosEvento } = datos;
+
   const evento = await Evento.findByPk(id);
 
   if (!evento) {
     throw new Error('Evento no encontrado');
   }
 
-  await evento.update(datos);
+  await evento.update(datosEvento);
 
-  return evento;
+  if (categorias) {
+    await evento.setCategorias(categorias);
+  }
+
+  return await Evento.findByPk(id, {
+    include: [
+      {
+        model: Categoria,
+        through: { attributes: [] },
+      },
+    ],
+  });
 }
 
 

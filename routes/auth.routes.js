@@ -9,6 +9,10 @@ const validacionRegistro = [
   body('nombre')
     .notEmpty().withMessage('El nombre es obligatorio')
     .isLength({ max: 120 }).withMessage('El nombre no debe superar los 120 caracteres'),
+  body('username')
+    .notEmpty().withMessage('El nombre de usuario es obligatorio')
+    .isLength({ min: 3, max: 60 }).withMessage('El usuario debe tener entre 3 y 60 caracteres')
+    .matches(/^[a-zA-Z0-9_]+$/).withMessage('Solo letras, números y guiones bajos'),
   body('email')
     .notEmpty().withMessage('El correo electrónico es obligatorio')
     .isEmail().withMessage('Debe proveer un correo electrónico válido')
@@ -23,9 +27,9 @@ const validacionRegistro = [
 ];
 
 const validacionLogin = [
-  body('email')
-    .notEmpty().withMessage('El correo electrónico es obligatorio')
-    .isEmail().withMessage('Debe proveer un correo electrónico válido'),
+  body('username')
+    .notEmpty().withMessage('El usuario es obligatorio')
+    .isLength({ max: 160 }).withMessage('El usuario no debe superar los 160 caracteres'),
   body('password')
     .notEmpty().withMessage('La contraseña es obligatoria'),
   validate,

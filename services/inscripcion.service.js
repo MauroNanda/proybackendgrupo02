@@ -192,6 +192,101 @@ class InscripcionService {
 
     return inscripcion;
   }
+
+  /**
+   * Obtiene la lista de inscritos para un evento con filtros de búsqueda y estado.
+   */
+  async obtenerInscriptosPorEvento(eventoId, queryParams = {}) {
+    const { estado, search, limit = 10, page = 1 } = queryParams;
+    const offset = (page - 1) * limit;
+
+    const where = { eventoId };
+    if (estado) {
+      where.estado = estado;
+    }
+
+    const { Op } = require('sequelize');
+    const includeUserWhere = {};
+
+    if (search) {
+      includeUserWhere[Op.or] = [
+        { nombre: { [Op.iLike]: `%${search}%` } },
+        { email: { [Op.iLike]: `%${search}%` } }
+      ];
+    }
+
+    const result = await Inscripcion.findAndCountAll({
+      where,
+      include: [
+        {
+          model: Usuario,
+          as: 'usuario',
+          attributes: ['id', 'nombre', 'email', 'rol'],
+          where: Object.keys(includeUserWhere).length > 0 ? includeUserWhere : undefined
+        }
+      ],
+      limit: parseInt(limit, 10),
+      offset: parseInt(offset, 10),
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Calcular estadísticas agrupadas por estado para este evento
+    const statsResult = await Inscripcion.findAll({
+      where: { eventoId },
+      attributes: [
+        'estado',
+        [Inscripcion.sequelize.fn('COUNT', Inscripcion.sequelize.col('id')), 'count']
+      ],
+      group: ['estado']
+    });
+
+    const stats = {
+      CONFIRMADO: 0,
+      ESPERA: 0,
+      ASISTIO: 0,
+      CANCELADO: 0
+    };
+
+    statsResult.forEach(item => {
+      const state = item.getDataValue('estado');
+      const stateCount = parseInt(item.getDataValue('count'), 10) || 0;
+      if (state in stats) {
+        stats[state] = stateCount;
+      }
+    });
+
+    return {
+      rows: result.rows,
+      count: result.count,
+      stats
+    };
+  }
+
+  /**
+   * Registra check-in manual para una inscripción.
+   */
+  async checkInManual(id) {
+    const inscripcion = await Inscripcion.findByPk(id, {
+      include: [{ model: Usuario, as: 'usuario', attributes: ['id', 'nombre', 'email'] }]
+    });
+
+    if (!inscripcion) {
+      throw new HttpError('Inscripción no encontrada', 404);
+    }
+
+    if (inscripcion.estado === 'ASISTIO') {
+      throw new HttpError('La asistencia ya fue registrada previamente', 400);
+    }
+
+    if (inscripcion.estado !== 'CONFIRMADO') {
+      throw new HttpError('Solo se puede realizar el check-in para inscripciones confirmadas', 400);
+    }
+
+    inscripcion.estado = 'ASISTIO';
+    await inscripcion.save();
+
+    return inscripcion;
+  }
 }
 
 module.exports = new InscripcionService();
