@@ -1,43 +1,45 @@
 const service = require('../services/categoria.service');
 
 const listar = async (req, res, next) => {
-    try { 
-        res.json(await service.getAll()); 
-    } catch (err) { 
-        next(err); 
-    }
+  try {
+    res.json(await service.getAll());
+  } catch (err) {
+    next(err);
+  }
 };
 
 const crear = async (req, res, next) => {
-    try { 
-        res.status(201).json(await service.create(req.body)); 
-    } catch (err) { 
-        next(err); 
-    }
+  try {
+    res.status(201).json(await service.create(req.body));
+  } catch (err) {
+    next(err);
+  }
 };
 
 const editar = async (req, res, next) => {
-    try { 
-        const [updated] = await service.update(req.params.id, req.body);
-        if (updated) 
-            res.json({ message: 'Actualizado' });
-        else 
-            res.status(404).json({ message: 'No encontrado' });
-    } catch (err) { 
-        next(err); 
+  try {
+    const categoria = await service.update(req.params.id, req.body);
+    res.json(categoria);
+  } catch (err) {
+    if (err.message === 'Categoría no encontrada') {
+      res.status(404).json({ mensaje: err.message });
+    } else {
+      next(err);
     }
+  }
 };
 
 const eliminar = async (req, res, next) => {
-    try {
-        const deleted = await service.remove(req.params.id);
-        if (deleted) 
-            res.json({ message: 'Eliminado' });
-        else 
-            res.status(404).json({ message: 'No encontrado' });
-    } catch (err) { 
-        next(err); 
+  try {
+    await service.remove(req.params.id);
+    res.json({ mensaje: 'Categoría eliminada' });
+  } catch (err) {
+    if (err.message === 'Categoría no encontrada') {
+      res.status(404).json({ mensaje: err.message });
+    } else {
+      next(err);
     }
+  }
 };
 
 module.exports = { listar, crear, editar, eliminar };
