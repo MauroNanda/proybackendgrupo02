@@ -190,7 +190,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-08 — ABM de Categorías
-*   **Estado:** `LIBRE`
+*   **Estado:** `COMPLETO`
 *   **Rama:** `feature/abm-categorias`
 *   **Descripción:** Crear el panel administrativo para que el organizador administre (lista, crea, edita, elimina) las categorías de eventos disponibles.
 *   **Etapa 1: Backend**
@@ -207,7 +207,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-09 — ABM de Eventos
-*   **Estado:** `LIBRE`
+*   **Estado:** `COMPLETO`
 *   **Rama:** `feature/abm-eventos`
 *   **Descripción:** Implementar el panel administrativo para publicar, listar y modificar los eventos institucionales, incluyendo su vinculación con múltiples categorías.
 *   **Etapa 1: Backend**
