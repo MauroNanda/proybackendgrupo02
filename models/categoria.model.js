@@ -25,6 +25,7 @@ module.exports = (sequelize) => {
     through: db.EventoCategoria,
     foreignKey: 'categoriaId',
     otherKey: 'eventoId',
+    onDelete: 'CASCADE'
   });
 };
   return Categoria;
