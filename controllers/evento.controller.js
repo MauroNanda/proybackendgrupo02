@@ -22,7 +22,7 @@ class EventoController {
 
       if (!evento) {
         return res.status(404).json({
-          mensaje: 'Evento no encontrado',
+          error: { message: 'Evento no encontrado' },
         });
       }
 
@@ -71,11 +71,8 @@ async crear(req, res, next) {
       await eventoService.eliminar(req.params.id);
       res.json({ mensaje: 'Evento eliminado correctamente' });
     } catch (err) {
-      if (err.message === 'Evento no encontrado') {
-        res.status(404).json({ mensaje: err.message });
-      } else {
-        next(err);
-      }
+      // El servicio ahora lanza HttpError(404); el error-handler central unifica la respuesta.
+      next(err);
     }
   }
 }

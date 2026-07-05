@@ -31,9 +31,23 @@ app.use((_req, res) => {
 // ===== Error handler (debe ir al final) =====
 app.use(errorHandler);
 
+// ===== Validación de variables de entorno requeridas =====
+function validarEnv() {
+  const requeridas = ['DATABASE_URL', 'JWT_SECRET'];
+  const faltantes = requeridas.filter((clave) => !process.env[clave]);
+  if (faltantes.length > 0) {
+    throw new Error(
+      `Faltan variables de entorno requeridas: ${faltantes.join(', ')}. ` +
+      'Definilas en el archivo .env (ver .env.example).'
+    );
+  }
+}
+
 // ===== Arranque del servidor =====
 async function start() {
   try {
+    validarEnv();
+
     await sequelize.authenticate();
     console.log('[DB] Conexión con Neon.tech establecida.');
 

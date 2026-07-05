@@ -6,7 +6,10 @@ class NotificacionService {
    * Obtiene las notificaciones del usuario.
    */
   async obtenerPorUsuario(usuarioId, queryParams = {}) {
-    const { leida, limit = 10, page = 1 } = queryParams;
+    const { leida } = queryParams;
+    // Clamp de paginación para evitar valores fuera de rango (limit máx. 100).
+    const limit = Math.min(Math.max(parseInt(queryParams.limit, 10) || 10, 1), 100);
+    const page = Math.max(parseInt(queryParams.page, 10) || 1, 1);
     const offset = (page - 1) * limit;
 
     const where = { usuario_id: usuarioId };

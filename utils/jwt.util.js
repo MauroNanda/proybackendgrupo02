@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'convoca-secret-key-super-secure';
+// Sin valor por defecto: si JWT_SECRET no está definido, la app no debe arrancar
+// (la validación de arranque en app.js lo verifica antes de aceptar tráfico).
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 /**
