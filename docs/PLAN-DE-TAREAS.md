@@ -241,10 +241,124 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 
 ---
 
-## 🚀 Fase 3 — Integraciones Avanzadas
-> *   Bot de Telegram (Notificaciones + 2FA).
-> *   Bot de Discord (Anuncio de eventos).
-> *   Web Push API (Notificaciones nativas en el navegador).
-> *   Google Calendar Integration.
-> *   Google OAuth 2.0.
-> *   Autenticación de Dos Factores (2FA).
+## 📋 Detalle de Tareas — Fase 3 (Integraciones Avanzadas)
+
+> **Terreno preparado (rama `feature/fase3-preparacion`):** ya existe un **hub de notificaciones** (`integrations/notificaciones.js` + `integrations/channels/`) y un **sistema de hooks de eventos** (`integrations/eventos.hooks.js`). Gracias a esto, agregar Telegram, Web Push o Discord **no requiere tocar los servicios de negocio** (`inscripcion.service.js`, `evento.service.js`): alcanza con crear un archivo de canal/handler y registrarlo. Ver `integrations/README.md`.
+>
+> **APIs externas de la fase:** Google OAuth, Telegram, Discord, Web Push, Google Calendar (5 → cumple el mínimo de 4 de la consigna).
+
+| Tarea | Dominio | Dificultad | Toca Front | Estado |
+|---|---|---|---|---|
+| **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `LIBRE` |
+| **T-12** | Telegram Bot | 🔴 Difícil | Sí | `LIBRE` |
+| **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
+| **T-14** | Discord Bot | 🟢 Fácil-media | No | `LIBRE` |
+| **T-15** | Google Calendar | 🟢 Fácil | Solo front | `LIBRE` |
+
+---
+
+### T-11 — Google OAuth 2.0 (+ 2FA opcional)
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/auth-oauth-2fa`
+*   **Dificultad:** 🟡 Media. **Requisito de consigna** (§5: "Login social con APIs de Google (OAuth)").
+*   **Descripción:** Permitir iniciar sesión / registrarse con cuenta de Google. Como add-on **opcional** (suma en la rúbrica de seguridad), verificación en dos pasos (2FA) por usuario.
+*   **Circuito (OAuth):** `clic "Login Google"` → front redirige a `/api/auth/google` → consentimiento Google → `/api/auth/google/callback?code` → back canjea el `code` por el perfil → busca `Usuario` por `google_id`/`email`, si no existe lo crea (rol `ASISTENTE`) → firma JWT → redirige al front con el token → `AuthService` lo guarda → sesión iniciada.
+*   **Circuito (2FA opt-in):** login con password → si `two_factor_enabled` → **no** entrega JWT, genera código de 6 dígitos (con expiración) y lo envía por el hub (email/Telegram) → responde "2FA requerido" → el usuario ingresa el código en `POST /api/auth/2fa/verify` → si es válido y no expiró, recién ahí se entrega el JWT.
+
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `services/auth.service.js` y `controllers/auth.controller.js` (rama OAuth: crear/mapear usuario por `google_id`; rama 2FA: partir el login en dos pasos).
+    *   `routes/auth.routes.js` (nuevos endpoints: `GET /auth/google`, `GET /auth/google/callback`, `POST /auth/2fa/verify`, `POST /auth/2fa/enable`, `POST /auth/2fa/disable`).
+    *   `migrations/<timestamp>-2fa-y-oauth.js` (campos para el código 2FA temporal: `codigo_2fa`, `codigo_2fa_expira`; y cambiar el default de `two_factor_enabled` a **`false`**).
+    *   `models/usuario.model.js` (ajustar default de `two_factor_enabled`; los campos `google_id`/`avatar_url` ya existen).
+*   **Consejos de Integración:**
+    *   ⚠️ `auth.service.js` lo toca **solo esta tarea** (evitar conflictos con el resto del equipo).
+    *   ⚠️ El envío del código 2FA usa el hub de notificaciones ya existente (no reimplementar el email).
+*   **Deps / Env:** `google-auth-library`. Env: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`. Config previa: crear credenciales OAuth en Google Cloud Console.
+*   **Criterios de aceptación:** El login con Google crea/reusa el usuario y devuelve un JWT válido. Con 2FA activo, el password solo no alcanza: sin código válido no se entrega JWT. El 2FA es **opt-in** (apagado por defecto).
+
+#### Etapa 2: Frontend
+*   **Archivos a crear/tocar:**
+    *   Botón "Login con Google" en `login/` y `registro/` (la UI ya está maquetada) → redirige al endpoint del backend.
+    *   `features/auth/oauth-callback/` (recibe el token del redirect y lo guarda vía `AuthService`).
+    *   `features/.../perfil/` sección "Seguridad": switch de 2FA + pantalla de ingreso de código.
+*   **Criterios de aceptación:** El flujo de Google redirige y deja la sesión iniciada. El toggle de 2FA vive en el perfil (no en pantallas públicas) y refleja el estado real de la cuenta.
+
+---
+
+### T-12 — Telegram Bot
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/telegram-bot`
+*   **Dificultad:** 🔴 Difícil (ciclo de vida del bot + vinculación de cuenta).
+*   **Descripción:** Bot de Telegram para vincular la cuenta y enviar notificaciones (confirmación de inscripción, QR, recordatorios). Además actúa como canal de entrega del código 2FA de T-11.
+*   **Circuito (vinculación):** usuario en su perfil → "Vincular Telegram" → el backend genera un token corto ligado a su `id` → el front muestra el deeplink `t.me/<bot>?start=<token>` → el usuario abre Telegram y hace `/start` → el bot resuelve el token → guarda `Usuario.telegram_id` → confirma en el chat.
+*   **Circuito (notificación):** usuario se inscribe → `inscripcion.service` → **hub de notificaciones** → `telegram.channel.inscripcionConfirmada(usuario, evento)` → si hay `telegram_id`, el bot manda el mensaje + QR.
+
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `integrations/telegram.service.js` (inicialización del bot, `enviarMensaje(telegram_id, texto)`, manejo de `/start`).
+    *   `integrations/channels/telegram.channel.js` (implementa `inscripcionConfirmada`, `cupoLiberado`, etc.) y registrarlo en `integrations/notificaciones.js` (**una línea**).
+    *   Endpoint para generar el token de vinculación (en `auth`/`usuario`).
+*   **Consejos de Integración:**
+    *   ✅ Gracias al hub, **no hace falta tocar `inscripcion.service.js`**.
+    *   ⚠️ El campo `Usuario.telegram_id` ya existe.
+*   **Deps / Env:** `telegraf`. Env: `TELEGRAM_BOT_TOKEN`. Config previa: crear el bot con @BotFather.
+
+#### Etapa 2: Frontend
+*   **Archivos a crear/tocar:** sección "Seguridad"/"Integraciones" del perfil → botón "Vincular Telegram" que muestra el deeplink.
+*   **Criterios de aceptación:** Tras `/start`, la cuenta queda vinculada y las inscripciones llegan por Telegram a los usuarios vinculados.
+
+---
+
+### T-13 — Web Push (+ PWA opcional)
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/web-push`
+*   **Dificultad:** 🔴 Difícil (service worker + VAPID + nuevo modelo).
+*   **Descripción:** Notificaciones nativas del navegador/SO. Opcionalmente, convertir la app en PWA instalable (cubre el punto opcional de la consigna §3).
+*   **Circuito (suscripción):** usuario logueado → el service worker (front) pide permiso → obtiene la `PushSubscription` (endpoint + keys) → `POST /api/push/subscribe` → el backend la guarda en la tabla `PushSubscription` (ligada a `usuario_id`).
+*   **Circuito (notificación):** inscripción/recordatorio → **hub** → `push.channel` → `web-push` envía al endpoint → el navegador muestra la notificación nativa (incluso con la pestaña cerrada, vía SW).
+
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `models/push-subscription.model.js` + su migración (`usuario_id`, `endpoint`, `keys`).
+    *   `routes/push.routes.js` y `controllers/push.controller.js` (`POST /push/subscribe`).
+    *   `integrations/channels/push.channel.js` + registrarlo en el hub (**una línea**).
+*   **Deps / Env:** `web-push`. Env: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`.
+
+#### Etapa 2: Frontend
+*   **Archivos a crear/tocar:** service worker (push), `PushService` (pedir permiso, registrar suscripción). Opcional: `@angular/service-worker` para la PWA.
+*   **Criterios de aceptación:** El usuario que acepta el permiso recibe una notificación nativa al inscribirse. La suscripción queda persistida por usuario.
+
+---
+
+### T-14 — Discord Bot
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/discord-bot`
+*   **Dificultad:** 🟢 Fácil-media (**solo backend**, superficie chica).
+*   **Descripción:** Difundir automáticamente los eventos nuevos en un canal de Discord del servidor de la comunidad.
+*   **Circuito:** el organizador publica un evento → `evento.service` → `eventosHooks.alPublicarEvento(evento)` → handler de Discord → `discord.service.anunciar(evento)` → el bot postea un embed en el canal → los miembros lo ven. (Unidireccional sistema → Discord.)
+
+#### Etapa 1: Backend
+*   **Archivos a crear/tocar:**
+    *   `integrations/discord.service.js` (bot + `anunciarEvento(evento)`).
+    *   Registrar el handler con `eventosHooks.onPublicado(...)` al arrancar la app.
+*   **Consejos de Integración:**
+    *   ✅ Gracias al hook, **no hace falta tocar `evento.service.js`**.
+*   **Deps / Env:** `discord.js`. Env: `DISCORD_BOT_TOKEN`, `DISCORD_CHANNEL_ID`. Config previa: crear la app/bot en el Discord Developer Portal e invitarlo al server.
+*   **Criterios de aceptación:** Al publicar un evento, aparece el anuncio en el canal de Discord. Un fallo de Discord no rompe el alta/edición del evento (el hook aísla el error).
+
+---
+
+### T-15 — Google Calendar
+*   **Estado:** `LIBRE`
+*   **Rama:** `feature/google-calendar`
+*   **Dificultad:** 🟢 Fácil (**solo frontend**, sin backend ni deps).
+*   **Descripción:** Botón "Agregar a Google Calendar" en el detalle del evento.
+*   **Circuito:** usuario en el detalle del evento → clic "Agendar" → el front arma la URL `calendar.google.com/render?action=TEMPLATE&text=...&dates=...&location=...` con los datos del evento → abre una pestaña de Google Calendar prellenada → el usuario confirma en **su** calendario. Todo client-side.
+
+#### Etapa 1: Frontend
+*   **Archivos a crear/tocar:**
+    *   `features/public/event-detail/` (función que construye la URL a partir del evento) + botón.
+*   **Consejos de Integración:**
+    *   La versión simple **no requiere OAuth**. La versión avanzada (crear el evento vía API en el calendario del usuario) reutilizaría el OAuth de T-11.
+*   **Criterios de aceptación:** El botón abre Google Calendar con el título, fecha/hora y ubicación del evento ya cargados.

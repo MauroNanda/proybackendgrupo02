@@ -1,9 +1,7 @@
-const { Notificacion, Inscripcion, Evento, Usuario, sequelize } = require('../models');
+const { Inscripcion, Evento, Usuario, sequelize } = require('../models');
 const HttpError = require('../utils/http-error');
 const crypto = require('crypto');
-const { enviarEmail } = require('../integrations/email.service');
-const fs = require('fs');
-const path = require('path');
+const notificaciones = require('../integrations/notificaciones');
 
 /**
  * Servicio para gestionar la lógica de negocio de Inscripciones.
@@ -24,7 +22,7 @@ class InscripcionService {
   async inscribirse(usuarioId, eventoId) {
     // La validación de cupo y la creación se hacen dentro de una transacción con
     // bloqueo de fila del evento para evitar sobreventa por inscripciones concurrentes.
-    const { inscripcionFinal, estadoFinal } = await sequelize.transaction(async (t) => {
+    const { inscripcionFinal, estadoFinal, evento } = await sequelize.transaction(async (t) => {
       // 1. Verificar si el evento existe (bloqueando la fila hasta el commit)
       const evento = await Evento.findByPk(eventoId, {
         transaction: t,
@@ -75,29 +73,22 @@ class InscripcionService {
         }, { transaction: t });
       }
 
-      return { inscripcionFinal: inscripcion, estadoFinal: estado };
+      return { inscripcionFinal: inscripcion, estadoFinal: estado, evento };
     });
 
-    // --- LÓGICA DE NOTIFICACIÓN (fuera de la transacción; es un efecto secundario) ---
+    // --- NOTIFICACIÓN (fuera de la transacción; efecto secundario, no bloquea) ---
+    // El hub decide qué canales usar (in-app, email, y a futuro Telegram/Push).
     try {
       const usuario = await Usuario.findByPk(usuarioId);
-
-      // 1. Guardar en base de datos
-      await Notificacion.create({
-        usuario_id: usuarioId,
-        titulo: 'Confirmación de Inscripción',
-        mensaje: `Te has inscrito exitosamente al evento.`,
-        tipo: 'INSCRIPCION'
-      });
-
-      // 2. Enviar el email
-      if (estadoFinal === 'CONFIRMADO') {
-        const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
-        const htmlContent = fs.readFileSync(templatePath, 'utf8');
-        await enviarEmail(usuario.email, '¡Inscripción confirmada!', htmlContent);
+      if (usuario) {
+        if (estadoFinal === 'CONFIRMADO') {
+          await notificaciones.inscripcionConfirmada(usuario, evento);
+        } else {
+          await notificaciones.inscripcionEnEspera(usuario, evento);
+        }
       }
     } catch (error) {
-      console.log("Error al notificar al usuario:", error);
+      console.log('Error al notificar al usuario:', error);
     }
 
     return inscripcionFinal;
@@ -157,16 +148,7 @@ class InscripcionService {
       try {
         const usuarioPromovido = await Usuario.findByPk(promovidoId);
         if (usuarioPromovido) {
-          await Notificacion.create({
-            usuario_id: promovidoId,
-            titulo: 'Inscripción Confirmada desde Lista de Espera',
-            mensaje: 'Se liberó un cupo y has sido promovido a la lista de confirmados.',
-            tipo: 'CUPO_LIBERADO'
-          });
-
-          const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
-          const htmlContent = fs.readFileSync(templatePath, 'utf8');
-          await enviarEmail(usuarioPromovido.email, '¡Tu inscripción ha sido confirmada!', htmlContent);
+          await notificaciones.cupoLiberado(usuarioPromovido);
         }
       } catch (error) {
         console.log('Error al notificar al usuario promovido:', error);

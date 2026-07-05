@@ -31,12 +31,17 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] Remover archivos binarios pesados (mockups) del repositorio Git y referenciarlos en un README.md hacia Drive para evitar bloat.
 - [x] **Fase 2:** Dashboard administrativo con KPIs y gráficos (T-10) mergeado a `main` en ambos repos.
 - [x] **Mejoras sutiles:** ronda de robustez (backend) y UX/rendimiento (frontend) en la rama `feature/mejoras-sutiles`.
+- [x] **Fase 3 — Terreno:** hub de notificaciones y hooks de eventos para desacoplar integraciones (rama `feature/fase3-preparacion`).
+- [x] **Fase 3 — Planificación:** tareas T-11 a T-15 detalladas en `PLAN-DE-TAREAS.md`.
 - [ ] Crear Bot de Telegram y Bot de Discord (Fase 3).
 - [ ] Configurar Google OAuth en Google Cloud Console (Fase 3).
 - [ ] Configurar cuenta de Resend (necesario para Fase 1, dominio Notificaciones).
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-05 (Sesión 10):** Preparación de Fase 3.
+    *   **Terreno (rama `feature/fase3-preparacion`):** hub de notificaciones (`integrations/notificaciones.js` + `channels/`) y hooks de eventos (`integrations/eventos.hooks.js`), para que las integraciones se sumen creando un archivo y registrándolo, sin tocar `inscripcion.service`/`evento.service`. Guía en `integrations/README.md`.
+    *   **Planificación:** definidas las tareas T-11 a T-15 en `PLAN-DE-TAREAS.md` (Google OAuth + 2FA opt-in, Telegram, Web Push, Discord, Google Calendar) con circuito, archivos, dependencias y dificultad por tarea.
 *   **2026-07-04 (Sesión 9):** Cierre de Fase 2 y ronda de mejoras.
     *   **Dashboard (T-10):** Panel administrativo con KPIs y gráficos (Chart.js) finalizado y mergeado a `main` en backend y frontend.
     *   **Mejoras sutiles (rama `feature/mejoras-sutiles`):** endurecimiento del backend (transacciones con bloqueo en inscripciones/cancelaciones para evitar sobreventa de cupos, rate limiting en autenticación, validaciones y `.trim()` en rutas, paginación acotada, unificación de errores, índices en `Inscripciones`) y del frontend (corrección de fugas de memoria en countdown y catálogo, spinner de carga y `trackBy` en el catálogo, timeout en el health-check, accesibilidad ARIA, limpieza de código muerto). `JWT_SECRET` pasa a ser obligatorio solo en producción (fallback en desarrollo, con `.env.example` de referencia).
