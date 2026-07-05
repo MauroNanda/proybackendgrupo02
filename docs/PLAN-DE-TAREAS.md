@@ -174,7 +174,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-07 — Exportación y Reportes (PDF y Excel)
-*   **Estado:** `LIBRE`
+*   **Estado:** `COMPLETO`
 *   **Rama:** `feature/exportacion-reportes`
 *   **Descripción:** Añadir servicios del lado del cliente para exportar la lista de inscriptos a Excel y descargar los pases confirmados (tickets) a PDF.
 *   **Etapa 1: Frontend**
