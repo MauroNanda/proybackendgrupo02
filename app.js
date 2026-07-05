@@ -8,6 +8,9 @@ const sequelize = require('./config/db');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler.middleware');
 const sanitize = require('./middlewares/sanitize.middleware');
+// Integración con Discord para anuncios de eventos
+const discordService = require('./integrations/discord.service');
+const eventosHooks = require('./integrations/eventos.hooks');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,7 +63,12 @@ async function start() {
       console.log(`[Convoca API] Servidor corriendo en http://localhost:${PORT}`);
       console.log(`[Convoca API] Health check: http://localhost:${PORT}/api/health`);
     });
-  } catch (err) {
+    eventosHooks.onPublicado(async (evento) => {
+        await discordService.anunciarEvento(evento);
+      });
+      console.log('[Hooks] Escuchando publicaciones de eventos para el Bot de Discord.');
+  }
+   catch (err) {
     console.error('[FATAL] No se pudo iniciar el servidor:', err.message);
     process.exit(1);
   }
