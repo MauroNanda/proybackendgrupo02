@@ -1,8 +1,11 @@
 const jwt = require('jsonwebtoken');
 
-// Sin valor por defecto: si JWT_SECRET no está definido, la app no debe arrancar
-// (la validación de arranque en app.js lo verifica antes de aceptar tráfico).
-const JWT_SECRET = process.env.JWT_SECRET;
+// En producción JWT_SECRET es obligatorio (lo valida app.js al arrancar).
+// En desarrollo, si no está definido, se usa un secreto de respaldo para no
+// romper el setup local del equipo (solo hace falta configurar la DB).
+const isProd = process.env.NODE_ENV === 'production';
+const JWT_SECRET =
+  process.env.JWT_SECRET || (isProd ? undefined : 'convoca-dev-secret-inseguro-no-usar-en-prod');
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 /**
