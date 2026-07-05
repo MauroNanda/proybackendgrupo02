@@ -3,10 +3,10 @@ const eventoService = require('../services/evento.service');
 class EventoController {
   async listar(req, res, next) {
     try {
-      const { categoria, todos } = req.query;
+      const { categoria, todos, search } = req.query;
       const mostrarTodos = todos === 'true' || todos === true;
 
-      const eventos = await eventoService.listar(categoria, mostrarTodos);
+      const eventos = await eventoService.listar(categoria, mostrarTodos, search);
 
       res.json(eventos);
     } catch (error) {

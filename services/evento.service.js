@@ -1,13 +1,19 @@
 const { Evento, Categoria, Inscripcion, EventoCategoria } = require('../models');
 
 class EventoService {
-  async listar(categoria, todos = false) {
+  async listar(categoria, todos = false, search = '') {
     const where = {};
+    const { Op } = require('sequelize');
 
     if (!todos) {
-      const { Op } = require('sequelize');
       where.estado = {
         [Op.in]: ['PUBLICADO', 'CANCELADO'],
+      };
+    }
+
+    if (search) {
+      where.titulo = {
+        [Op.iLike]: `%${search}%`,
       };
     }
 
