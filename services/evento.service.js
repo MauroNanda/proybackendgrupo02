@@ -1,5 +1,6 @@
 const { Evento, Categoria, Inscripcion, EventoCategoria, sequelize } = require('../models');
 const HttpError = require('../utils/http-error');
+const eventosHooks = require('../integrations/eventos.hooks');
 
 class EventoService {
   async listar(categoria, todos = false, search = '') {
@@ -59,6 +60,11 @@ async crear(datos) {
     await evento.setCategorias(categorias);
   }
 
+  // Si nace publicado, disparar el hook (ej. difusión en Discord). No bloquea.
+  if (evento.estado === 'PUBLICADO') {
+    await eventosHooks.alPublicarEvento(evento);
+  }
+
   return evento;
 }
 
@@ -71,10 +77,17 @@ async actualizar(id, datos) {
     throw new HttpError('Evento no encontrado', 404);
   }
 
+  const estadoAnterior = evento.estado;
+
   await evento.update(datosEvento);
 
   if (categorias) {
     await evento.setCategorias(categorias);
+  }
+
+  // Disparar el hook solo en la transición a PUBLICADO (no en cada edición).
+  if (evento.estado === 'PUBLICADO' && estadoAnterior !== 'PUBLICADO') {
+    await eventosHooks.alPublicarEvento(evento);
   }
 
   return await Evento.findByPk(id, {
