@@ -44,4 +44,18 @@ router.post('/registro', registroLimiter, validacionRegistro, authController.reg
 router.post('/login', loginLimiter, validacionLogin, authController.login);
 router.get('/perfil', authMiddleware, authController.perfil);
 
+// Rutas para Google OAuth
+router.get('/google', authController.redirigirGoogle);
+router.get('/google/callback', authController.callbackGoogle);
+
+// Ruta para verificar el 2FA
+router.post('/2fa/verify', [
+  body('email').isEmail().withMessage('Debe proveer un correo válido'),
+  body('codigo').isLength({ min: 6, max: 6 }).withMessage('El código debe tener 6 dígitos'),
+  validate
+], authController.verificar2FA);
+
+// Ruta para habilitar/deshabilitar 2FA (protegida por autenticación)
+router.post('/2fa/config', authMiddleware, authController.configurar2FA);
+
 module.exports = router;

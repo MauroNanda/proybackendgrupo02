@@ -4,6 +4,7 @@ const { Usuario } = require('../models');
 const HttpError = require('../utils/http-error');
 const { firmarToken } = require('../utils/jwt.util');
 const { serializarUsuario } = require('../utils/usuario.util');
+const notificacionService = require('./notificacion.service');
 
 const BCRYPT_ROUNDS = 10;
 
@@ -64,6 +65,10 @@ class AuthService {
       throw new HttpError('Credenciales inválidas', 401);
     }
 
+    if (usuario.two_factor_enabled) {
+    return await this._iniciarFlujo2FA(usuario);
+}
+
     const token = this._generarToken(usuario);
 
     return {
@@ -81,6 +86,80 @@ class AuthService {
       throw new HttpError('Usuario no encontrado', 404);
     }
     return serializarUsuario(usuario);
+  }
+
+  /**
+   * Maneja el login vía Google.
+   */
+  async loginGoogle({ id, email, displayName, picture }) {
+    let usuario = await Usuario.findOne({ where: { google_id: id } });
+
+    if (!usuario) {
+      usuario = await Usuario.create({
+        nombre: displayName,
+        email: email,
+        google_id: id,
+        avatar_url: picture,
+        rol: 'ASISTENTE',
+      });
+    }
+
+    if (usuario.two_factor_enabled) {
+      return await this._iniciarFlujo2FA(usuario);
+    }
+
+    return {
+      token: this._generarToken(usuario),
+      usuario: serializarUsuario(usuario),
+    };
+  }
+
+  /**
+   * Valida el código 2FA ingresado por el usuario.
+   */
+  async validarCodigo2FA(email, codigo) {
+    const usuario = await Usuario.findOne({ where: { email } });
+
+    if (!usuario || usuario.codigo_2fa !== codigo || usuario.codigo_2fa_expira < new Date()) {
+      throw new HttpError('Código inválido o expirado', 401);
+    }
+
+    // Limpiamos los campos temporales
+    usuario.codigo_2fa = null;
+    usuario.codigo_2fa_expira = null;
+    await usuario.save();
+
+    return {
+      token: this._generarToken(usuario),
+      usuario: serializarUsuario(usuario),
+    };
+  }
+
+  /**
+   * Método auxiliar privado para generar y enviar el código 2FA
+   */
+  async _iniciarFlujo2FA(usuario) {
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    usuario.codigo_2fa = codigo;
+    usuario.codigo_2fa_expira = new Date(Date.now() + 10 * 60000); // 10 min
+    await usuario.save();
+
+    await notificacionService.enviar(usuario.email, `Tu código es: ${codigo}`);
+    
+    return { requiere2FA: true, mensaje: 'Código enviado a tu email' };
+  }
+
+  async cambiarEstado2FA(usuarioId, habilitar) {
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) throw new HttpError('Usuario no encontrado', 404);
+
+    usuario.two_factor_enabled = habilitar;
+    await usuario.save();
+    
+    return { 
+      message: habilitar ? '2FA habilitado correctamente' : '2FA desactivado correctamente',
+      two_factor_enabled: usuario.two_factor_enabled 
+    };
   }
 
   _generarToken(usuario) {
