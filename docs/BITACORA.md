@@ -1,9 +1,9 @@
 # Bitácora del Proyecto y Estado Actual
 
-## Estado Global: `Fase 0 — Proyecto Base (en marcha)`
+## Estado Global: `Fase 2 completada — preparando Fase 3 (Integraciones)`
 
 ### Resumen del Estado Actual
-Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. Falta inicializar el código fuente en ambos repos y crear el Proyecto Base en `develop`.
+Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. El Proyecto Base y las Fases 1 y 2 (Asistente MVP y Organizador MVP) ya están implementados y mergeados a `main`; el proyecto se encuentra preparando la Fase 3 (Integraciones Avanzadas).
 
 ### Repositorios
 *   **Backend:** https://github.com/MauroNanda/proybackendgrupo02
@@ -29,12 +29,17 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] PR del Proyecto Base a `main` en ambos repos. **Habilita el inicio de Fase 1 al mergearse.**
 - [x] Esperar resultado de Claude Design → crear `docs/DISEÑO.md`, `src/styles/_variables.scss` y aplicar paleta + tipografía + logo en layouts.
 - [x] Remover archivos binarios pesados (mockups) del repositorio Git y referenciarlos en un README.md hacia Drive para evitar bloat.
+- [x] **Fase 2:** Dashboard administrativo con KPIs y gráficos (T-10) mergeado a `main` en ambos repos.
+- [x] **Mejoras sutiles:** ronda de robustez (backend) y UX/rendimiento (frontend) en la rama `feature/mejoras-sutiles`.
 - [ ] Crear Bot de Telegram y Bot de Discord (Fase 3).
 - [ ] Configurar Google OAuth en Google Cloud Console (Fase 3).
 - [ ] Configurar cuenta de Resend (necesario para Fase 1, dominio Notificaciones).
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-04 (Sesión 9):** Cierre de Fase 2 y ronda de mejoras.
+    *   **Dashboard (T-10):** Panel administrativo con KPIs y gráficos (Chart.js) finalizado y mergeado a `main` en backend y frontend.
+    *   **Mejoras sutiles (rama `feature/mejoras-sutiles`):** endurecimiento del backend (transacciones con bloqueo en inscripciones/cancelaciones para evitar sobreventa de cupos, rate limiting en autenticación, validaciones y `.trim()` en rutas, paginación acotada, unificación de errores, índices en `Inscripciones`) y del frontend (corrección de fugas de memoria en countdown y catálogo, spinner de carga y `trackBy` en el catálogo, timeout en el health-check, accesibilidad ARIA, limpieza de código muerto). `JWT_SECRET` pasa a ser obligatorio solo en producción (fallback en desarrollo, con `.env.example` de referencia).
 *   **2026-06-27 (Sesión 8):** Integración de diseño y limpieza de binarios.
     *   **Diseño:** Seleccionada la paleta "Arctic Reflection" (azules elegantes con accent ámbar). Creados los tokens de diseño y variables SCSS en el frontend, importadas las Google Fonts (Space Grotesk + Inter) y aplicados los estilos a los layouts público y administrativo. Creado `docs/DISEÑO.md` con las especificaciones del Design System.
     *   **Limpieza:** Eliminados los archivos binarios pesados de los mockups (PNGs y PDF) del repositorio Git para evitar sobrecarga de historial. Agregado `mockup/README.md` con la referencia al Google Drive compartido.

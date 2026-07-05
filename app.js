@@ -31,9 +31,28 @@ app.use((_req, res) => {
 // ===== Error handler (debe ir al final) =====
 app.use(errorHandler);
 
+// ===== Validación de variables de entorno requeridas =====
+function validarEnv() {
+  // DATABASE_URL siempre es obligatoria. JWT_SECRET solo es obligatoria en
+  // producción; en desarrollo hay un secreto de respaldo (ver jwt.util.js).
+  const requeridas = ['DATABASE_URL'];
+  if (process.env.NODE_ENV === 'production') {
+    requeridas.push('JWT_SECRET');
+  }
+  const faltantes = requeridas.filter((clave) => !process.env[clave]);
+  if (faltantes.length > 0) {
+    throw new Error(
+      `Faltan variables de entorno requeridas: ${faltantes.join(', ')}. ` +
+      'Definilas en el archivo .env (ver .env.example).'
+    );
+  }
+}
+
 // ===== Arranque del servidor =====
 async function start() {
   try {
+    validarEnv();
+
     await sequelize.authenticate();
     console.log('[DB] Conexión con Neon.tech establecida.');
 

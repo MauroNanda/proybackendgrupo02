@@ -31,6 +31,10 @@ module.exports = (sequelize) => {
     },
     {
       tableName: 'Inscripciones',
+      indexes: [
+        { name: 'idx_inscripciones_evento_estado', fields: ['eventoId', 'estado'] },
+        { name: 'idx_inscripciones_usuario', fields: ['usuarioId'] },
+      ],
     }
   );
 

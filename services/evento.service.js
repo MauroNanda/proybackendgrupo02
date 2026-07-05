@@ -1,13 +1,20 @@
-const { Evento, Categoria, Inscripcion, EventoCategoria } = require('../models');
+const { Evento, Categoria, Inscripcion, EventoCategoria, sequelize } = require('../models');
+const HttpError = require('../utils/http-error');
 
 class EventoService {
-  async listar(categoria, todos = false) {
+  async listar(categoria, todos = false, search = '') {
     const where = {};
+    const { Op } = require('sequelize');
 
     if (!todos) {
-      const { Op } = require('sequelize');
       where.estado = {
         [Op.in]: ['PUBLICADO', 'CANCELADO'],
+      };
+    }
+
+    if (search) {
+      where.titulo = {
+        [Op.iLike]: `%${search}%`,
       };
     }
 
@@ -61,7 +68,7 @@ async actualizar(id, datos) {
   const evento = await Evento.findByPk(id);
 
   if (!evento) {
-    throw new Error('Evento no encontrado');
+    throw new HttpError('Evento no encontrado', 404);
   }
 
   await evento.update(datosEvento);
@@ -81,17 +88,20 @@ async actualizar(id, datos) {
   }
 
   async eliminar(id) {
-    const evento = await Evento.findByPk(id);
-    if (!evento) {
-      throw new Error('Evento no encontrado');
-    }
-    // Delete registrations (Inscripcion) associated with this event
-    await Inscripcion.destroy({ where: { eventoId: id } });
-    // Delete category relations (EventoCategoria)
-    await EventoCategoria.destroy({ where: { eventoId: id } });
-    // Delete the event
-    await evento.destroy();
-    return true;
+    // Borrado atómico: si falla algún paso, no queda el evento a medias.
+    return await sequelize.transaction(async (t) => {
+      const evento = await Evento.findByPk(id, { transaction: t });
+      if (!evento) {
+        throw new HttpError('Evento no encontrado', 404);
+      }
+      // Inscripciones asociadas al evento
+      await Inscripcion.destroy({ where: { eventoId: id }, transaction: t });
+      // Relaciones con categorías
+      await EventoCategoria.destroy({ where: { eventoId: id }, transaction: t });
+      // El evento
+      await evento.destroy({ transaction: t });
+      return true;
+    });
   }
 }
 

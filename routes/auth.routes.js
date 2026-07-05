@@ -4,16 +4,20 @@ const { body } = require('express-validator');
 const authController = require('../controllers/auth.controller');
 const validate = require('../middlewares/validate.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
+const { loginLimiter, registroLimiter } = require('../middlewares/rate-limit.middleware');
 
 const validacionRegistro = [
   body('nombre')
+    .trim()
     .notEmpty().withMessage('El nombre es obligatorio')
     .isLength({ max: 120 }).withMessage('El nombre no debe superar los 120 caracteres'),
   body('username')
+    .trim()
     .notEmpty().withMessage('El nombre de usuario es obligatorio')
     .isLength({ min: 3, max: 60 }).withMessage('El usuario debe tener entre 3 y 60 caracteres')
     .matches(/^[a-zA-Z0-9_]+$/).withMessage('Solo letras, números y guiones bajos'),
   body('email')
+    .trim()
     .notEmpty().withMessage('El correo electrónico es obligatorio')
     .isEmail().withMessage('Debe proveer un correo electrónico válido')
     .isLength({ max: 160 }).withMessage('El correo electrónico no debe superar los 160 caracteres'),
@@ -28,6 +32,7 @@ const validacionRegistro = [
 
 const validacionLogin = [
   body('username')
+    .trim()
     .notEmpty().withMessage('El usuario es obligatorio')
     .isLength({ max: 160 }).withMessage('El usuario no debe superar los 160 caracteres'),
   body('password')
@@ -35,8 +40,8 @@ const validacionLogin = [
   validate,
 ];
 
-router.post('/registro', validacionRegistro, authController.registro);
-router.post('/login', validacionLogin, authController.login);
+router.post('/registro', registroLimiter, validacionRegistro, authController.registro);
+router.post('/login', loginLimiter, validacionLogin, authController.login);
 router.get('/perfil', authMiddleware, authController.perfil);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const { Notificacion, Inscripcion, Evento, Usuario } = require('../models');
+const { Notificacion, Inscripcion, Evento, Usuario, sequelize } = require('../models');
 const HttpError = require('../utils/http-error');
 const crypto = require('crypto');
 const { enviarEmail } = require('../integrations/email.service');
@@ -22,59 +22,63 @@ class InscripcionService {
    * Registra un usuario a un evento con validación de cupo y lista de espera.
    */
   async inscribirse(usuarioId, eventoId) {
-    // 1. Verificar si el evento existe
-    const evento = await Evento.findByPk(eventoId);
-    if (!evento) {
-      throw new HttpError('El evento no existe', 404);
-    }
+    // La validación de cupo y la creación se hacen dentro de una transacción con
+    // bloqueo de fila del evento para evitar sobreventa por inscripciones concurrentes.
+    const { inscripcionFinal, estadoFinal } = await sequelize.transaction(async (t) => {
+      // 1. Verificar si el evento existe (bloqueando la fila hasta el commit)
+      const evento = await Evento.findByPk(eventoId, {
+        transaction: t,
+        lock: t.LOCK.UPDATE,
+      });
+      if (!evento) {
+        throw new HttpError('El evento no existe', 404);
+      }
 
-    // 2. Verificar si el usuario ya tiene una inscripción activa (CONFIRMADO, ESPERA, ASISTIO)
-    const inscripcionExistente = await Inscripcion.findOne({
-      where: { usuarioId, eventoId }
-    });
+      // 2. Verificar si el usuario ya tiene una inscripción activa
+      const inscripcionExistente = await Inscripcion.findOne({
+        where: { usuarioId, eventoId },
+        transaction: t,
+      });
 
-    if (inscripcionExistente) {
-      if (['CONFIRMADO', 'ESPERA', 'ASISTIO'].includes(inscripcionExistente.estado)) {
+      if (inscripcionExistente &&
+          ['CONFIRMADO', 'ESPERA', 'ASISTIO'].includes(inscripcionExistente.estado)) {
         throw new HttpError('Ya te encuentras registrado en este evento con estado: ' + inscripcionExistente.estado, 400);
       }
-    }
 
-    // 3. Contar cupos ocupados (inscripciones en estado CONFIRMADO o ASISTIO)
-    const totalConfirmados = await Inscripcion.count({
-      where: {
-        eventoId,
-        estado: ['CONFIRMADO', 'ASISTIO']
+      // 3. Contar cupos ocupados dentro de la transacción
+      const totalConfirmados = await Inscripcion.count({
+        where: {
+          eventoId,
+          estado: ['CONFIRMADO', 'ASISTIO']
+        },
+        transaction: t,
+      });
+
+      // Determinar estado de la inscripción
+      const estado = totalConfirmados >= evento.cupo_maximo ? 'ESPERA' : 'CONFIRMADO';
+      const nuevoQrToken = crypto.randomUUID();
+
+      let inscripcion;
+      if (inscripcionExistente) {
+        // Reutilizar el registro cancelado
+        inscripcionExistente.estado = estado;
+        inscripcionExistente.qr_token = nuevoQrToken;
+        await inscripcionExistente.save({ transaction: t });
+        inscripcion = inscripcionExistente;
+      } else {
+        // Crear nueva inscripción
+        inscripcion = await Inscripcion.create({
+          usuarioId,
+          eventoId,
+          estado,
+          qr_token: nuevoQrToken
+        }, { transaction: t });
       }
+
+      return { inscripcionFinal: inscripcion, estadoFinal: estado };
     });
 
-    // Determinar estado de la inscripción
-    let estadoFinal = 'CONFIRMADO';
-    if (totalConfirmados >= evento.cupo_maximo) {
-      estadoFinal = 'ESPERA';
-    }
-
-    const nuevoQrToken = crypto.randomUUID();
-
-    let inscripcionFinal;
-
-    if (inscripcionExistente) {
-      // Reutilizar el registro cancelado
-      inscripcionExistente.estado = estadoFinal;
-      inscripcionExistente.qr_token = nuevoQrToken;
-      await inscripcionExistente.save();
-      inscripcionFinal = inscripcionExistente;
-    } else {
-      // Crear nueva inscripción
-      inscripcionFinal = await Inscripcion.create({
-        usuarioId,
-        eventoId,
-        estado: estadoFinal,
-        qr_token: nuevoQrToken
-      });
-    }
-
-
-    // --- LÓGICA DE NOTIFICACIÓN  ---
+    // --- LÓGICA DE NOTIFICACIÓN (fuera de la transacción; es un efecto secundario) ---
     try {
       const usuario = await Usuario.findByPk(usuarioId);
 
@@ -106,57 +110,66 @@ class InscripcionService {
    * Cancela una inscripción y promueve al siguiente en lista de espera si corresponde.
    */
   async cancelar(usuarioId, eventoId) {
-    // 1. Buscar la inscripción activa
-    const inscripcion = await Inscripcion.findOne({
-      where: {
-        usuarioId,
-        eventoId,
-        estado: ['CONFIRMADO', 'ESPERA']
-      }
-    });
-
-    if (!inscripcion) {
-      throw new HttpError('No tienes ninguna inscripción activa para este evento', 404);
-    }
-
-    const estadoAnterior = inscripcion.estado;
-
-    // 2. Cambiar estado a CANCELADO
-    inscripcion.estado = 'CANCELADO';
-    await inscripcion.save();
-
-    // 3. Si estaba CONFIRMADO, promover al primero en lista de espera (ESPERA)
-    if (estadoAnterior === 'CONFIRMADO') {
-      const siguienteEnEspera = await Inscripcion.findOne({
+    // Cancelación y promoción del siguiente en lista de espera se hacen atómicamente.
+    const { inscripcion, promovidoId } = await sequelize.transaction(async (t) => {
+      // 1. Buscar la inscripción activa
+      const insc = await Inscripcion.findOne({
         where: {
+          usuarioId,
           eventoId,
-          estado: 'ESPERA'
+          estado: ['CONFIRMADO', 'ESPERA']
         },
-        order: [['createdAt', 'ASC']]
+        transaction: t,
       });
 
-      if (siguienteEnEspera) {
-        siguienteEnEspera.estado = 'CONFIRMADO';
-        await siguienteEnEspera.save();
+      if (!insc) {
+        throw new HttpError('No tienes ninguna inscripción activa para este evento', 404);
+      }
 
-        // Notificar al usuario promovido (Email + DB log)
-        try {
-          const usuarioPromovido = await Usuario.findByPk(siguienteEnEspera.usuarioId);
-          if (usuarioPromovido) {
-            await Notificacion.create({
-              usuario_id: siguienteEnEspera.usuarioId,
-              titulo: 'Inscripción Confirmada desde Lista de Espera',
-              mensaje: 'Se liberó un cupo y has sido promovido a la lista de confirmados.',
-              tipo: 'CUPO_LIBERADO'
-            });
+      const estadoAnterior = insc.estado;
 
-            const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
-            const htmlContent = fs.readFileSync(templatePath, 'utf8');
-            await enviarEmail(usuarioPromovido.email, '¡Tu inscripción ha sido confirmada!', htmlContent);
-          }
-        } catch (error) {
-          console.log('Error al notificar al usuario promovido:', error);
+      // 2. Cambiar estado a CANCELADO
+      insc.estado = 'CANCELADO';
+      await insc.save({ transaction: t });
+
+      // 3. Si estaba CONFIRMADO, promover al primero en lista de espera (ESPERA)
+      let promovido = null;
+      if (estadoAnterior === 'CONFIRMADO') {
+        const siguienteEnEspera = await Inscripcion.findOne({
+          where: { eventoId, estado: 'ESPERA' },
+          order: [['createdAt', 'ASC']],
+          transaction: t,
+          lock: t.LOCK.UPDATE,
+        });
+
+        if (siguienteEnEspera) {
+          siguienteEnEspera.estado = 'CONFIRMADO';
+          await siguienteEnEspera.save({ transaction: t });
+          promovido = siguienteEnEspera.usuarioId;
         }
+      }
+
+      return { inscripcion: insc, promovidoId: promovido };
+    });
+
+    // Notificar al usuario promovido fuera de la transacción (efecto secundario).
+    if (promovidoId) {
+      try {
+        const usuarioPromovido = await Usuario.findByPk(promovidoId);
+        if (usuarioPromovido) {
+          await Notificacion.create({
+            usuario_id: promovidoId,
+            titulo: 'Inscripción Confirmada desde Lista de Espera',
+            mensaje: 'Se liberó un cupo y has sido promovido a la lista de confirmados.',
+            tipo: 'CUPO_LIBERADO'
+          });
+
+          const templatePath = path.join(__dirname, '../integrations/templates/inscripcion-confirmada.html');
+          const htmlContent = fs.readFileSync(templatePath, 'utf8');
+          await enviarEmail(usuarioPromovido.email, '¡Tu inscripción ha sido confirmada!', htmlContent);
+        }
+      } catch (error) {
+        console.log('Error al notificar al usuario promovido:', error);
       }
     }
 
@@ -197,7 +210,10 @@ class InscripcionService {
    * Obtiene la lista de inscritos para un evento con filtros de búsqueda y estado.
    */
   async obtenerInscriptosPorEvento(eventoId, queryParams = {}) {
-    const { estado, search, limit = 10, page = 1 } = queryParams;
+    const { estado, search } = queryParams;
+    // Clamp de paginación para evitar valores fuera de rango (limit máx. 100).
+    const limit = Math.min(Math.max(parseInt(queryParams.limit, 10) || 10, 1), 100);
+    const page = Math.max(parseInt(queryParams.page, 10) || 1, 1);
     const offset = (page - 1) * limit;
 
     const where = { eventoId };

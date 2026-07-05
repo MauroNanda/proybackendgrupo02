@@ -8,10 +8,12 @@ const roleMiddleware = require('../middlewares/role.middleware');
 
 const validationSchema = [
   body('nombre')
+    .trim()
     .notEmpty().withMessage('El nombre es obligatorio')
     .isLength({ max: 100 }).withMessage('El nombre no debe superar los 100 caracteres'),
   body('descripcion')
     .optional()
+    .trim()
     .isLength({ max: 255 }).withMessage('La descripción no debe superar los 255 caracteres'),
   validate,
 ];
