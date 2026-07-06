@@ -161,11 +161,16 @@ class InscripcionService {
     });
 
     // Notificar al usuario promovido fuera de la transacción (efecto secundario).
+    // Se pasa el evento para que el aviso diga de QUÉ evento se liberó el cupo
+    // (si no, un usuario en espera en varios eventos no sabe cuál se confirmó).
     if (promovidoId) {
       try {
-        const usuarioPromovido = await Usuario.findByPk(promovidoId);
+        const [usuarioPromovido, evento] = await Promise.all([
+          Usuario.findByPk(promovidoId),
+          Evento.findByPk(eventoId),
+        ]);
         if (usuarioPromovido) {
-          await notificaciones.cupoLiberado(usuarioPromovido);
+          await notificaciones.cupoLiberado(usuarioPromovido, evento);
         }
       } catch (error) {
         console.log('Error al notificar al usuario promovido:', error);

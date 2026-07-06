@@ -19,11 +19,11 @@ const push = require('./channels/push.channel');
 
 const canales = [inApp, email, push];
 
-async function emitir(metodo, usuario, evento) {
+async function emitir(metodo, usuario, evento, extra) {
   for (const canal of canales) {
     if (typeof canal[metodo] !== 'function') continue;
     try {
-      await canal[metodo](usuario, evento);
+      await canal[metodo](usuario, evento, extra);
     } catch (err) {
       console.error(`[notif] canal "${canal.nombre}" método "${metodo}":`, err.message);
     }
@@ -37,4 +37,7 @@ module.exports = {
   inscripcionConfirmada: (usuario, evento) => emitir('inscripcionConfirmada', usuario, evento),
   inscripcionEnEspera: (usuario, evento) => emitir('inscripcionEnEspera', usuario, evento),
   cupoLiberado: (usuario, evento) => emitir('cupoLiberado', usuario, evento),
+  // Avisos sobre el evento en sí, dirigidos a sus inscriptos activos.
+  eventoCancelado: (usuario, evento) => emitir('eventoCancelado', usuario, evento),
+  eventoModificado: (usuario, evento, cambios) => emitir('eventoModificado', usuario, evento, cambios),
 };

@@ -27,7 +27,7 @@ module.exports = (sequelize) => {
             defaultValue: false
         },
         tipo: {
-            type: DataTypes.ENUM('INSCRIPCION', 'RECORDATORIO', 'CUPO_LIBERADO', 'EVENTO_NUEVO'),
+            type: DataTypes.ENUM('INSCRIPCION', 'RECORDATORIO', 'CUPO_LIBERADO', 'EVENTO_NUEVO', 'EVENTO_CANCELADO', 'EVENTO_MODIFICADO'),
             allowNull: false
         }
     }, {

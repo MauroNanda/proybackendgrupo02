@@ -51,11 +51,26 @@ module.exports = {
     await enviarATodasDelUsuario(usuario, titulo, cuerpo);
   },
 
-  async cupoLiberado(usuario) {
-    await enviarATodasDelUsuario(
-      usuario,
-      'Cupo liberado',
-      'Se liberó un lugar y tu inscripción fue confirmada.'
-    );
+  async cupoLiberado(usuario, evento) {
+    const cuerpo = evento?.titulo
+      ? `Se liberó un lugar en "${evento.titulo}" y tu inscripción fue confirmada.`
+      : 'Se liberó un lugar y tu inscripción fue confirmada.';
+    await enviarATodasDelUsuario(usuario, 'Cupo liberado', cuerpo);
+  },
+
+  async eventoCancelado(usuario, evento) {
+    const cuerpo = evento?.titulo
+      ? `El evento "${evento.titulo}" fue cancelado. Tu inscripción quedó sin efecto.`
+      : 'Un evento en el que estabas inscripto fue cancelado.';
+    await enviarATodasDelUsuario(usuario, 'Evento cancelado', cuerpo);
+  },
+
+  async eventoModificado(usuario, evento, cambios = {}) {
+    const partes = [];
+    if (cambios.fecha) partes.push('cambió la fecha');
+    if (cambios.ubicacion) partes.push('cambió el lugar');
+    const detalle = partes.length ? ` (${partes.join(' y ')})` : '';
+    const cuerpo = `El evento${evento?.titulo ? ` "${evento.titulo}"` : ''} tuvo cambios${detalle}. Revisá los detalles.`;
+    await enviarATodasDelUsuario(usuario, 'Cambio en un evento', cuerpo);
   },
 };
