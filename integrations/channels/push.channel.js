@@ -73,4 +73,17 @@ module.exports = {
     const cuerpo = `El evento${evento?.titulo ? ` "${evento.titulo}"` : ''} tuvo cambios${detalle}. Revisá los detalles.`;
     await enviarATodasDelUsuario(usuario, 'Cambio en un evento', cuerpo);
   },
+
+  async recordatorioEvento(usuario, evento) {
+    const cuando = evento?.fecha
+      ? new Date(evento.fecha).toLocaleString('es-AR', {
+          weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+          timeZone: 'America/Argentina/Jujuy',
+        })
+      : 'pronto';
+    const cuerpo = evento?.titulo
+      ? `"${evento.titulo}" empieza ${cuando}${evento.ubicacion ? ` en ${evento.ubicacion}` : ''}. ¡Te esperamos!`
+      : 'Tenés un evento que empieza en menos de 24 horas.';
+    await enviarATodasDelUsuario(usuario, 'Recordatorio de evento', cuerpo);
+  },
 };
