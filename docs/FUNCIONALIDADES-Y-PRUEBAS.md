@@ -63,7 +63,7 @@ Detalle interno: [`circuitos/autenticacion.md`](./circuitos/autenticacion.md).
 - Qué hace: si está activado, el login no entrega token; manda un código de 6 dígitos al email (un solo uso, guardado hasheado) y pide validarlo.
 - Cómo probar: logueado, ir a `/perfil` y activar el switch "Doble factor por email (2FA)" (`POST /api/auth/2fa/config`). Cerrar sesión y volver a loguear: la app lleva a la pantalla de código (`/auth/2fa`). Ingresar el código recibido (`POST /api/auth/2fa/verify`).
 - Qué se espera: con el código correcto entra; con uno incorrecto o vencido, 401. También aplica al login con Google si la cuenta tiene 2FA.
-- Ojo para la demo: el código viaja por email real vía Resend. Sin `RESEND_API_KEY` el envío se simula por consola y el código no llega a ningún lado, así que no activar 2FA si no está configurado el email (la cuenta queda sin poder completar el login).
+- Ojo para la demo: el código viaja por email real vía Resend. Sin `RESEND_API_KEY` el envío se simula por consola: el backend imprime el cuerpo del correo (incluido el código de 6 dígitos), así que en desarrollo se lee en la terminal del backend y se completa el login igual.
 
 **Perfil**
 - Qué hace: ver los datos de la cuenta y cambiar el nombre visible.
@@ -178,7 +178,7 @@ Detalle interno: [`circuitos/notificaciones.md`](./circuitos/notificaciones.md) 
 **Emails**
 - Qué hace: manda por correo los mismos avisos (confirmación, cupo liberado, cancelación, recordatorio) y el código 2FA, vía Resend.
 - Cómo probar: con `RESEND_API_KEY` configurada, inscribirse a un evento y revisar la casilla.
-- Qué se espera: llega el email. Sin la API key, el backend loguea `[Simulado] Enviando correo a: ...` en la consola y no envía nada — para la demo sin key, mostrar ese log en la terminal del backend. Con Resend en modo prueba (remitente `onboarding@resend.dev`) solo entrega a la casilla del dueño de la cuenta de Resend.
+- Qué se espera: llega el email. Sin la API key, el backend loguea `[Simulado] Enviando correo a: ...` junto con el asunto y el cuerpo del correo, y no envía nada — para la demo sin key, mostrar ese log en la terminal del backend (ahí se lee, por ejemplo, el código 2FA). Con Resend en modo prueba (remitente `onboarding@resend.dev`) solo entrega a la casilla del dueño de la cuenta de Resend.
 
 **Notificaciones push del navegador**
 - Qué hace: manda los avisos como notificaciones nativas del navegador aunque la pestaña esté cerrada (service worker + protocolo Web Push).
@@ -226,7 +226,7 @@ Detalle interno: [`circuitos/dashboard.md`](./circuitos/dashboard.md).
 
 | Variable(s) | Funcionalidad afectada | Comportamiento sin configurar |
 |---|---|---|
-| `RESEND_API_KEY` | Emails y código 2FA | Envío simulado: se loguea en la consola del backend y no llega ningún correo. No activar 2FA sin esto. |
+| `RESEND_API_KEY` | Emails y código 2FA | Envío simulado: el backend loguea el correo completo (asunto y cuerpo, incluido el código 2FA) en su consola y no envía nada. El 2FA se puede completar leyendo el código en la terminal. |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Login con Google | El flujo OAuth falla al redirigir; el login local sigue funcionando. |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHANNEL_ID` | Difusión en Telegram | Desactivada. Publicar y cancelar eventos funciona igual. |
 | `DISCORD_BOT_TOKEN` / `DISCORD_CHANNEL_ID` | Difusión en Discord | El bot no se conecta; desactivada. |
