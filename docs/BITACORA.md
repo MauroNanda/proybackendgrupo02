@@ -1,6 +1,6 @@
 # Bitácora del Proyecto y Estado Actual
 
-## Estado Global: `Fase 3 en curso (Integraciones) — T-14 Discord mergeado`
+## Estado Global: `Fase 3 en curso (Integraciones) — T-11 OAuth/2FA, T-12 Telegram y T-14 Discord hechos`
 
 ### Resumen del Estado Actual
 Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. El Proyecto Base y las Fases 1 y 2 (Asistente MVP y Organizador MVP) ya están implementados y mergeados a `main`; el proyecto se encuentra preparando la Fase 3 (Integraciones Avanzadas).
@@ -40,6 +40,12 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 13):** Fase 3 — Google OAuth 2.0 + 2FA (T-11), con revisión de seguridad. Toca **ambos repos**.
+    *   **Alcance:** login con Google (OAuth) y segundo factor (2FA) por email. Validado de punta a punta en vivo (registro, login usuario/contraseña, 2FA y login con Google real → sesión con identidad).
+    *   **Revisión de seguridad y fixes (backend):** el envío del código 2FA usaba un método inexistente (`notificacionService.enviar`) y crasheaba → ahora usa `email.service`; código generado con `crypto` y **guardado hasheado** (bcrypt) + limiter en `/2fa/verify` (fuerza bruta); registro **fuerza rol ASISTENTE** (cierra la escalada de C-02); OAuth con `state` anti-CSRF (cookie httpOnly), **token por fragment** (no en query → no queda en logs/Referer), **account-linking** por email (evita duplicar/500), `FRONTEND_URL` desde env; `down` de migración completo.
+    *   **Fixes (frontend):** callback lee el token del fragment y **pide `/perfil`** para poblar `currentUser` (antes quedaba logueado sin identidad ni rol); 2FA/login usan `sessionStorage` (no `localStorage`) para el email, con manejo de error y `takeUntilDestroyed`; redirect a Google desde `environment`; tipos corregidos; `login()` ya no persiste `token=undefined` en la respuesta 2FA.
+    *   **Pendiente documentado:** el JWT sigue en `localStorage` (patrón app-wide) → registrado como **C-22** en `CORRECCIONES.md` para migrar a cookie httpOnly como tarea transversal.
+    *   **Recordatorio post-merge:** dependencia nueva `google-auth-library` → correr `npm install`.
 *   **2026-07-05 (Sesión 12):** Fase 3 — Bot de Telegram (T-12, scope reducido).
     *   **Integración (rama `feature/telegram-bot`):** difusión grupal en el canal `@convoca_unju_2026` — anuncio de evento publicado (`telegram.service.anunciarEvento`, formato HTML, urgencia <48hs, escasez de cupo, botón/link al detalle) y aviso de cancelación (`anunciarCancelacion`). Nuevo hook `onCancelado`/`alCancelarEvento`; al cancelar, `evento.service` da de baja las inscripciones activas antes de notificar.
     *   **Scope reducido (decisión de equipo):** solo difusión a nivel grupo. Quedan fuera la vinculación de cuenta, las notificaciones personales (QR/recordatorios) y la entrega de 2FA que describía el T-12 original.

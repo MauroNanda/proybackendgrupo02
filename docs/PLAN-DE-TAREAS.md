@@ -249,7 +249,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 
 | Tarea | Dominio | Dificultad | Toca Front | Estado |
 |---|---|---|---|---|
-| **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `LIBRE` |
+| **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `✅ HECHO` |
 | **T-12** | Telegram Bot (difusión) | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
 | **T-14** | Discord Bot | 🟢 Fácil-media | No | `✅ HECHO` |
@@ -258,7 +258,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-11 — Google OAuth 2.0 (+ 2FA opcional)
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — login con Google + 2FA por email, validado en vivo (registro/login/2FA/OAuth end-to-end). Revisión de seguridad aplicada (ver changelog Sesión 13 y `CORRECCIONES.md` C-22).
 *   **Rama:** `feature/auth-oauth-2fa`
 *   **Dificultad:** 🟡 Media. **Requisito de consigna** (§5: "Login social con APIs de Google (OAuth)").
 *   **Descripción:** Permitir iniciar sesión / registrarse con cuenta de Google. Como add-on **opcional** (suma en la rúbrica de seguridad), verificación en dos pasos (2FA) por usuario.

@@ -35,6 +35,12 @@
 | C-19 | Front | Badge de notificaciones no se refresca tras login en la misma sesión | Baja | No | `layout público` ngOnInit |
 | C-20 | Front | `checkinPct` calcula % sobre `cupo_maximo` en vez de sobre inscriptos | Baja | No | `features/admin/attendees/attendee-list.component.ts:37-41` |
 | C-21 | Front | Promedio de valoración `0` se muestra como "Sin datos" (falsy) | Baja | No | `features/admin/dashboard/dashboard.component.ts` template |
+| C-22 | Front (app-wide) | JWT guardado en `localStorage` → robable vía XSS | Media | No | `core/services/auth.service.ts` (`guardarSesion`/`guardarToken`) |
+
+---
+
+### C-22 — Token JWT en `localStorage` (decisión de proyecto)
+Detectado al revisar T-11 (OAuth/2FA). El token de sesión se persiste en `localStorage`, accesible por cualquier script → un XSS puede robarlo. **No es específico de T-11:** es el patrón de auth de toda la app (login normal, registro y OAuth usan el mismo `guardarSesion`). Migrarlo a **cookie httpOnly** implica rehacer el interceptor, los guards y el manejo de sesión en todo el front + emitir la cookie desde el backend en login/registro/2FA/OAuth. **Fix:** planificar la migración a cookie httpOnly como tarea transversal de seguridad (no dentro de T-11).
 
 ---
 
