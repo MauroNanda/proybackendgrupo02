@@ -55,6 +55,7 @@ module.exports = (sequelize) => {
       through: models.EventoCategoria,
       foreignKey: 'eventoId',
       otherKey: 'categoriaId',
+      as: 'categorias',
     });
     Evento.hasMany(models.Inscripcion, {
       foreignKey: 'eventoId',

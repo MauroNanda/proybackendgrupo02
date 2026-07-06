@@ -322,6 +322,7 @@ class InscripcionService {
           include: [
             {
               model: Categoria,
+              as: 'categorias',
               through: { attributes: [] },
             }
           ]

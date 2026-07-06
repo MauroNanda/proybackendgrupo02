@@ -24,7 +24,14 @@ class EventoService {
     const include = [
       {
         model: Categoria,
+        as: 'categorias',
         through: { attributes: [] },
+      },
+      {
+        model: Inscripcion,
+        as: 'inscripciones',
+        attributes: ['id', 'estado'],
+        required: false,
       },
     ];
 
@@ -44,6 +51,7 @@ class EventoService {
       include: [
         {
           model: Categoria,
+          as: 'categorias',
           through: { attributes: [] },
         },
       ],
@@ -56,7 +64,7 @@ class EventoService {
 // Recupera un evento con sus categorías (usado para responder y para notificar).
 async _conCategorias(id) {
   return await Evento.findByPk(id, {
-    include: [{ model: Categoria, through: { attributes: [] } }],
+    include: [{ model: Categoria, as: 'categorias', through: { attributes: [] } }],
   });
 }
 
