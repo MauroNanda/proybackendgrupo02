@@ -59,16 +59,18 @@ async function start() {
     await sequelize.authenticate();
     console.log('[DB] Conexión con Neon.tech establecida.');
 
+    // Conectar integraciones a los hooks antes de aceptar tráfico, así el
+    // primer evento publicado ya encuentra registrado el anuncio de Discord.
+    eventosHooks.onPublicado(async (evento) => {
+      await discordService.anunciarEvento(evento);
+    });
+    console.log('[Hooks] Escuchando publicaciones de eventos para el Bot de Discord.');
+
     app.listen(PORT, () => {
       console.log(`[Convoca API] Servidor corriendo en http://localhost:${PORT}`);
       console.log(`[Convoca API] Health check: http://localhost:${PORT}/api/health`);
     });
-    eventosHooks.onPublicado(async (evento) => {
-        await discordService.anunciarEvento(evento);
-      });
-      console.log('[Hooks] Escuchando publicaciones de eventos para el Bot de Discord.');
-  }
-   catch (err) {
+  } catch (err) {
     console.error('[FATAL] No se pudo iniciar el servidor:', err.message);
     process.exit(1);
   }
