@@ -8,6 +8,7 @@ const sequelize = require('./config/db');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler.middleware');
 const sanitize = require('./middlewares/sanitize.middleware');
+const registrarIntegraciones = require('./integrations/register');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -55,6 +56,10 @@ async function start() {
 
     await sequelize.authenticate();
     console.log('[DB] Conexión con Neon.tech establecida.');
+
+    // Conectar integraciones externas a los hooks antes de aceptar tráfico
+    // (Telegram + Discord). Ver integrations/register.js.
+    registrarIntegraciones();
 
     app.listen(PORT, () => {
       console.log(`[Convoca API] Servidor corriendo en http://localhost:${PORT}`);

@@ -14,6 +14,7 @@
 
 const handlers = {
   publicado: [],
+  cancelado: [],
 };
 
 async function alPublicarEvento(evento) {
@@ -26,7 +27,19 @@ async function alPublicarEvento(evento) {
   }
 }
 
+async function alCancelarEvento(evento) {
+  for (const fn of handlers.cancelado) {
+    try {
+      await fn(evento);
+    } catch (err) {
+      console.error('[evento-hook] cancelado:', err.message);
+    }
+  }
+}
+
 module.exports = {
   onPublicado: (fn) => handlers.publicado.push(fn),
   alPublicarEvento,
+  onCancelado: (fn) => handlers.cancelado.push(fn),
+  alCancelarEvento,
 };
