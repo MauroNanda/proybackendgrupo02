@@ -253,7 +253,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 | **T-12** | Telegram Bot (difusión) | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
 | **T-14** | Discord Bot | 🟢 Fácil-media | No | `✅ HECHO` |
-| **T-15** | Google Calendar | 🟢 Fácil | Solo front | `LIBRE` |
+| **T-15** | Google Calendar | 🟢 Fácil | Solo front | `✅ HECHO` |
 
 ---
 

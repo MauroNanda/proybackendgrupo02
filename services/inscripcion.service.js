@@ -32,6 +32,23 @@ class InscripcionService {
         throw new HttpError('El evento no existe', 404);
       }
 
+      // 1.b. Solo se admite inscripción a eventos PUBLICADOS y que aún no ocurrieron.
+      // BORRADOR se trata como inexistente (404) para no revelar eventos no visibles;
+      // CANCELADO y fecha pasada son conflictos con el estado del recurso (409).
+      // Se valida acá, con la fila ya bloqueada, para que una cancelación
+      // concurrente del evento no se cruce con esta inscripción.
+      if (evento.estado === 'BORRADOR') {
+        throw new HttpError('El evento no existe', 404);
+      }
+      if (evento.estado === 'CANCELADO') {
+        throw new HttpError('El evento fue cancelado y no admite inscripciones', 409);
+      }
+      // fecha es DataTypes.DATE (timestamptz): comparar con new Date() es seguro
+      // (ambas en UTC). El guard de null es defensivo ante datos legacy.
+      if (evento.fecha && new Date(evento.fecha) < new Date()) {
+        throw new HttpError('El evento ya se realizó y no admite nuevas inscripciones', 409);
+      }
+
       // 2. Verificar si el usuario ya tiene una inscripción activa
       const inscripcionExistente = await Inscripcion.findOne({
         where: { usuarioId, eventoId },
