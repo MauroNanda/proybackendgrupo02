@@ -1,4 +1,5 @@
 const { Evento, Categoria, Inscripcion, Usuario, EventoCategoria, sequelize } = require('../models');
+const { Op } = require('sequelize');
 const HttpError = require('../utils/http-error');
 const eventosHooks = require('../integrations/eventos.hooks');
 const notificaciones = require('../integrations/notificaciones');
@@ -9,14 +10,15 @@ class EventoService {
     const { Op } = require('sequelize');
 
     if (!todos) {
-      // Catálogo público: solo eventos publicados. Los CANCELADOS salen del
-      // listado pero siguen accesibles por link directo vía obtenerPorId
-      // (el detalle muestra su estado; la inscripción los rechaza con 409).
-      where.estado = 'PUBLICADO';
-
-      // Decisión: los eventos pasados SÍ se muestran (historial + valoraciones).
-      // Si se decide ocultarlos del catálogo, descomentar:
-      // where.fecha = { [Op.gte]: new Date() };
+      where.estado = {
+        [Op.in]: ['PUBLICADO', 'CANCELADO'],
+      };
+      // Catálogo público: no listar eventos que ya ocurrieron (no se puede
+      // hacer nada con ellos). Los que aún no pasaron se muestran aunque el
+      // cupo esté lleno, porque el usuario puede sumarse a la lista de espera.
+      where.fecha = {
+        [Op.gte]: new Date(),
+      };
     }
 
     if (search) {
@@ -28,7 +30,14 @@ class EventoService {
     const include = [
       {
         model: Categoria,
+        as: 'categorias',
         through: { attributes: [] },
+      },
+      {
+        model: Inscripcion,
+        as: 'inscripciones',
+        attributes: ['id', 'estado'],
+        required: false,
       },
     ];
 
@@ -48,6 +57,7 @@ class EventoService {
       include: [
         {
           model: Categoria,
+          as: 'categorias',
           through: { attributes: [] },
         },
       ],
@@ -60,7 +70,7 @@ class EventoService {
 // Recupera un evento con sus categorías (usado para responder y para notificar).
 async _conCategorias(id) {
   return await Evento.findByPk(id, {
-    include: [{ model: Categoria, through: { attributes: [] } }],
+    include: [{ model: Categoria, as: 'categorias', through: { attributes: [] } }],
   });
 }
 
@@ -90,6 +100,18 @@ async actualizar(id, datos) {
 
   if (!evento) {
     throw new HttpError('Evento no encontrado', 404);
+  }
+
+  if (datosEvento.cupo_maximo !== undefined) {
+    const countActive = await Inscripcion.count({
+      where: {
+        eventoId: id,
+        estado: { [Op.in]: ['CONFIRMADO', 'ASISTIO'] }
+      }
+    });
+    if (datosEvento.cupo_maximo < countActive) {
+      throw new HttpError(`No se puede reducir el cupo a ${datosEvento.cupo_maximo} porque ya existen ${countActive} inscripciones confirmadas/asistidas`, 400);
+    }
   }
 
   const estadoAnterior = evento.estado;

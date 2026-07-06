@@ -30,6 +30,8 @@ const validacionCheckIn = [
 // Todas las rutas de inscripciones requieren autenticación
 router.use(authMiddleware);
 
+router.get('/mis-inscripciones', inscripcionController.obtenerMisInscripciones);
+
 router.post('/', validacionInscribirse, inscripcionController.inscribirse);
 router.delete('/:eventoId', validacionCancelar, inscripcionController.cancelar);
 router.get('/estado/:eventoId', validacionEstado, inscripcionController.obtenerEstado);

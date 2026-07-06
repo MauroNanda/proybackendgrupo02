@@ -27,7 +27,13 @@ const validacionCrear = [
     .isLength({ max: 200 }).withMessage('La ubicación no debe superar los 200 caracteres'),
   body('fecha')
     .notEmpty().withMessage('La fecha es obligatoria')
-    .isISO8601().withMessage('La fecha debe tener un formato válido'),
+    .isISO8601().withMessage('La fecha debe tener un formato válido')
+    .custom((value) => {
+      if (new Date(value) < new Date()) {
+        throw new Error('La fecha del evento debe ser en el futuro');
+      }
+      return true;
+    }),
   body('cupo_maximo')
     .isInt({ min: 1 }).withMessage('El cupo máximo debe ser un entero mayor o igual a 1'),
   body('estado')
@@ -54,7 +60,13 @@ const validacionActualizar = [
     .isLength({ max: 200 }).withMessage('La ubicación no debe superar los 200 caracteres'),
   body('fecha')
     .optional()
-    .isISO8601().withMessage('La fecha debe tener un formato válido'),
+    .isISO8601().withMessage('La fecha debe tener un formato válido')
+    .custom((value) => {
+      if (new Date(value) < new Date()) {
+        throw new Error('La fecha del evento debe ser en el futuro');
+      }
+      return true;
+    }),
   body('cupo_maximo')
     .optional()
     .isInt({ min: 1 }).withMessage('El cupo máximo debe ser un entero mayor o igual a 1'),

@@ -1,6 +1,15 @@
 const db = require('../models');
 
-const getAll = async () => await db.Categoria.findAll({ order: [['nombre', 'ASC']] });
+const getAll = async () => await db.Categoria.findAll({
+  include: [
+    {
+      model: db.Evento,
+      through: { attributes: [] },
+      attributes: ['id', 'titulo'],
+    },
+  ],
+  order: [['nombre', 'ASC']],
+});
 
 const create = async (data) => await db.Categoria.create(data);
 

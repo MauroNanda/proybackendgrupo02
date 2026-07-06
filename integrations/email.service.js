@@ -18,8 +18,12 @@ const enviarEmail = async (destinatario, asunto, htmlContent) => {
       html: htmlContent,
     });
   } else {
+    // Sin Resend configurado se simula el envío por consola. Se loguea también
+    // el cuerpo para poder leer en desarrollo datos como el código 2FA (que solo
+    // viaja por email); sin esto, el login con 2FA no se podría completar en dev.
     console.log(`✉️  [Simulado] Enviando correo a: ${destinatario}`);
     console.log(`   Asunto: ${asunto}`);
+    console.log(`   Cuerpo: ${htmlContent}`);
     return { id: 'mock-email-id-' + Date.now() };
   }
 };

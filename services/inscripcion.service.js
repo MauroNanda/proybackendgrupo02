@@ -307,6 +307,32 @@ class InscripcionService {
 
     return inscripcion;
   }
+
+  /**
+   * Obtiene las inscripciones del usuario logueado con detalles del evento.
+   */
+  async obtenerMisInscripciones(usuarioId) {
+    const { Categoria } = require('../models');
+    return await Inscripcion.findAll({
+      where: { usuarioId },
+      include: [
+        {
+          model: Evento,
+          as: 'evento',
+          include: [
+            {
+              model: Categoria,
+              as: 'categorias',
+              through: { attributes: [] },
+            }
+          ]
+        }
+      ],
+      order: [
+        [{ model: Evento, as: 'evento' }, 'fecha', 'ASC']
+      ]
+    });
+  }
 }
 
 module.exports = new InscripcionService();
