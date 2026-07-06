@@ -1,6 +1,6 @@
 # Bitácora del Proyecto y Estado Actual
 
-## Estado Global: `Fase 2 completada — preparando Fase 3 (Integraciones)`
+## Estado Global: `Fase 3 en curso (Integraciones) — T-14 Discord mergeado`
 
 ### Resumen del Estado Actual
 Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. El Proyecto Base y las Fases 1 y 2 (Asistente MVP y Organizador MVP) ya están implementados y mergeados a `main`; el proyecto se encuentra preparando la Fase 3 (Integraciones Avanzadas).
@@ -33,12 +33,19 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] **Mejoras sutiles:** ronda de robustez (backend) y UX/rendimiento (frontend) en la rama `feature/mejoras-sutiles`.
 - [x] **Fase 3 — Terreno:** hub de notificaciones y hooks de eventos para desacoplar integraciones (rama `feature/fase3-preparacion`).
 - [x] **Fase 3 — Planificación:** tareas T-11 a T-15 detalladas en `PLAN-DE-TAREAS.md`.
-- [ ] Crear Bot de Telegram y Bot de Discord (Fase 3).
+- [x] **Fase 3 (T-14):** Bot de Discord — difusión de eventos publicados en `#eventos_convoca`, mergeado a `main`.
+- [ ] Crear Bot de Telegram (Fase 3).
 - [ ] Configurar Google OAuth en Google Cloud Console (Fase 3).
 - [ ] Configurar cuenta de Resend (necesario para Fase 1, dominio Notificaciones).
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-05 (Sesión 11):** Fase 3 — Bot de Discord (T-14).
+    *   **Integración (rama `feature/discord-bot`):** `integrations/discord.service.js` difunde los eventos publicados en el canal `#eventos_convoca` vía `eventosHooks.onPublicado`, sin tocar `evento.service` (aprovecha el hook). Registro del handler movido antes de `app.listen`.
+    *   **Correcciones sobre el aporte inicial:** campo `evento.lugar` → `evento.ubicacion` (no existía), intents reducidos a `Guilds` (se quitó el privilegiado `GuildPresences` que podía impedir el login), limpieza de comentario/consejo inseguro, fix del deprecation `ready` → `clientReady` (discord.js v14).
+    *   **Mejora del embed (revisado con modelo Fable):** aviso de urgencia (<48hs), tono de escasez por cupo, timestamps nativos de Discord (`<t:unix:F/R>`, evita el bug de timezone del servidor), escape de markdown anti-inyección, truncado de descripción, footer corregido `ConvocApp` → `Convoca`, título clickeable al detalle solo si la URL es pública.
+    *   **Validación:** circuito probado en vivo (dos eventos de prueba, casos normal y urgente/escaso) → embeds correctos en el canal. `discord.js` es dependencia nueva: **correr `npm install`** tras el merge.
+    *   **Pendiente (rama futura de integraciones):** CTA "Unite al Discord" (invite permanente `https://discord.gg/NM7xnE4VUN`) en el punto de captación (frontend / anuncio de Telegram), a implementar cuando Telegram esté en `main`.
 *   **2026-07-05 (Sesión 10):** Preparación de Fase 3.
     *   **Terreno (rama `feature/fase3-preparacion`):** hub de notificaciones (`integrations/notificaciones.js` + `channels/`) y hooks de eventos (`integrations/eventos.hooks.js`), para que las integraciones se sumen creando un archivo y registrándolo, sin tocar `inscripcion.service`/`evento.service`. Guía en `integrations/README.md`.
     *   **Planificación:** definidas las tareas T-11 a T-15 en `PLAN-DE-TAREAS.md` (Google OAuth + 2FA opt-in, Telegram, Web Push, Discord, Google Calendar) con circuito, archivos, dependencias y dificultad por tarea.

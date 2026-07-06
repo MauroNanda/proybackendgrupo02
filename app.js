@@ -57,7 +57,8 @@ async function start() {
     await sequelize.authenticate();
     console.log('[DB] Conexión con Neon.tech establecida.');
 
-    // Conectar integraciones externas a los hooks del sistema (ej. Telegram).
+    // Conectar integraciones externas a los hooks antes de aceptar tráfico
+    // (Telegram + Discord). Ver integrations/register.js.
     registrarIntegraciones();
 
     app.listen(PORT, () => {

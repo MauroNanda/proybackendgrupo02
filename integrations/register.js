@@ -4,12 +4,15 @@
 
 const eventosHooks = require('./eventos.hooks');
 const telegram = require('./telegram.service');
+const discord = require('./discord.service');
 
 function registrarIntegraciones() {
   // Nivel grupo: difundir en el canal de Telegram cuando se publica un evento.
   eventosHooks.onPublicado((evento) => telegram.anunciarEvento(evento));
-  // Aviso al canal cuando un evento se cancela.
+  // Aviso al canal de Telegram cuando un evento se cancela.
   eventosHooks.onCancelado((evento) => telegram.anunciarCancelacion(evento));
+  // Difundir también en el canal de Discord al publicar un evento.
+  eventosHooks.onPublicado((evento) => discord.anunciarEvento(evento));
 }
 
 module.exports = registrarIntegraciones;
