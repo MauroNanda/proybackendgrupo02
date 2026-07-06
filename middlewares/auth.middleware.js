@@ -1,18 +1,25 @@
 const { verificarToken } = require('../utils/jwt.util');
+const { COOKIE_NAME, leerCookie } = require('../utils/cookie.util');
 const HttpError = require('../utils/http-error');
 
 /**
- * Verifica el JWT del header Authorization y adjunta el payload en req.usuario.
- * Rutas sin token o con token inválido responden 401.
+ * Verifica el JWT y adjunta el payload en req.usuario.
+ * Fuente del token: cookie httpOnly (nueva) o header Authorization: Bearer
+ * (legado, se mantiene para Postman y durante la transición del front).
  */
 function authMiddleware(req, _res, next) {
-  const authHeader = req.headers.authorization;
+  let token = leerCookie(req, COOKIE_NAME);
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(new HttpError('Token de autenticación requerido', 401));
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.slice(7);
+    }
   }
 
-  const token = authHeader.slice(7);
+  if (!token) {
+    return next(new HttpError('Token de autenticación requerido', 401));
+  }
 
   try {
     const payload = verificarToken(token);

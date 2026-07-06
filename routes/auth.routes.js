@@ -43,6 +43,9 @@ router.post('/registro', registroLimiter, validacionRegistro, authController.reg
 router.post('/login', loginLimiter, validacionLogin, authController.login);
 router.get('/perfil', authMiddleware, authController.perfil);
 
+// Logout: borra la cookie httpOnly de sesión (POST porque cambia estado).
+router.post('/logout', authController.logout);
+
 // Rutas para Google OAuth
 router.get('/google', authController.redirigirGoogle);
 router.get('/google/callback', authController.callbackGoogle);

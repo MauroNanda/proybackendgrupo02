@@ -40,6 +40,12 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 18):** C-22 — JWT de localStorage → cookie httpOnly (diseño con Fable). **Backend (rama `feature/auth-cookie-httponly`)**, aditivo y sin romper el front actual.
+    *   **Nuevo `utils/cookie.util.js`:** `setAuthCookie`/`clearAuthCookie`/`leerCookie`. Cookie `convoca_token` con `httpOnly` (JS no la lee → XSS no roba el token), `sameSite: lax` (localhost:4200↔:3000 es same-site, el puerto no cuenta), `secure` solo en prod, `path: /api`, `maxAge` alineado a `JWT_EXPIRES_IN`.
+    *   `auth.controller`: setea la cookie en login/registro/verificar2FA/callbackGoogle; nuevo `POST /api/auth/logout` que la borra (el front no puede por httpOnly). `auth.middleware` lee la **cookie con fallback a Bearer** (Postman/tests/front viejo siguen andando). Se reusa `leerCookie` del util (también para el `oauth_state`).
+    *   **Transición:** se mantiene `token` en el body y `#token=` en el callback → el front actual no se rompe; el front nuevo (PR aparte) usará la cookie. Validado por curl: Set-Cookie httpOnly, `/perfil` funciona solo con cookie (200), sin nada 401, logout borra la cookie.
+    *   **Pendiente:** PR frontend (interceptor `withCredentials`, sacar token de localStorage, `isLoggedIn` desde `currentUser`+`/perfil`, callback sin `#token`). Restricción de deploy documentada: front y API deben quedar en el mismo dominio registrable (si no, `sameSite=none`+`secure`).
+
 *   **2026-07-06 (Sesión 16):** Ampliación de notificaciones de eventos (rama `feature/notif-eventos`, análisis con modelo Fable).
     *   **🔴 Bug corregido:** `inscripcion.service.cancelar` llamaba `notificaciones.cupoLiberado(usuario)` **sin el evento** → el aviso no decía de qué evento se liberó el cupo. Ahora pasa el `evento` (in-app y push nombran el evento).
     *   **Nuevo `eventoCancelado`:** al cancelar un evento, se captura la lista de inscriptos activos **antes** del baja masiva (después quedan en CANCELADO, indistinguibles) y se les notifica personalmente por los 3 canales (antes solo había difusión grupal Telegram/Discord — el inscripto podía no enterarse). Cierra el hueco que el propio comentario del código prometía.
