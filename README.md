@@ -1,131 +1,71 @@
-# Convoca — Sistema de Gestión de Eventos Universitarios
+# Convoca — Backend
 
-Trabajo Final Integrador de la materia **Programación y Servicios Web** — Facultad de Ingeniería, Universidad Nacional de Jujuy.
+API REST del sistema Convoca. Trabajo Final Integrador de **Programación y Servicios Web** — Facultad de Ingeniería, Universidad Nacional de Jujuy. Grupo G02.
 
-**Grupo G02 — 5 integrantes.**
+## Qué es Convoca
 
----
+Convoca es una plataforma web para la gestión de eventos universitarios (charlas, talleres, hackathons, actividades culturales y deportivas). Permite publicar eventos, administrar inscripciones con control de cupo, hacer check-in de asistentes mediante código QR y mantener informados a los participantes con notificaciones por varios canales.
 
-## Descripción del Proyecto
+## Stack
 
-**Convoca** es un sistema web completo para la gestión de eventos universitarios (charlas, talleres, hackathons, actividades culturales y deportivas). El sistema cuenta con:
+*   **Backend (este repositorio):** Node.js + Express, con Sequelize (ORM) sobre PostgreSQL alojado en Neon.
+*   **Frontend:** Angular + Bootstrap — [proyfrontendgrupo02](https://github.com/MauroNanda/proyfrontendgrupo02).
 
-*   **Dos vistas diferenciadas por rol:**
-    *   **Asistente:** explora el catálogo de eventos, se inscribe, recibe notificaciones y valora.
-    *   **Organizador:** crea y gestiona eventos, ve estadísticas, exporta datos, escanea QRs para check-in.
-*   **Sistema de notificaciones multicanal:** Telegram, Discord, Email y Notificaciones Push.
-*   **Autenticación robusta:** JWT, hash de contraseñas con bcrypt, Login Social con Google, Autenticación de Dos Factores (2FA).
-*   **Seguridad:** prevención de XSS y CSRF, auditoría de acciones e historial de accesos.
-*   **Dashboard administrativo** con gráficos (Chart.js), DataTables y exportación a PDF y Excel.
+## Funcionalidades principales
 
----
+*   Autenticación con email y contraseña, login con Google y verificación en dos pasos (2FA).
+*   Gestión de eventos por parte de organizadores y catálogo público para asistentes.
+*   Inscripciones con control de cupo y lista de espera.
+*   Notificaciones en la aplicación, por email y push del navegador.
+*   Integraciones con Telegram, Discord y Google Calendar.
+*   Dashboard administrativo con estadísticas y exportación de datos.
 
-## Tecnologías Aplicadas
+## Cómo levantarlo
 
-### Frontend
-*   **Angular 22** con Standalone Components y Signals
-*   **Bootstrap 5** (responsive, mobile-first)
-*   **ReactiveFormsModule** con validaciones personalizadas
-*   **Chart.js / ng2-charts** para gráficos del Dashboard
-*   **DataTables**, **jsPDF**, **exceljs** para listados y exportación
+Requisitos: Node.js y una base de datos PostgreSQL (por ejemplo, en Neon).
 
-### Backend
-*   **Node.js + Express** (arquitectura MVC con capa de Servicios)
-*   **Sequelize** (ORM) sobre **PostgreSQL** (alojado en Neon.tech)
-*   **JWT** para sesiones, **bcrypt** para hash de contraseñas
-*   **express-validator**, **helmet** y middlewares de sanitización para seguridad
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/MauroNanda/proybackendgrupo02.git
+cd proybackendgrupo02
 
-### Servicios Web Externos Integrados (6 — la consigna pide mínimo 4)
-1.  **Google OAuth 2.0** — Login Social.
-2.  **Telegram Bot API** — Notificaciones y 2FA.
-3.  **Discord Bot** — Difusión automática de eventos nuevos.
-4.  **Resend** — Emails transaccionales con plantillas HTML.
-5.  **Google Calendar** — Link dinámico para agendar eventos.
-6.  **Web Push API** — Notificaciones nativas del navegador.
+# 2. Instalar dependencias
+npm install
 
----
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Completar las variables en .env (base de datos, JWT, servicios externos)
 
-## Estructura del Proyecto (Dos Repositorios)
+# 4. Ejecutar las migraciones
+npx sequelize-cli db:migrate
 
-Conforme a la consigna, el proyecto está dividido en dos repositorios independientes:
+# 5. Iniciar el servidor
+npm start          # producción
+npm run dev        # desarrollo (recarga automática con nodemon)
+```
 
-| Repositorio | URL | Contenido |
-|---|---|---|
-| **Backend** (este repo) | https://github.com/MauroNanda/proybackendgrupo02 | API REST en Node + Express, modelos Sequelize, integraciones con servicios externos y **documentación completa del proyecto**. |
-| **Frontend** | https://github.com/MauroNanda/proyfrontendgrupo02 | Aplicación Angular 22 con las dos vistas y consumo de la API. |
+El servidor queda en `http://localhost:3000` (configurable con la variable `PORT`). Para verificar que responde: `GET http://localhost:3000/api/health`.
 
----
+Guía de instalación detallada en [`docs/SETUP.md`](./docs/SETUP.md).
 
 ## Documentación
 
-Toda la documentación técnica del proyecto vive en la carpeta [`docs/`](./docs) de este repositorio. Es la **fuente única de verdad**.
+Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs) de este repositorio:
 
 | Archivo | Contenido |
 |---|---|
-| [`docs/CONSIGNA-TP-FINAL.md`](./docs/CONSIGNA-TP-FINAL.md) | Consigna oficial de la cátedra. |
-| [`docs/PROPUESTA.md`](./docs/PROPUESTA.md) | Visión, alcance, features, flujos de usuario e integraciones. |
-| [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Diagrama Entidad-Relación, esquema de BD (9 tablas) y estructura MVC. |
+| [`docs/PROPUESTA.md`](./docs/PROPUESTA.md) | Alcance del proyecto, funcionalidades e integraciones. |
+| [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Esquema de base de datos y estructura del código. |
+| [`docs/PLAN-DE-TAREAS.md`](./docs/PLAN-DE-TAREAS.md) | Tareas organizadas por fases y dominios, con responsables. |
+| [`docs/BITACORA.md`](./docs/BITACORA.md) | Estado actual y funcionalidades implementadas. |
 | [`docs/CONVENCIONES.md`](./docs/CONVENCIONES.md) | Reglas de código, estilo y nomenclatura. |
-| [`docs/FLUJO_DE_TRABAJO.md`](./docs/FLUJO_DE_TRABAJO.md) | Estrategia de ramas, commits y Pull Requests. |
-| [`docs/PLAN-DE-TAREAS.md`](./docs/PLAN-DE-TAREAS.md) | Tareas organizadas por fases y dominios, con asignación clara. |
+| [`docs/FLUJO_DE_TRABAJO.md`](./docs/FLUJO_DE_TRABAJO.md) | Forma de trabajo del equipo con Git. |
+| [`docs/CONSIGNA-TP-FINAL.md`](./docs/CONSIGNA-TP-FINAL.md) | Consigna oficial de la cátedra. |
 | [`docs/SETUP.md`](./docs/SETUP.md) | Guía paso a paso para levantar el proyecto. |
-| [`docs/BITACORA.md`](./docs/BITACORA.md) | Estado actual del proyecto y changelog. |
 
----
+## Repositorios
 
-## Instalación Rápida
-
-Ver guía completa en [`docs/SETUP.md`](./docs/SETUP.md).
-
-```bash
-# 1. Clonar ambos repositorios
-git clone https://github.com/MauroNanda/proybackendgrupo02.git
-git clone https://github.com/MauroNanda/proyfrontendgrupo02.git
-
-# 2. Backend
-cd proybackendgrupo02
-npm install
-cp .env.example .env       # completar variables
-npx sequelize-cli db:migrate
-npm run dev
-
-# 3. Frontend (en otra terminal)
-cd ../proyfrontendgrupo02
-npm install
-npm start
-```
-
-Backend: `http://localhost:3000` — Frontend: `http://localhost:4200`.
-
----
-
-## Cumplimiento de la Consigna
-
-| Requisito de la Consigna | Cobertura en el Proyecto |
+| Repositorio | URL |
 |---|---|
-| Múltiples roles de usuario | Organizador / Asistente |
-| Operaciones CRUD | Eventos, Usuarios, Inscripciones, Valoraciones, Categorías |
-| Métodos HTTP GET, POST, PUT, DELETE | Implementados en toda la API REST |
-| Arquitectura MVC en backend | `controllers/`, `models/`, `routes/`, `services/` |
-| Componentes Angular | Standalone Components con Signals |
-| Bootstrap 5 + mobile-first | Sistema de estilos principal |
-| Formularios reactivos con validaciones personalizadas | `ReactiveFormsModule` con custom validators |
-| Al menos 4 servicios web externos | **6 integraciones** (Google OAuth, Telegram, Discord, Resend, Google Calendar, Web Push) |
-| JWT + bcrypt + control de roles | Implementado |
-| Prevención XSS, CSRF | Middlewares `helmet`, `sanitize`, validación de inputs |
-| Login social OAuth | Google OAuth 2.0 |
-| Auditoría de acciones | Tabla `AuditoriaAccion` |
-| Historial de accesos | Tabla `HistorialAcceso` |
-| Sequelize + Postgres | Sequelize sobre Neon.tech |
-| Dashboard con gráficos | Chart.js / ng2-charts |
-| DataTables con filtros, búsqueda, paginación | Lista de inscriptos |
-| Exportación PDF y Excel | Reportes de inscriptos |
-| Dos repositorios Git independientes | Backend y Frontend separados |
-
----
-
-## Equipo
-
-Grupo G02 — 5 integrantes. Materia **Programación y Servicios Web**, Facultad de Ingeniería, Universidad Nacional de Jujuy.
-
-> Para más información sobre cómo trabajamos como equipo, ver [`docs/FLUJO_DE_TRABAJO.md`](./docs/FLUJO_DE_TRABAJO.md).
+| Backend (este) | https://github.com/MauroNanda/proybackendgrupo02 |
+| Frontend | https://github.com/MauroNanda/proyfrontendgrupo02 |
