@@ -140,6 +140,20 @@ class AuthController {
     res.json({ mensaje: 'Sesión cerrada' });
   }
 
+  async actualizarPerfil(req, res, next) {
+    try {
+      const usuarioId = req.usuario.id;
+      const { nombre } = req.body;
+      const usuario = await authService.actualizarPerfil(usuarioId, { nombre });
+      res.json({
+        message: 'Perfil actualizado con éxito.',
+        usuario
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async configurar2FA(req, res, next) {
     try {
       const { habilitar } = req.body; // true para activar, false para desactivar

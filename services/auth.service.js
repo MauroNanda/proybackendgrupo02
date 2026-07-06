@@ -199,6 +199,18 @@ class AuthService {
     };
   }
 
+  async actualizarPerfil(id, datos) {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+      throw new HttpError('Usuario no encontrado', 404);
+    }
+    if (datos.nombre) {
+      usuario.nombre = datos.nombre;
+    }
+    await usuario.save();
+    return serializarUsuario(usuario);
+  }
+
   _generarToken(usuario) {
     return firmarToken({
       id: usuario.id,

@@ -43,6 +43,17 @@ router.post('/registro', registroLimiter, validacionRegistro, authController.reg
 router.post('/login', loginLimiter, validacionLogin, authController.login);
 router.get('/perfil', authMiddleware, authController.perfil);
 
+const validacionActualizarPerfil = [
+  body('nombre')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('El nombre no puede estar vacío')
+    .isLength({ max: 120 }).withMessage('El nombre no debe superar los 120 caracteres'),
+  validate,
+];
+
+router.put('/perfil', authMiddleware, validacionActualizarPerfil, authController.actualizarPerfil);
+
 // Logout: borra la cookie httpOnly de sesión (POST porque cambia estado).
 router.post('/logout', authController.logout);
 
