@@ -8,20 +8,17 @@ const client = new OAuth2Client(
   process.env.GOOGLE_CALLBACK_URL
 );
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
+const { setAuthCookie, clearAuthCookie, leerCookie } = require('../utils/cookie.util');
 
-// Lee una cookie puntual del header (evita sumar cookie-parser solo para esto).
-function leerCookie(req, nombre) {
-  const raw = req.headers.cookie;
-  if (!raw) return null;
-  const par = raw.split(';').map((c) => c.trim()).find((c) => c.startsWith(`${nombre}=`));
-  return par ? decodeURIComponent(par.slice(nombre.length + 1)) : null;
-}
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
 
 class AuthController {
   async registro(req, res, next) {
     try {
       const resultado = await authService.registro(req.body);
+      setAuthCookie(res, resultado.token);
+      // TRANSICIÓN: seguimos devolviendo `token` en el body para el front viejo
+      // (Bearer). El front nuevo usa la cookie httpOnly e ignora este campo.
       res.status(201).json(resultado);
     } catch (err) {
       next(err);
@@ -31,6 +28,10 @@ class AuthController {
   async login(req, res, next) {
     try {
       const resultado = await authService.login(req.body);
+      // Si pidió 2FA todavía no hay token → no hay cookie que setear.
+      if (resultado.token) {
+        setAuthCookie(res, resultado.token);
+      }
       res.json(resultado);
     } catch (err) {
       next(err);
@@ -109,8 +110,10 @@ class AuthController {
         );
       }
 
-      // Token en el fragment (#), no en la query (?): el fragment no viaja al
-      // servidor, así que no queda en logs de acceso ni en el header Referer.
+      // Cookie httpOnly con el token (el front nuevo la usa vía withCredentials).
+      setAuthCookie(res, resultado.token);
+      // TRANSICIÓN: se mantiene #token= para el front viejo. Cuando el front
+      // migre a la cookie, cambiar por `#ok=1` (así el token deja de ir en la URL).
       res.redirect(`${FRONTEND_URL}/auth/callback#token=${resultado.token}`);
     } catch (err) {
       next(err);
@@ -122,10 +125,19 @@ class AuthController {
     try {
       const { email, codigo } = req.body;
       const resultado = await authService.validarCodigo2FA(email, codigo);
+      setAuthCookie(res, resultado.token);
       res.json(resultado);
     } catch (err) {
       next(err);
     }
+  }
+
+  // Logout real: borra la cookie httpOnly (el front no puede, justamente por
+  // httpOnly). Sin authMiddleware a propósito: un token ya vencido igual debe
+  // poder limpiar su cookie.
+  logout(_req, res) {
+    clearAuthCookie(res);
+    res.json({ mensaje: 'Sesión cerrada' });
   }
 
   async configurar2FA(req, res, next) {

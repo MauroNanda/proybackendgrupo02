@@ -31,4 +31,5 @@ function verificarToken(token) {
 module.exports = {
   firmarToken,
   verificarToken,
+  JWT_EXPIRES_IN,
 };

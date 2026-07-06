@@ -40,6 +40,11 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 18):** C-22 — JWT de localStorage → cookie httpOnly (diseño con Fable). **Backend (rama `feature/auth-cookie-httponly`)**, aditivo y sin romper el front actual.
+    *   **Nuevo `utils/cookie.util.js`:** `setAuthCookie`/`clearAuthCookie`/`leerCookie`. Cookie `convoca_token` con `httpOnly` (JS no la lee → XSS no roba el token), `sameSite: lax` (localhost:4200↔:3000 es same-site, el puerto no cuenta), `secure` solo en prod, `path: /api`, `maxAge` alineado a `JWT_EXPIRES_IN`.
+    *   `auth.controller`: setea la cookie en login/registro/verificar2FA/callbackGoogle; nuevo `POST /api/auth/logout` que la borra (el front no puede por httpOnly). `auth.middleware` lee la **cookie con fallback a Bearer** (Postman/tests/front viejo siguen andando). Se reusa `leerCookie` del util (también para el `oauth_state`).
+    *   **Transición:** se mantiene `token` en el body y `#token=` en el callback → el front actual no se rompe; el front nuevo usará la cookie. Validado por curl: Set-Cookie httpOnly, `/perfil` funciona solo con cookie (200), sin nada 401, logout borra la cookie.
+    *   **Frontend (mergeado):** interceptor `withCredentials`, `auth.service` sin token (sesión desde `currentUser`+`/perfil`), logout por endpoint, callback sin `#token`. Restricción de deploy: front y API en el mismo dominio registrable (si no, `sameSite=none`+`secure`).
 *   **2026-07-06 (Sesión 17):** Recordatorio push 24h antes del evento (rama `feature/recordatorio-24h`, diseño con Fable). Primera **tarea programada** del backend.
     *   **Job (`jobs/recordatorios.job.js`):** `node-cron` cada 15 min busca eventos PUBLICADO que empiezan dentro de 24h y avisa a los inscriptos CONFIRMADO por push + in-app (email no, para no spamear). Se engancha en `app.js` tras conectar la DB.
     *   **Idempotencia:** columna `Eventos.recordatorio_enviado_en` (migración `20260707000000`) + **claim atómico** (`UPDATE ... WHERE recordatorio_enviado_en IS NULL`) → no duplica ante reinicios, corridas superpuestas ni doble instancia. Ventana amplia (24h) → si el server estuvo caído, el aviso se recupera en la corrida siguiente.
