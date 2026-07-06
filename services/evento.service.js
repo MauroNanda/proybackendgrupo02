@@ -1,4 +1,5 @@
 const { Evento, Categoria, Inscripcion, Usuario, EventoCategoria, sequelize } = require('../models');
+const { Op } = require('sequelize');
 const HttpError = require('../utils/http-error');
 const eventosHooks = require('../integrations/eventos.hooks');
 const notificaciones = require('../integrations/notificaciones');
@@ -9,14 +10,9 @@ class EventoService {
     const { Op } = require('sequelize');
 
     if (!todos) {
-      // Catálogo público: solo eventos publicados. Los CANCELADOS salen del
-      // listado pero siguen accesibles por link directo vía obtenerPorId
-      // (el detalle muestra su estado; la inscripción los rechaza con 409).
-      where.estado = 'PUBLICADO';
-
-      // Decisión: los eventos pasados SÍ se muestran (historial + valoraciones).
-      // Si se decide ocultarlos del catálogo, descomentar:
-      // where.fecha = { [Op.gte]: new Date() };
+      where.estado = {
+        [Op.in]: ['PUBLICADO', 'CANCELADO'],
+      };
     }
 
     if (search) {
@@ -90,6 +86,18 @@ async actualizar(id, datos) {
 
   if (!evento) {
     throw new HttpError('Evento no encontrado', 404);
+  }
+
+  if (datosEvento.cupo_maximo !== undefined) {
+    const countActive = await Inscripcion.count({
+      where: {
+        eventoId: id,
+        estado: { [Op.in]: ['CONFIRMADO', 'ASISTIO'] }
+      }
+    });
+    if (datosEvento.cupo_maximo < countActive) {
+      throw new HttpError(`No se puede reducir el cupo a ${datosEvento.cupo_maximo} porque ya existen ${countActive} inscripciones confirmadas/asistidas`, 400);
+    }
   }
 
   const estadoAnterior = evento.estado;

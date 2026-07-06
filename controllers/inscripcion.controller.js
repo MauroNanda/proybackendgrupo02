@@ -25,6 +25,16 @@ class InscripcionController {
     }
   }
 
+  async obtenerMisInscripciones(req, res, next) {
+    try {
+      const usuarioId = req.usuario.id;
+      const inscripciones = await inscripcionService.obtenerMisInscripciones(usuarioId);
+      res.json(inscripciones);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async inscribirse(req, res, next) {
     try {
       const { eventoId } = req.body;
