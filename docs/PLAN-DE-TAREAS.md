@@ -252,7 +252,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 | **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `LIBRE` |
 | **T-12** | Telegram Bot | 🔴 Difícil | Sí | `LIBRE` |
 | **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
-| **T-14** | Discord Bot | 🟢 Fácil-media | No | `LIBRE` |
+| **T-14** | Discord Bot | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-15** | Google Calendar | 🟢 Fácil | Solo front | `LIBRE` |
 
 ---
@@ -332,8 +332,9 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-14 — Discord Bot
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — mergeado a `main`. Circuito validado en vivo (bot `convoca_unju_2026`, canal `#eventos_convoca`).
 *   **Rama:** `feature/discord-bot`
+*   **Notas de cierre:** embed enriquecido (urgencia <48hs, tono de escasez por cupo, timestamps nativos de Discord, escape de markdown anti-inyección, título clickeable solo con URL pública). Pendiente para una rama futura de integraciones: CTA "Unite al Discord" (invite `DISCORD_INVITE_URL`) en el punto de captación (frontend / anuncio de Telegram), a hacer una vez que Telegram esté en `main`.
 *   **Dificultad:** 🟢 Fácil-media (**solo backend**, superficie chica).
 *   **Descripción:** Difundir automáticamente los eventos nuevos en un canal de Discord del servidor de la comunidad.
 *   **Circuito:** el organizador publica un evento → `evento.service` → `eventosHooks.alPublicarEvento(evento)` → handler de Discord → `discord.service.anunciar(evento)` → el bot postea un embed en el canal → los miembros lo ven. (Unidireccional sistema → Discord.)
