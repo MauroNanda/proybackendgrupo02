@@ -13,7 +13,7 @@
     "seed:undo": "sequelize-cli db:seed:undo:all",
     "lint": "eslint .",
     "test": "echo \"No tests yet\" && exit 0",
-    "prepare": "husky"
+    "prepare": "node -e \"if(process.env.HUSKY==='0'||!require('fs').existsSync('node_modules/husky'))process.exit(0);require('child_process').execSync('husky',{stdio:'inherit'})\""
   },
   "keywords": [
     "convoca",
