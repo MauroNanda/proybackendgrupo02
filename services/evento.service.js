@@ -51,6 +51,13 @@ class EventoService {
 
 
 
+// Recupera un evento con sus categorías (usado para responder y para notificar).
+async _conCategorias(id) {
+  return await Evento.findByPk(id, {
+    include: [{ model: Categoria, through: { attributes: [] } }],
+  });
+}
+
 async crear(datos) {
   const { categorias, ...datosEvento } = datos;
 
@@ -60,12 +67,14 @@ async crear(datos) {
     await evento.setCategorias(categorias);
   }
 
-  // Si nace publicado, disparar el hook (ej. difusión en Discord). No bloquea.
-  if (evento.estado === 'PUBLICADO') {
-    await eventosHooks.alPublicarEvento(evento);
+  const eventoCompleto = await this._conCategorias(evento.id);
+
+  // Si nace publicado, difundirlo (Telegram, etc.). El hook aísla errores.
+  if (eventoCompleto.estado === 'PUBLICADO') {
+    await eventosHooks.alPublicarEvento(eventoCompleto);
   }
 
-  return evento;
+  return eventoCompleto;
 }
 
 async actualizar(id, datos) {
@@ -85,20 +94,26 @@ async actualizar(id, datos) {
     await evento.setCategorias(categorias);
   }
 
-  // Disparar el hook solo en la transición a PUBLICADO (no en cada edición).
-  if (evento.estado === 'PUBLICADO' && estadoAnterior !== 'PUBLICADO') {
-    await eventosHooks.alPublicarEvento(evento);
+  // Al cancelar un evento, dar de baja las inscripciones activas (antes de
+  // notificar, para que el aviso "tu inscripción quedó sin efecto" sea verdad).
+  if (evento.estado === 'CANCELADO' && estadoAnterior !== 'CANCELADO') {
+    await Inscripcion.update(
+      { estado: 'CANCELADO' },
+      { where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] } }
+    );
   }
 
-  return await Evento.findByPk(id, {
-    include: [
-      {
-        model: Categoria,
-        through: { attributes: [] },
-      },
-    ],
-    });
+  const eventoCompleto = await this._conCategorias(id);
+
+  // Disparar hooks solo en la transición de estado (no en cada edición).
+  if (evento.estado === 'PUBLICADO' && estadoAnterior !== 'PUBLICADO') {
+    await eventosHooks.alPublicarEvento(eventoCompleto);
+  } else if (evento.estado === 'CANCELADO' && estadoAnterior !== 'CANCELADO') {
+    await eventosHooks.alCancelarEvento(eventoCompleto);
   }
+
+  return eventoCompleto;
+}
 
   async eliminar(id) {
     // Borrado atómico: si falla algún paso, no queda el evento a medias.
