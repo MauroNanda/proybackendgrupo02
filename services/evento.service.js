@@ -13,6 +13,12 @@ class EventoService {
       where.estado = {
         [Op.in]: ['PUBLICADO', 'CANCELADO'],
       };
+      // Catálogo público: no listar eventos que ya ocurrieron (no se puede
+      // hacer nada con ellos). Los que aún no pasaron se muestran aunque el
+      // cupo esté lleno, porque el usuario puede sumarse a la lista de espera.
+      where.fecha = {
+        [Op.gte]: new Date(),
+      };
     }
 
     if (search) {
