@@ -1,6 +1,6 @@
 # Bitácora del Proyecto y Estado Actual
 
-## Estado Global: `Fase 3 en curso (Integraciones) — T-11 OAuth/2FA, T-12 Telegram y T-14 Discord hechos`
+## Estado Global: `Fase 3 avanzada — T-11, T-12, T-14, T-15 hechos; ronda de reglas de negocio (C-04/06/08/16) aplicada`
 
 ### Resumen del Estado Actual
 Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. El Proyecto Base y las Fases 1 y 2 (Asistente MVP y Organizador MVP) ya están implementados y mergeados a `main`; el proyecto se encuentra preparando la Fase 3 (Integraciones Avanzadas).
@@ -40,6 +40,15 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 14):** T-15 (Google Calendar) + ronda de reglas de negocio (rama `fix/reglas-negocio-eventos`).
+    *   **T-15 (frontend, mergeado):** botón "Agregar a Google Calendar" en el detalle del evento → abre el template URL de Google prellenado (título, fecha en UTC, descripción, ubicación). No usa API/OAuth de Calendar. Correcciones al revisar: `window.open` con `noopener` (anti-tabnabbing) y formato de fecha simplificado.
+    *   **Reglas de negocio (backend, diseño consultado con modelo Fable):**
+        *   **C-04:** `inscribirse` ahora valida el evento sobre la fila bloqueada: BORRADOR → 404, CANCELADO → 409, fecha pasada → 409. Antes dejaba inscribirse en cualquier estado/fecha. Validado en vivo (pasado → 409, futuro → 201).
+        *   **C-06:** el catálogo público lista **solo PUBLICADO** (antes incluía CANCELADO); el detalle por link directo sigue accesible.
+        *   **C-16:** KPI `totalEventos` cuenta solo PUBLICADO (antes inflaba con BORRADOR/CANCELADO). **Aviso:** el número baja de un día para otro, no es pérdida de datos.
+        *   **C-08:** `error-handler` mapea errores de Sequelize a status semántico (unique → 409, validación/UUID inválido → 400, FK → 409) con mensaje genérico (no filtra detalle de DB); un 500 en prod ya no expone `err.message`. Esto además resuelve **C-05** (registro concurrente → 409).
+    *   **Convención de status establecida:** 400 input inválido · 404 inexistente/no visible · 409 estado no admite la operación · 500 falla interna (mensaje genérico en prod).
+    *   **Impacto en front a revisar:** eventos CANCELADO ya no aparecen en el catálogo → badge "Cancelado" del listado queda sin caso de uso; "mis inscripciones" debe resolver el evento por `obtenerPorId`/relación, no por `listar`.
 *   **2026-07-06 (Sesión 13):** Fase 3 — Google OAuth 2.0 + 2FA (T-11), con revisión de seguridad. Toca **ambos repos**.
     *   **Alcance:** login con Google (OAuth) y segundo factor (2FA) por email. Validado de punta a punta en vivo (registro, login usuario/contraseña, 2FA y login con Google real → sesión con identidad).
     *   **Revisión de seguridad y fixes (backend):** el envío del código 2FA usaba un método inexistente (`notificacionService.enviar`) y crasheaba → ahora usa `email.service`; código generado con `crypto` y **guardado hasheado** (bcrypt) + limiter en `/2fa/verify` (fuerza bruta); registro **fuerza rol ASISTENTE** (cierra la escalada de C-02); OAuth con `state` anti-CSRF (cookie httpOnly), **token por fragment** (no en query → no queda en logs/Referer), **account-linking** por email (evita duplicar/500), `FRONTEND_URL` desde env; `down` de migración completo.

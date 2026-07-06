@@ -8,9 +8,14 @@ class EventoService {
     const { Op } = require('sequelize');
 
     if (!todos) {
-      where.estado = {
-        [Op.in]: ['PUBLICADO', 'CANCELADO'],
-      };
+      // Catálogo público: solo eventos publicados. Los CANCELADOS salen del
+      // listado pero siguen accesibles por link directo vía obtenerPorId
+      // (el detalle muestra su estado; la inscripción los rechaza con 409).
+      where.estado = 'PUBLICADO';
+
+      // Decisión: los eventos pasados SÍ se muestran (historial + valoraciones).
+      // Si se decide ocultarlos del catálogo, descomentar:
+      // where.fecha = { [Op.gte]: new Date() };
     }
 
     if (search) {
