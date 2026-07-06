@@ -1,6 +1,6 @@
 # Bitácora del Proyecto y Estado Actual
 
-## Estado Global: `Fase 2 completada — preparando Fase 3 (Integraciones)`
+## Estado Global: `Fase 3 avanzada — T-11, T-12, T-14, T-15 hechos; ronda de reglas de negocio (C-04/06/08/16) aplicada`
 
 ### Resumen del Estado Actual
 Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. El Proyecto Base y las Fases 1 y 2 (Asistente MVP y Organizador MVP) ya están implementados y mergeados a `main`; el proyecto se encuentra preparando la Fase 3 (Integraciones Avanzadas).
@@ -33,12 +33,39 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] **Mejoras sutiles:** ronda de robustez (backend) y UX/rendimiento (frontend) en la rama `feature/mejoras-sutiles`.
 - [x] **Fase 3 — Terreno:** hub de notificaciones y hooks de eventos para desacoplar integraciones (rama `feature/fase3-preparacion`).
 - [x] **Fase 3 — Planificación:** tareas T-11 a T-15 detalladas en `PLAN-DE-TAREAS.md`.
-- [ ] Crear Bot de Telegram y Bot de Discord (Fase 3).
+- [x] **Fase 3 (T-14):** Bot de Discord — difusión de eventos publicados en `#eventos_convoca`, mergeado a `main`.
+- [x] **Fase 3 (T-12, scope reducido):** Bot de Telegram — difusión grupal (anuncio + cancelación) en `@convoca_unju_2026`, mergeado a `main`. Sin vinculación de cuenta ni notificaciones personales.
 - [ ] Configurar Google OAuth en Google Cloud Console (Fase 3).
 - [ ] Configurar cuenta de Resend (necesario para Fase 1, dominio Notificaciones).
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 14):** T-15 (Google Calendar) + ronda de reglas de negocio (rama `fix/reglas-negocio-eventos`).
+    *   **T-15 (frontend, mergeado):** botón "Agregar a Google Calendar" en el detalle del evento → abre el template URL de Google prellenado (título, fecha en UTC, descripción, ubicación). No usa API/OAuth de Calendar. Correcciones al revisar: `window.open` con `noopener` (anti-tabnabbing) y formato de fecha simplificado.
+    *   **Reglas de negocio (backend, diseño consultado con modelo Fable):**
+        *   **C-04:** `inscribirse` ahora valida el evento sobre la fila bloqueada: BORRADOR → 404, CANCELADO → 409, fecha pasada → 409. Antes dejaba inscribirse en cualquier estado/fecha. Validado en vivo (pasado → 409, futuro → 201).
+        *   **C-06:** el catálogo público lista **solo PUBLICADO** (antes incluía CANCELADO); el detalle por link directo sigue accesible.
+        *   **C-16:** KPI `totalEventos` cuenta solo PUBLICADO (antes inflaba con BORRADOR/CANCELADO). **Aviso:** el número baja de un día para otro, no es pérdida de datos.
+        *   **C-08:** `error-handler` mapea errores de Sequelize a status semántico (unique → 409, validación/UUID inválido → 400, FK → 409) con mensaje genérico (no filtra detalle de DB); un 500 en prod ya no expone `err.message`. Esto además resuelve **C-05** (registro concurrente → 409).
+    *   **Convención de status establecida:** 400 input inválido · 404 inexistente/no visible · 409 estado no admite la operación · 500 falla interna (mensaje genérico en prod).
+    *   **Impacto en front a revisar:** eventos CANCELADO ya no aparecen en el catálogo → badge "Cancelado" del listado queda sin caso de uso; "mis inscripciones" debe resolver el evento por `obtenerPorId`/relación, no por `listar`.
+*   **2026-07-06 (Sesión 13):** Fase 3 — Google OAuth 2.0 + 2FA (T-11), con revisión de seguridad. Toca **ambos repos**.
+    *   **Alcance:** login con Google (OAuth) y segundo factor (2FA) por email. Validado de punta a punta en vivo (registro, login usuario/contraseña, 2FA y login con Google real → sesión con identidad).
+    *   **Revisión de seguridad y fixes (backend):** el envío del código 2FA usaba un método inexistente (`notificacionService.enviar`) y crasheaba → ahora usa `email.service`; código generado con `crypto` y **guardado hasheado** (bcrypt) + limiter en `/2fa/verify` (fuerza bruta); registro **fuerza rol ASISTENTE** (cierra la escalada de C-02); OAuth con `state` anti-CSRF (cookie httpOnly), **token por fragment** (no en query → no queda en logs/Referer), **account-linking** por email (evita duplicar/500), `FRONTEND_URL` desde env; `down` de migración completo.
+    *   **Fixes (frontend):** callback lee el token del fragment y **pide `/perfil`** para poblar `currentUser` (antes quedaba logueado sin identidad ni rol); 2FA/login usan `sessionStorage` (no `localStorage`) para el email, con manejo de error y `takeUntilDestroyed`; redirect a Google desde `environment`; tipos corregidos; `login()` ya no persiste `token=undefined` en la respuesta 2FA.
+    *   **Pendiente documentado:** el JWT sigue en `localStorage` (patrón app-wide) → registrado como **C-22** en `CORRECCIONES.md` para migrar a cookie httpOnly como tarea transversal.
+    *   **Recordatorio post-merge:** dependencia nueva `google-auth-library` → correr `npm install`.
+*   **2026-07-05 (Sesión 12):** Fase 3 — Bot de Telegram (T-12, scope reducido).
+    *   **Integración (rama `feature/telegram-bot`):** difusión grupal en el canal `@convoca_unju_2026` — anuncio de evento publicado (`telegram.service.anunciarEvento`, formato HTML, urgencia <48hs, escasez de cupo, botón/link al detalle) y aviso de cancelación (`anunciarCancelacion`). Nuevo hook `onCancelado`/`alCancelarEvento`; al cancelar, `evento.service` da de baja las inscripciones activas antes de notificar.
+    *   **Scope reducido (decisión de equipo):** solo difusión a nivel grupo. Quedan fuera la vinculación de cuenta, las notificaciones personales (QR/recordatorios) y la entrega de 2FA que describía el T-12 original.
+    *   **Unificación de integraciones:** al mergear con `main` (que ya traía Discord), se consolidó todo en `integrations/register.js` como hub único (Telegram publicar+cancelar, Discord publicar); `app.js` solo llama `registrarIntegraciones()` (se quitó el hook inline de Discord).
+    *   **Validación:** circuito completo probado en vivo tras el merge (anuncio + cancelación en Telegram, anuncio en Discord). Sin errores.
+*   **2026-07-05 (Sesión 11):** Fase 3 — Bot de Discord (T-14).
+    *   **Integración (rama `feature/discord-bot`):** `integrations/discord.service.js` difunde los eventos publicados en el canal `#eventos_convoca` vía `eventosHooks.onPublicado`, sin tocar `evento.service` (aprovecha el hook). Registro del handler movido antes de `app.listen`.
+    *   **Correcciones sobre el aporte inicial:** campo `evento.lugar` → `evento.ubicacion` (no existía), intents reducidos a `Guilds` (se quitó el privilegiado `GuildPresences` que podía impedir el login), limpieza de comentario/consejo inseguro, fix del deprecation `ready` → `clientReady` (discord.js v14).
+    *   **Mejora del embed (revisado con modelo Fable):** aviso de urgencia (<48hs), tono de escasez por cupo, timestamps nativos de Discord (`<t:unix:F/R>`, evita el bug de timezone del servidor), escape de markdown anti-inyección, truncado de descripción, footer corregido `ConvocApp` → `Convoca`, título clickeable al detalle solo si la URL es pública.
+    *   **Validación:** circuito probado en vivo (dos eventos de prueba, casos normal y urgente/escaso) → embeds correctos en el canal. `discord.js` es dependencia nueva: **correr `npm install`** tras el merge.
+    *   **Pendiente (rama futura de integraciones):** CTA "Unite al Discord" (invite permanente `https://discord.gg/NM7xnE4VUN`) en el punto de captación (frontend / anuncio de Telegram), a implementar cuando Telegram esté en `main`.
 *   **2026-07-05 (Sesión 10):** Preparación de Fase 3.
     *   **Terreno (rama `feature/fase3-preparacion`):** hub de notificaciones (`integrations/notificaciones.js` + `channels/`) y hooks de eventos (`integrations/eventos.hooks.js`), para que las integraciones se sumen creando un archivo y registrándolo, sin tocar `inscripcion.service`/`evento.service`. Guía en `integrations/README.md`.
     *   **Planificación:** definidas las tareas T-11 a T-15 en `PLAN-DE-TAREAS.md` (Google OAuth + 2FA opt-in, Telegram, Web Push, Discord, Google Calendar) con circuito, archivos, dependencias y dificultad por tarea.

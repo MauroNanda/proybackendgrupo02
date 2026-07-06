@@ -249,16 +249,16 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 
 | Tarea | Dominio | Dificultad | Toca Front | Estado |
 |---|---|---|---|---|
-| **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `LIBRE` |
-| **T-12** | Telegram Bot | 🔴 Difícil | Sí | `LIBRE` |
+| **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `✅ HECHO` |
+| **T-12** | Telegram Bot (difusión) | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
-| **T-14** | Discord Bot | 🟢 Fácil-media | No | `LIBRE` |
-| **T-15** | Google Calendar | 🟢 Fácil | Solo front | `LIBRE` |
+| **T-14** | Discord Bot | 🟢 Fácil-media | No | `✅ HECHO` |
+| **T-15** | Google Calendar | 🟢 Fácil | Solo front | `✅ HECHO` |
 
 ---
 
 ### T-11 — Google OAuth 2.0 (+ 2FA opcional)
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — login con Google + 2FA por email, validado en vivo (registro/login/2FA/OAuth end-to-end). Revisión de seguridad aplicada (ver changelog Sesión 13 y `CORRECCIONES.md` C-22).
 *   **Rama:** `feature/auth-oauth-2fa`
 *   **Dificultad:** 🟡 Media. **Requisito de consigna** (§5: "Login social con APIs de Google (OAuth)").
 *   **Descripción:** Permitir iniciar sesión / registrarse con cuenta de Google. Como add-on **opcional** (suma en la rúbrica de seguridad), verificación en dos pasos (2FA) por usuario.
@@ -287,8 +287,9 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-12 — Telegram Bot
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — mergeado a `main`. Circuito validado en vivo (canal `@convoca_unju_2026`: anuncio + cancelación).
 *   **Rama:** `feature/telegram-bot`
+*   **⚠️ Scope reducido (decisión de equipo):** se implementó **solo la difusión a nivel grupo** (anuncio de evento publicado + aviso de cancelación al canal, con baja de inscripciones activas al cancelar). **NO** incluye la vinculación de cuenta (`/start`, `telegram_id`), las notificaciones personales (QR, recordatorios) ni la entrega de 2FA descriptas abajo; esas quedan fuera del alcance actual.
 *   **Dificultad:** 🔴 Difícil (ciclo de vida del bot + vinculación de cuenta).
 *   **Descripción:** Bot de Telegram para vincular la cuenta y enviar notificaciones (confirmación de inscripción, QR, recordatorios). Además actúa como canal de entrega del código 2FA de T-11.
 *   **Circuito (vinculación):** usuario en su perfil → "Vincular Telegram" → el backend genera un token corto ligado a su `id` → el front muestra el deeplink `t.me/<bot>?start=<token>` → el usuario abre Telegram y hace `/start` → el bot resuelve el token → guarda `Usuario.telegram_id` → confirma en el chat.
@@ -332,8 +333,9 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-14 — Discord Bot
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — mergeado a `main`. Circuito validado en vivo (bot `convoca_unju_2026`, canal `#eventos_convoca`).
 *   **Rama:** `feature/discord-bot`
+*   **Notas de cierre:** embed enriquecido (urgencia <48hs, tono de escasez por cupo, timestamps nativos de Discord, escape de markdown anti-inyección, título clickeable solo con URL pública). Pendiente para una rama futura de integraciones: CTA "Unite al Discord" (invite `DISCORD_INVITE_URL`) en el punto de captación (frontend / anuncio de Telegram), a hacer una vez que Telegram esté en `main`.
 *   **Dificultad:** 🟢 Fácil-media (**solo backend**, superficie chica).
 *   **Descripción:** Difundir automáticamente los eventos nuevos en un canal de Discord del servidor de la comunidad.
 *   **Circuito:** el organizador publica un evento → `evento.service` → `eventosHooks.alPublicarEvento(evento)` → handler de Discord → `discord.service.anunciar(evento)` → el bot postea un embed en el canal → los miembros lo ven. (Unidireccional sistema → Discord.)

@@ -44,7 +44,15 @@ module.exports = (sequelize) => {
       two_factor_enabled: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true,
+        defaultValue: false,
+      },
+      codigo_2fa: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      codigo_2fa_expira: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       avatar_url: {
         type: DataTypes.STRING(500),

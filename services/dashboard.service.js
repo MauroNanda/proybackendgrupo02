@@ -11,7 +11,10 @@ class DashboardService {
     const [totalUsuarios, totalEventos, totalInscripciones, valoracionResult] = await Promise.all([
       Usuario.count(),
 
-      Evento.count(),
+      // Solo eventos publicados: los borradores son trabajo en curso y los
+      // cancelados ya se desglosan en el gráfico "eventos por estado".
+      // Así el KPI queda alineado con el catálogo público.
+      Evento.count({ where: { estado: 'PUBLICADO' } }),
 
       // Solo contamos inscripciones que representan presencia real (no canceladas ni en espera)
       Inscripcion.count({
