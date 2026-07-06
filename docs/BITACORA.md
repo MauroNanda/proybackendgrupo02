@@ -34,12 +34,17 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [x] **Fase 3 — Terreno:** hub de notificaciones y hooks de eventos para desacoplar integraciones (rama `feature/fase3-preparacion`).
 - [x] **Fase 3 — Planificación:** tareas T-11 a T-15 detalladas en `PLAN-DE-TAREAS.md`.
 - [x] **Fase 3 (T-14):** Bot de Discord — difusión de eventos publicados en `#eventos_convoca`, mergeado a `main`.
-- [ ] Crear Bot de Telegram (Fase 3).
+- [x] **Fase 3 (T-12, scope reducido):** Bot de Telegram — difusión grupal (anuncio + cancelación) en `@convoca_unju_2026`, mergeado a `main`. Sin vinculación de cuenta ni notificaciones personales.
 - [ ] Configurar Google OAuth en Google Cloud Console (Fase 3).
 - [ ] Configurar cuenta de Resend (necesario para Fase 1, dominio Notificaciones).
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-05 (Sesión 12):** Fase 3 — Bot de Telegram (T-12, scope reducido).
+    *   **Integración (rama `feature/telegram-bot`):** difusión grupal en el canal `@convoca_unju_2026` — anuncio de evento publicado (`telegram.service.anunciarEvento`, formato HTML, urgencia <48hs, escasez de cupo, botón/link al detalle) y aviso de cancelación (`anunciarCancelacion`). Nuevo hook `onCancelado`/`alCancelarEvento`; al cancelar, `evento.service` da de baja las inscripciones activas antes de notificar.
+    *   **Scope reducido (decisión de equipo):** solo difusión a nivel grupo. Quedan fuera la vinculación de cuenta, las notificaciones personales (QR/recordatorios) y la entrega de 2FA que describía el T-12 original.
+    *   **Unificación de integraciones:** al mergear con `main` (que ya traía Discord), se consolidó todo en `integrations/register.js` como hub único (Telegram publicar+cancelar, Discord publicar); `app.js` solo llama `registrarIntegraciones()` (se quitó el hook inline de Discord).
+    *   **Validación:** circuito completo probado en vivo tras el merge (anuncio + cancelación en Telegram, anuncio en Discord). Sin errores.
 *   **2026-07-05 (Sesión 11):** Fase 3 — Bot de Discord (T-14).
     *   **Integración (rama `feature/discord-bot`):** `integrations/discord.service.js` difunde los eventos publicados en el canal `#eventos_convoca` vía `eventosHooks.onPublicado`, sin tocar `evento.service` (aprovecha el hook). Registro del handler movido antes de `app.listen`.
     *   **Correcciones sobre el aporte inicial:** campo `evento.lugar` → `evento.ubicacion` (no existía), intents reducidos a `Guilds` (se quitó el privilegiado `GuildPresences` que podía impedir el login), limpieza de comentario/consejo inseguro, fix del deprecation `ready` → `clientReady` (discord.js v14).
