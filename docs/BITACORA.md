@@ -1,6 +1,6 @@
 # Bitácora del Proyecto y Estado Actual
 
-## Estado Global: `Fase 3 avanzada — T-11, T-12, T-14, T-15 hechos; ronda de reglas de negocio (C-04/06/08/16) aplicada`
+## Estado Global: `Fase 3 COMPLETA — T-11 a T-15 hechos (falta cargar VAPID y probar push en vivo); reglas de negocio C-04/06/08/16 aplicadas`
 
 ### Resumen del Estado Actual
 Propuesta completa definida y adaptada a la consigna oficial. Repositorios separados creados en GitHub (grupo G02). El repo del backend (`proybackendgrupo02`) es la **fuente única de verdad de la documentación** (propuesta, arquitectura, consigna, bitácora, convenciones globales, flujo de trabajo). El repo del frontend (`proyfrontendgrupo02`) tiene su propio `README.md`, `CLAUDE.md` y dos docs específicas (`SETUP-FRONTEND.md`, `CONVENCIONES-FRONTEND.md`) que enlazan al backend para evitar duplicación. El Proyecto Base y las Fases 1 y 2 (Asistente MVP y Organizador MVP) ya están implementados y mergeados a `main`; el proyecto se encuentra preparando la Fase 3 (Integraciones Avanzadas).
@@ -40,6 +40,11 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 15):** T-13 (Web Push) integrado en ambos repos — **última tarea de Fase 3**.
+    *   **Backend (`feature/web-push`):** modelo `PushSubscription` (endpoint único + `keys` JSONB) con migración, `integrations/push.service.js` (wrapper de `web-push`, config VAPID lazy), `integrations/channels/push.channel.js` registrado en el hub de notificaciones (`inscripcionConfirmada`/`inscripcionEnEspera`/`cupoLiberado`, borra suscripciones con 410), rutas `GET /api/push/vapid-public-key` (pública) y `POST /api/push/subscribe` (autenticada). Validado: server arranca sin VAPID (push deshabilitado con warning), `/vapid-public-key` → 503 sin config, `/subscribe` → 401 sin token.
+    *   **Frontend (`feature/web-push`):** service worker (`sw.js`), `manifest.webmanifest` (PWA), `push.service.ts` (permiso + suscripción con `applicationServerKey`), botón "Alertas del navegador" en el layout público. Incluye además el rebranding de logo/favicon (la rama `feature/logo` era su base). Build OK.
+    *   **Correcciones al integrar:** el backend traía el `.env.example` con **marcadores de conflicto commiteados** (merge de main sin resolver) → resuelto unificando las 4 integraciones (Google, Telegram, Discord, VAPID). El frontend se mergeó con `main` (T-11 + T-15) sin conflictos manuales.
+    *   **Pendiente:** cargar las `VAPID_*` en el `.env` y probar el envío real en el navegador (suscribir + inscribirse → notificación nativa).
 *   **2026-07-06 (Sesión 14):** T-15 (Google Calendar) + ronda de reglas de negocio (rama `fix/reglas-negocio-eventos`).
     *   **T-15 (frontend, mergeado):** botón "Agregar a Google Calendar" en el detalle del evento → abre el template URL de Google prellenado (título, fecha en UTC, descripción, ubicación). No usa API/OAuth de Calendar. Correcciones al revisar: `window.open` con `noopener` (anti-tabnabbing) y formato de fecha simplificado.
     *   **Reglas de negocio (backend, diseño consultado con modelo Fable):**

@@ -1,5 +1,6 @@
 const inApp = require('./channels/in-app.channel');
 const email = require('./channels/email.channel');
+const push = require('./channels/push.channel');
 
 // ============================================================================
 // HUB DE NOTIFICACIONES
@@ -16,7 +17,7 @@ const email = require('./channels/email.channel');
 // canal (si un canal falla, los demás siguen). No hace falta tocar los servicios.
 // ============================================================================
 
-const canales = [inApp, email];
+const canales = [inApp, email, push];
 
 async function emitir(metodo, usuario, evento) {
   for (const canal of canales) {

@@ -79,6 +79,10 @@ module.exports = (sequelize) => {
       foreignKey: 'usuarioId',
       as: 'inscripciones',
     });
+    Usuario.hasMany(models.PushSubscription, {
+      foreignKey: 'usuario_id',
+      as: 'pushSubscriptions',
+    });
   };
 
   return Usuario;
