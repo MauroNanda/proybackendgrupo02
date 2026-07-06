@@ -4,7 +4,7 @@
 
 ## Qué hace
 
-Cuando un organizador publica un evento, el sistema lo anuncia automáticamente en un canal de Discord mediante un embed (tarjeta enriquecida con título, descripción, fecha, lugar y cupo). El bot es de difusión pura: mantiene una sesión abierta con Discord pero solo envía mensajes al canal, nunca lee ni responde nada.
+Cuando un organizador publica un evento, el sistema lo anuncia en un canal de Discord mediante un embed (tarjeta con título, descripción, fecha, lugar y cupo). El bot es de difusión pura: mantiene una sesión abierta con Discord pero solo envía mensajes al canal, nunca lee ni responde nada.
 
 ## Flujo paso a paso
 
@@ -42,7 +42,7 @@ A diferencia de Telegram, el bot de Discord **no** anuncia cancelaciones: en `re
 - **Difusión unidireccional.** El cliente se crea solo con el intent `Guilds` (lo mínimo para resolver el canal y postear). No se usan intents privilegiados como `MessageContent` o `GuildPresences` porque el bot no lee mensajes de nadie; es sistema → canal, nunca al revés. Además, activar intents privilegiados sin habilitarlos en el Developer Portal haría fallar el login.
 - **Arranque tolerante.** El login se hace al levantar el backend, de forma asíncrona y con `.catch`: si el token falta o es inválido, la API arranca igual (solo sin difusión a Discord). La bandera `isReady` evita intentar enviar antes de que la conexión esté establecida.
 - **Saneamiento del contenido.** La descripción y el lugar renderizan markdown en Discord, así que se truncan primero y se escapan después (`sanear` = `escapeMarkdown(truncar(...))`; el orden importa: escapar antes de truncar podría dejar una barra invertida cortada al final). El título del embed no renderiza markdown, por eso no se escapa (mostraría barras literales) y solo se respeta el límite de 256 caracteres.
-- **Fecha sin problemas de zona horaria.** Se usa el timestamp nativo de Discord (`<t:unix:F>` + `<t:unix:R>`): cada usuario lo ve en su propia zona horaria e idioma, sin depender del timezone del servidor.
+- **Fecha como timestamp nativo de Discord** (`<t:unix:F>` + `<t:unix:R>`): cada usuario la ve en su propia zona horaria e idioma, sin depender del timezone del servidor.
 
 ## Bloques de código clave
 
@@ -123,3 +123,11 @@ try {
   console.error('[Discord Bot] Error aislado al intentar enviar el mensaje a Discord:', error.message);
 }
 ```
+
+## Fuera del circuito (contexto para defender)
+
+- **Configuración previa (una sola vez, fuera del código).** En el [Discord Developer Portal](https://discord.com/developers/applications) se crea una **aplicación** y, dentro de ella, el **bot**, que es el que tiene el token (`DISCORD_BOT_TOKEN`). Al bot hay que **invitarlo al servidor** con una URL de OAuth2 generada en el portal (scope `bot`) con los permisos *Send Messages* y *Embed Links*. El ID del canal (`DISCORD_CHANNEL_ID`) se copia desde Discord con el modo desarrollador activado (clic derecho sobre el canal → "Copiar ID"). Token e ID van al `.env`.
+- **Por qué solo el intent `Guilds`.** Los *intents* le declaran a Discord qué datos va a consumir el bot. `Guilds` es el mínimo que permite resolver un canal (`channels.fetch`) y postear en él. `MessageContent` o `GuildPresences` son intents *privilegiados*: dan acceso a mensajes y actividad de los usuarios, exigen habilitación manual en el portal y no los necesitamos porque el bot no lee nada. Pedir lo mínimo reduce superficie de acceso y evita que el login falle por un intent no habilitado.
+- **Si falta el token.** No se intenta el login (queda un warning al arrancar), `isReady` nunca pasa a `true` y `anunciarEvento` retorna en el primer chequeo. El backend funciona completo, solo sin difusión a Discord.
+- **Si falta `DISCORD_CHANNEL_ID`.** `anunciarEvento` lo detecta, loguea el error y retorna antes de intentar enviar.
+- **Si el bot no está en el servidor (o no tiene permisos).** `client.channels.fetch(channelId)` falla (el bot no "ve" ese canal) o `channel.send` es rechazado por permisos. En ambos casos la excepción cae en el `try/catch` de `anunciarEvento`, se loguea y el evento se publica igual: es el mismo aislamiento que ante una caída de Discord.

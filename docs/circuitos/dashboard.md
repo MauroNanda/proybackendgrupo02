@@ -48,7 +48,7 @@ No usa variables de entorno propias (solo la conexión a la BD que ya usa toda l
 5. **Seguridad por rol:** `router.use(authMiddleware)` + `router.use(roleMiddleware(['ORGANIZADOR']))` en `routes/dashboard.routes.js`. La protección está en el backend; el guard del front es solo UX.
 6. **Gráficos en el front (`dashboard.component.ts`):** `crearBarraMes()` (barra vertical), `crearTortaEstados()` (doughnut con `cutout: '60%'`), `crearBarraEventos()` (barra horizontal, `indexAxis: 'y'`). Los colores por estado salen del mapa `ESTADO_COLORES` (ej. CONFIRMADO azul, ASISTIO verde, CANCELADO rojo, ESPERA amarillo). Los charts se guardan en un array y se destruyen en `ngOnDestroy()` y antes de recargar, para no duplicar instancias sobre el mismo canvas.
 7. **Detalle de Angular:** tras recibir datos, los canvas recién existen cuando el `@if (!cargando())` re-renderiza; por eso `crearGraficos()` se llama dentro de un `setTimeout(..., 0)` — se espera un tick para que el DOM esté listo.
-8. **Manejo de errores:** si cualquiera de los dos requests falla, `forkJoin` cae al `error` y el componente muestra un alert con mensaje claro; el botón "Actualizar" permite reintentar.
+8. **Manejo de errores:** si cualquiera de los dos requests falla, `forkJoin` cae al `error` y el componente muestra un alert; se reintenta con el botón "Actualizar".
 
 ## Bloques de código clave
 
@@ -159,3 +159,11 @@ private crearBarraMes(rows: MesRow[]): void {
   );
 }
 ```
+
+## Fuera del circuito (contexto para defender)
+
+- **Por qué el KPI de eventos cuenta solo `PUBLICADO`.** El número grande tiene que reflejar la oferta real: los borradores son trabajo en curso del organizador y los cancelados ya no convocan a nadie. Ninguno se pierde del panel — el gráfico "eventos por estado" los muestra desglosados — pero si el KPI contara todo, diría más eventos de los que el público puede ver.
+
+- **El promedio de valoraciones existe sin pantalla de carga.** El modelo `Valoracion` (`models/valoracion.model.js`: `puntuacion` entera 1–5 con `validate`, `comentario` opcional, FKs a usuario y evento) y su migración están en la BD, y el KPI hace el `AVG` sobre esa tabla. Lo que todavía no hay es endpoint ni componente para que el asistente valore un evento: la captura de valoraciones quedó como feature pendiente. Por eso, sin filas cargadas (a mano o por seed), el KPI devuelve `null` y el front muestra "Sin datos" en vez de un 0 que no significa nada.
+
+- **Protección por rol, en las dos puntas.** El backend responde 403 a cualquier no-ORGANIZADOR: `router.use(roleMiddleware(['ORGANIZADOR']))` cubre el router entero, incluida cualquier ruta que se agregue después. En el front, `roleGuard` saca al asistente de `/admin`, pero eso es UX: un asistente que llame directo a `GET /api/dashboard/kpis` con su cookie recibe el 403 igual. Los dos endpoints son `GET` de solo lectura, por eso tampoco pasan por `auditMiddleware` (que solo registra mutaciones).

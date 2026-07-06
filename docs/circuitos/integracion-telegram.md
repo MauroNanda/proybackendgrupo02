@@ -4,7 +4,7 @@
 
 ## Qué hace
 
-Cuando un organizador publica un evento, el sistema lo anuncia automáticamente en un canal de Telegram del grupo; si un evento publicado se cancela, también avisa la cancelación en el mismo canal. El bot es de difusión pura: solo envía mensajes (un POST a la API de Telegram), nunca recibe ni lee nada.
+Cuando un organizador publica un evento, el sistema lo anuncia en un canal de Telegram del grupo; si un evento publicado se cancela, también avisa la cancelación en el mismo canal. El bot es de difusión pura: solo envía mensajes (un POST a la API de Telegram), nunca recibe ni lee nada.
 
 ## Flujo paso a paso
 
@@ -49,7 +49,7 @@ Nota: este aviso al canal es la difusión *grupal*. En paralelo, el servicio de 
 - **La difusión no toca la lógica de negocio.** `evento.service.js` solo conoce el hub genérico (`eventosHooks.alPublicarEvento`); no importa Telegram ni Discord. Quién reacciona a "se publicó un evento" se decide en un único lugar (`integrations/register.js`). Agregar o quitar una integración es una línea en `register.js`, sin modificar el servicio de eventos (patrón observer / publish-subscribe casero).
 - **Un fallo en Telegram no rompe el alta del evento.** En `eventos.hooks.js`, cada handler corre dentro de su propio `try/catch` (`alPublicarEvento`, líneas 20-28): si la API de Telegram falla (`enviarMensaje` lanza `Error` cuando la respuesta no es OK), el error se loguea con `console.error('[evento-hook] publicado:', ...)` y el evento igual se crea/actualiza y se responde 200 al organizador.
 - **Difusión unidireccional.** El bot no hace polling ni tiene webhook: `telegram.service.js` solo hace `fetch POST /sendMessage`. No recibe ni procesa mensajes de usuarios; es sistema → canal, nunca al revés.
-- **Configuración opcional y segura.** `estaConfigurado()` verifica token y canal; si faltan, `enviarMensaje` retorna con un warning en vez de romper. El token nunca está en el código, solo en variables de entorno.
+- **Configuración opcional.** `estaConfigurado()` verifica token y canal; si faltan, `enviarMensaje` retorna con un warning en vez de romper. El token nunca está en el código, solo en variables de entorno.
 - **Prevención de inyección HTML.** Como el mensaje usa `parse_mode: 'HTML'`, todo texto ingresado por el usuario (título, descripción, ubicación) pasa por `escaparHtml` antes de interpolarse (escapa `&`, `<`, `>`).
 - **Se anuncia solo la transición de estado.** En `actualizar`, la condición es `evento.estado === 'PUBLICADO' && estadoAnterior !== 'PUBLICADO'`: editar un evento ya publicado no lo re-anuncia, y cancelar dos veces no duplica el aviso.
 
@@ -122,3 +122,10 @@ async function enviarMensaje(text, extra = {}) {
   }
 }
 ```
+
+## Fuera del circuito (contexto para defender)
+
+- **Configuración previa (una sola vez, fuera del código).** El bot se crea hablando con **@BotFather** en Telegram (`/newbot`): ahí se elige el nombre y BotFather devuelve el token (`TELEGRAM_BOT_TOKEN`). Después se crea el canal y se agrega el bot como **administrador** — sin ser admin no puede publicar en un canal. `TELEGRAM_CHANNEL_ID` es el identificador de ese canal: el `@usuario` si el canal es público, o el id numérico (formato `-100...`) si es privado. Ambas cosas van al `.env`, nunca al repositorio.
+- **Si faltan las variables.** `estaConfigurado()` devuelve `false`, `enviarMensaje` loguea "Difusión desactivada" y retorna. El backend arranca y funciona completo; lo único que no pasa es el anuncio en el canal. Esto permite que cada integrante desarrolle sin tener el bot configurado.
+- **Es difusión de un solo sentido.** El bot no tiene webhook ni hace polling (`getUpdates`): no hay ningún código que reciba mensajes. Si alguien le escribe al bot o comenta en el canal, nuestro sistema ni se entera. La inscripción real siempre ocurre en la web; Telegram solo lleva gente hacia allá.
+- **El enlace depende de `FRONTEND_URL`.** El botón "Inscribirme" apunta a `FRONTEND_URL/eventos/:id`. En producción esa variable debe tener el dominio real del frontend desplegado; si quedara en el default (`http://localhost:4200`), Telegram rechaza la URL como botón y el link viaja como texto dentro del mensaje, que en el celular de otra persona no lleva a ningún lado.

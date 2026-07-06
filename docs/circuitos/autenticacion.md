@@ -41,7 +41,7 @@ Permite que una persona cree su cuenta e ingrese a Convoca, ya sea con usuario y
    - Canjea el `code` por tokens con `client.getToken(...)` y verifica el `id_token` con `client.verifyIdToken` (librería oficial `google-auth-library`).
    - Llama a `authService.loginGoogle` con los datos del perfil de Google: busca por `google_id`; si no existe pero hay un usuario con ese email, **vincula** el `google_id` a esa cuenta (evita duplicados); si no existe nada, crea la cuenta con rol `ASISTENTE` y sin contraseña.
 5. Si la cuenta tiene 2FA activado, redirige a `{FRONTEND_URL}/auth/2fa#email=...` sin emitir token (no se puede saltear el segundo factor entrando por Google). Si no, setea la cookie httpOnly con `setAuthCookie` y redirige a `{FRONTEND_URL}/auth/callback`.
-6. En el front, `oauth-callback.component.ts` no recibe el token (ya viajó en la cookie): simplemente llama a `cargarPerfil()` (`GET /api/auth/perfil`, autenticado por cookie) para saber quién es el usuario, puebla `currentUser` y redirige según rol.
+6. En el front, `oauth-callback.component.ts` no recibe el token (ya viajó en la cookie): llama a `cargarPerfil()` (`GET /api/auth/perfil`, autenticado por cookie) para saber quién es el usuario, puebla `currentUser` y redirige según rol.
 
 ### (d) Verificación en dos pasos (2FA)
 
@@ -57,7 +57,7 @@ Permite que una persona cree su cuenta e ingrese a Convoca, ya sea con usuario y
 1. Tras el login, el navegador tiene la cookie `convoca_token` (httpOnly). En el front, `credentials.interceptor.ts` clona cada request a la API con `withCredentials: true`, así el navegador adjunta esa cookie automáticamente.
 2. En el back, cualquier ruta protegida usa `authMiddleware` (`middlewares/auth.middleware.js`): lee el token de la cookie con `leerCookie(req, COOKIE_NAME)` (o del header `Authorization: Bearer`, mantenido como legado para Postman), lo verifica con `verificarToken` (firma + expiración) y adjunta el payload en `req.usuario`. Sin token o token inválido → 401.
 3. Si la ruta exige un rol, se encadena `roleMiddleware(['ORGANIZADOR'])` (`middlewares/role.middleware.js`) después de `authMiddleware`: si `req.usuario.rol` no está en la lista, responde 403.
-4. En el front los guards de router hacen la protección de UX (no de seguridad): `authGuard` redirige a `/login?returnUrl=...` si no hay sesión, `roleGuard` manda al home si no es ORGANIZADOR, y `guestGuard` impide ver login/registro con sesión activa. La seguridad real siempre está en el backend.
+4. En el front los guards de router hacen la protección de UX (no de seguridad): `authGuard` redirige a `/login?returnUrl=...` si no hay sesión, `roleGuard` manda al home si no es ORGANIZADOR, y `guestGuard` impide ver login/registro con sesión activa.
 5. Logout: `POST /api/auth/logout` llama a `clearAuthCookie(res)`; el front no puede borrar la cookie por sí mismo (es httpOnly), por eso se lo pide al backend y además limpia `localStorage` y el signal.
 
 ---
@@ -198,3 +198,15 @@ const usuario = await Usuario.create({
   rol: 'ASISTENTE',         // NUNCA se toma del body → sin escalada de privilegios
 });
 ```
+
+---
+
+## Fuera del circuito (contexto para defender)
+
+- **Configuración de Google OAuth en Google Cloud Console.** El flujo (c) necesita credenciales creadas en la consola de Google Cloud: un cliente OAuth 2.0 de tipo "aplicación web", la pantalla de consentimiento configurada con los scopes `email` y `profile`, y la **redirect URI autorizada** exactamente igual a `GOOGLE_CALLBACK_URL` (en desarrollo, `http://localhost:3000/api/auth/google/callback`) — si difiere en un carácter, Google corta el flujo con `redirect_uri_mismatch`. Como la app está en modo prueba (sin pasar la verificación de Google), solo pueden loguearse los **usuarios de prueba** dados de alta en la pantalla de consentimiento. Las credenciales llegan por variables de entorno: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_CALLBACK_URL` (se leen en `controllers/auth.controller.js`).
+
+- **El email del 2FA es el mismo canal que el de las notificaciones.** `_iniciarFlujo2FA` manda el código con `enviarEmail` de `integrations/email.service.js`, el mismo wrapper de Resend que usa `integrations/channels/email.channel.js` para los avisos de inscripción. Hay una sola integración de email en todo el sistema.
+
+- **Qué pasa sin `RESEND_API_KEY`.** `email.service.js` chequea la variable al cargar: si falta, avisa con un warning y cada `enviarEmail` se simula por consola (loguea destinatario y asunto, y devuelve un id mock). El servidor no se cae y el login normal sigue andando, pero el mock no imprime el cuerpo del mail, así que el código 2FA no se ve por ningún lado: en un entorno sin Resend, un usuario con 2FA activado no puede completar el login. Para probar el 2FA hace falta la key configurada.
+
+- **Relación con la auditoría.** `middlewares/audit.middleware.js` depende de este circuito: corre después de `authMiddleware` porque necesita `req.usuario.id` para atribuir la acción (sin usuario autenticado no registra nada). Guarda en la tabla `Auditoria` (`models/auditoria.model.js`) la acción (`CREAR_X` / `ACTUALIZAR_X` / `ELIMINAR_X`), la entidad afectada, el body sin campos sensibles (borra `password` y `token` antes de persistir) y la IP del cliente, solo cuando la respuesta fue 2xx. Hoy está aplicado al check-in manual de inscripciones (`routes/inscripcion.routes.js`). El login y el logout no pasan por él — audita mutaciones sobre entidades, no accesos — así que no hay un historial de accesos como tal; si lo preguntan, la trazabilidad del sistema es de acciones, con el usuario que las hizo y desde qué IP.

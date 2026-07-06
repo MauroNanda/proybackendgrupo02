@@ -56,6 +56,8 @@ Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs) de este
 |---|---|
 | [`docs/PROPUESTA.md`](./docs/PROPUESTA.md) | Alcance del proyecto, funcionalidades e integraciones. |
 | [`docs/ARQUITECTURA.md`](./docs/ARQUITECTURA.md) | Esquema de base de datos y estructura del código. |
+| [`docs/FUNCIONALIDADES-Y-PRUEBAS.md`](./docs/FUNCIONALIDADES-Y-PRUEBAS.md) | Funcionalidades existentes y cómo probar cada una. |
+| [`docs/circuitos/`](./docs/circuitos) | Guías de defensa por circuito: flujo, archivos y puntos clave, con responsables. |
 | [`docs/PLAN-DE-TAREAS.md`](./docs/PLAN-DE-TAREAS.md) | Tareas organizadas por fases y dominios, con responsables. |
 | [`docs/BITACORA.md`](./docs/BITACORA.md) | Estado actual y funcionalidades implementadas. |
 | [`docs/CONVENCIONES.md`](./docs/CONVENCIONES.md) | Reglas de código, estilo y nomenclatura. |

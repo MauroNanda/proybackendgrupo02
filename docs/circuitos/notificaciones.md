@@ -30,7 +30,7 @@ Centraliza el envío de avisos al usuario en un único punto (el "hub" `integrat
    - **in-app** (`channels/in-app.channel.js`): crea una fila en la tabla `Notificaciones` (`Notificacion.create` con `usuario_id`, `titulo`, `mensaje`, `tipo: 'INSCRIPCION'`, `leida: false`). El frontend la muestra en la campana.
    - **email** (`channels/email.channel.js`): manda un mail vía `email.service.js` (Resend) usando la plantilla HTML `inscripcion-confirmada.html`. Si el usuario no tiene email, retorna sin hacer nada.
    - **push** (`channels/push.channel.js`): busca **todas** las suscripciones del usuario en `PushSubscriptions` (puede tener varias: PC y celular) y envía una notificación de navegador a cada una vía `push.service.js`. Si el endpoint devuelve `410 Gone` (el usuario revocó el permiso), borra esa suscripción de la BD.
-5. El usuario recibe el aviso por la campana, por mail y por el navegador; la respuesta HTTP de la inscripción ya había salido sin depender de nada de esto.
+5. El usuario recibe el aviso por la campana, por mail y por el navegador.
 
 ### (b) El recordatorio 24 h
 
@@ -177,3 +177,11 @@ for (const registro of suscripciones) {
   }
 }
 ```
+
+## Fuera del circuito (contexto para defender)
+
+- **El recordatorio depende de que el proceso esté vivo.** `node-cron` corre adentro del proceso de Node: no es un cron del sistema operativo ni una cola externa. En un hosting gratuito que suspende el proceso por inactividad (Render free, por ejemplo), el job no corre mientras el servidor está dormido. La ventana de 24 h amortigua el problema: cuando el proceso despierta, la corrida siguiente agarra los eventos que todavía están dentro de la ventana. Pero si el servidor pasa dormido las 24 horas previas al evento, ese recordatorio no sale. Es una limitación asumida: un cron externo o una cola administrada exceden el alcance del TP.
+
+- **Canales que se desactivan solos si faltan variables.** Sin `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`, `integrations/push.service.js → asegurarVapid()` loguea un warning y `enviarPush` retorna sin enviar nada. Sin `RESEND_API_KEY`, `integrations/email.service.js` simula el envío por consola (loguea destinatario y asunto). En los dos casos el hub sigue andando: el canal in-app solo necesita la BD, así que la campana funciona siempre.
+
+- **La difusión por Telegram/Discord no pasa por este hub.** Los anuncios al canal del grupo cuando se publica o cancela un evento van por otro camino: `integrations/eventos.hooks.js` (los handlers se registran en `integrations/register.js`) hacia `telegram.service.js` y `discord.service.js`. Son mensajes de nivel grupo — un canal público, sin destinatario individual — distintos de las notificaciones personales de este circuito; por eso no son un canal más del array `canales`, cuyos métodos reciben siempre un `usuario`. También se apagan solos si faltan sus variables (`TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHANNEL_ID`, `DISCORD_BOT_TOKEN`/`DISCORD_CHANNEL_ID`).

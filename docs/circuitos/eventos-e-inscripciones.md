@@ -1,6 +1,6 @@
 # Circuito: Eventos e Inscripciones (núcleo del sistema)
 
-**Responsable:** equipo (base del sistema). Es el circuito central de Convoca: todos los demás (notificaciones, integraciones, estadísticas) se cuelgan de este.
+**Responsable:** equipo. Todos los demás circuitos (notificaciones, integraciones, estadísticas) se cuelgan de este.
 
 ## Qué hace
 
@@ -220,3 +220,15 @@ if (inscripcion.estado !== 'CONFIRMADO') { // ESPERA o CANCELADO no entran
 inscripcion.estado = 'ASISTIO';
 await inscripcion.save();
 ```
+
+## Fuera del circuito (contexto para defender)
+
+- **Por qué el público ve también los CANCELADO.** El filtro de `listar()` deja pasar `PUBLICADO` y `CANCELADO` a propósito: si el evento cancelado desapareciera del catálogo, alguien que lo vio publicado no sabría si se canceló o si no lo está encontrando. Se muestra con su marca de cancelado para comunicar la baja. `BORRADOR`, en cambio, es trabajo en curso del organizador y nunca sale sin `?todos=true`.
+
+- **El borrado de evento es en transacción.** `evento.service.js → eliminar()` borra dentro de una misma transacción las inscripciones del evento, las filas de `EventoCategorias` y el evento. Si algo falla a mitad de camino se revierte todo: no quedan inscripciones ni relaciones apuntando a un evento que ya no existe.
+
+- **Índices y constraints que sostienen el circuito.** En `models/inscripcion.model.js`: `qr_token` es único (el check-in busca por esa columna con índice único), `idx_inscripciones_evento_estado` sobre `(eventoId, estado)` cubre el conteo de cupo y el panel de inscriptos, e `idx_inscripciones_usuario` cubre "mis inscripciones". Aparte, `Categoria.nombre` es único (no hay categorías duplicadas) y `Usuario.email` también (es lo que permite vincular la cuenta de Google sin duplicar usuarios).
+
+- **El QR es un token, no datos.** El código QR codifica solo el `qr_token` (UUID v4: 122 bits aleatorios, no se adivina por fuerza bruta). No lleva id de usuario ni de evento; el backend resuelve la inscripción buscando por esa columna única, así el pase no expone datos personales de nadie que lo vea.
+
+- **La difusión al publicar es de otro circuito.** `crear()` y `actualizar()` disparan `eventosHooks.alPublicarEvento` / `alCancelarEvento` (`integrations/eventos.hooks.js`); los anuncios a Telegram y Discord se registran en `integrations/register.js` y corren aislados con `try/catch`, así una falla del bot no rompe el alta ni la edición del evento.

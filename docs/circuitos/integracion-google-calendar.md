@@ -4,7 +4,7 @@
 
 ## Qué hace
 
-Desde el detalle de un evento, el usuario puede tocar el botón "Agregar a Google Calendar" y se abre Google Calendar en otra pestaña con el evento ya prellenado (título, fecha de inicio y fin, descripción y ubicación). Es una integración **solo de frontend**: no usa la API de Google Calendar ni OAuth; simplemente construye una URL con los datos del evento y la abre.
+Desde el detalle de un evento, el usuario puede tocar el botón "Agregar a Google Calendar" y se abre Google Calendar en otra pestaña con el evento ya prellenado (título, fecha de inicio y fin, descripción y ubicación). Es una integración **solo de frontend**: no usa la API de Google Calendar ni OAuth; construye una URL con los datos del evento y la abre.
 
 ## Flujo paso a paso
 
@@ -93,3 +93,10 @@ Botón en la vista (`event-detail.component.html`):
   Agregar a Google Calendar
 </button>
 ```
+
+## Fuera del circuito (contexto para defender)
+
+- **Por qué no necesita cuenta de Google ni claves.** La app nunca habla con Google: solo arma un enlace a `calendar.google.com/calendar/render?action=TEMPLATE`, que es una URL pública de "plantilla de evento". Quien resuelve la sesión es el navegador del usuario: si tiene sesión de Google abierta ve el formulario prellenado, y si no, Google le pide iniciar sesión y después lo lleva al formulario. No hay API key, no hay OAuth, no hay secretos que guardar ni backend involucrado.
+- **Limitaciones asumidas.** La hora viaja en **UTC** (la `Z` del formato `YYYYMMDDTHHMMSSZ`); Google la convierte a la zona horaria del calendario del usuario, así que se ve bien, pero dependemos de que esa conversión sea correcta de su lado. La **duración es fija de 2 horas** porque el backend guarda una sola fecha por evento, sin hora de fin. Y lo que se agenda es una **copia**: si el evento después cambia de fecha o se cancela, la entrada en el calendario del usuario no se entera (de eso avisan las notificaciones del sistema).
+- **Funciona en cualquier dispositivo con sesión de Google.** Es un enlace común: en la PC abre Google Calendar web y en el celular abre la app de Calendar o la versión web móvil. No depende del sistema operativo ni de tener nada instalado.
+- **Diferencia con una integración por API.** Usar la API de Google Calendar permitiría crear el evento directamente en el calendario del usuario (sin que confirme) y sincronizar cambios o cancelaciones. El costo: OAuth 2.0 con consentimiento del usuario, pedir *scopes* de escritura sobre su calendario, guardar y refrescar tokens en el backend y registrar la app en Google Cloud. Para el caso de uso —que el usuario se agende un evento con un toque— el enlace de plantilla logra lo mismo sin pedir acceso a datos privados, y el usuario mantiene el control porque confirma con "Guardar".
