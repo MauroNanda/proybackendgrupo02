@@ -251,7 +251,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 |---|---|---|---|---|
 | **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `✅ HECHO` |
 | **T-12** | Telegram Bot (difusión) | 🟢 Fácil-media | No | `✅ HECHO` |
-| **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
+| **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `✅ HECHO` |
 | **T-14** | Discord Bot | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-15** | Google Calendar | 🟢 Fácil | Solo front | `✅ HECHO` |
 
@@ -312,8 +312,8 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-13 — Web Push (+ PWA opcional)
-*   **Estado:** `LIBRE`
-*   **Rama:** `feature/web-push`
+*   **Estado:** `✅ HECHO` — backend (endpoints + modelo + canal en el hub) y frontend (service worker + PWA + suscripción) integrados y al día con `main`. Pendiente solo cargar las `VAPID_*` en el `.env` y una prueba de envío real en el navegador.
+*   **Rama:** `feature/web-push` (ambos repos).
 *   **Dificultad:** 🔴 Difícil (service worker + VAPID + nuevo modelo).
 *   **Descripción:** Notificaciones nativas del navegador/SO. Opcionalmente, convertir la app en PWA instalable (cubre el punto opcional de la consigna §3).
 *   **Circuito (suscripción):** usuario logueado → el service worker (front) pide permiso → obtiene la `PushSubscription` (endpoint + keys) → `POST /api/push/subscribe` → el backend la guarda en la tabla `PushSubscription` (ligada a `usuario_id`).
@@ -352,7 +352,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-15 — Google Calendar
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — mergeado (PR #12 frontend). Botón "Agregar a Google Calendar" con template URL prellenado.
 *   **Rama:** `feature/google-calendar`
 *   **Dificultad:** 🟢 Fácil (**solo frontend**, sin backend ni deps).
 *   **Descripción:** Botón "Agregar a Google Calendar" en el detalle del evento.
