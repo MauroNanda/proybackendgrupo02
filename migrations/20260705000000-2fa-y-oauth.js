@@ -20,5 +20,10 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('Usuarios', 'codigo_2fa');
     await queryInterface.removeColumn('Usuarios', 'codigo_2fa_expira');
+    await queryInterface.changeColumn('Usuarios', 'two_factor_enabled', {
+      type: Sequelize.BOOLEAN,
+      defaultValue: true,
+      allowNull: false
+    });
   }
 };

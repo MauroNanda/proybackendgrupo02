@@ -4,7 +4,7 @@ const { body } = require('express-validator');
 const authController = require('../controllers/auth.controller');
 const validate = require('../middlewares/validate.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
-const { loginLimiter, registroLimiter } = require('../middlewares/rate-limit.middleware');
+const { loginLimiter, registroLimiter, codigo2faLimiter } = require('../middlewares/rate-limit.middleware');
 
 const validacionRegistro = [
   body('nombre')
@@ -24,9 +24,8 @@ const validacionRegistro = [
   body('password')
     .notEmpty().withMessage('La contraseña es obligatoria')
     .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
-  body('rol')
-    .optional()
-    .isIn(['ORGANIZADOR', 'ASISTENTE']).withMessage('El rol debe ser ORGANIZADOR o ASISTENTE'),
+  // `rol` se ignora a propósito: el registro público siempre crea ASISTENTE
+  // (la promoción a ORGANIZADOR va por un endpoint protegido para admins).
   validate,
 ];
 
@@ -48,8 +47,8 @@ router.get('/perfil', authMiddleware, authController.perfil);
 router.get('/google', authController.redirigirGoogle);
 router.get('/google/callback', authController.callbackGoogle);
 
-// Ruta para verificar el 2FA
-router.post('/2fa/verify', [
+// Ruta para verificar el 2FA (con limiter anti-fuerza bruta del código).
+router.post('/2fa/verify', codigo2faLimiter, [
   body('email').isEmail().withMessage('Debe proveer un correo válido'),
   body('codigo').isLength({ min: 6, max: 6 }).withMessage('El código debe tener 6 dígitos'),
   validate
