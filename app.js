@@ -9,6 +9,7 @@ const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler.middleware');
 const sanitize = require('./middlewares/sanitize.middleware');
 const registrarIntegraciones = require('./integrations/register');
+const recordatoriosJob = require('./jobs/recordatorios.job');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,6 +61,9 @@ async function start() {
     // Conectar integraciones externas a los hooks antes de aceptar tráfico
     // (Telegram + Discord). Ver integrations/register.js.
     registrarIntegraciones();
+
+    // Job de recordatorios 24h antes de cada evento (requiere DB conectada).
+    recordatoriosJob.iniciar();
 
     app.listen(PORT, () => {
       console.log(`[Convoca API] Servidor corriendo en http://localhost:${PORT}`);

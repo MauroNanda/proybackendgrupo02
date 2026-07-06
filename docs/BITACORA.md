@@ -40,6 +40,12 @@ Propuesta completa definida y adaptada a la consigna oficial. Repositorios separ
 - [ ] Redactar documento de funcionalidades y modelo de datos para aprobación del docente.
 
 ### Log de Cambios (Changelog)
+*   **2026-07-06 (Sesión 17):** Recordatorio push 24h antes del evento (rama `feature/recordatorio-24h`, diseño con Fable). Primera **tarea programada** del backend.
+    *   **Job (`jobs/recordatorios.job.js`):** `node-cron` cada 15 min busca eventos PUBLICADO que empiezan dentro de 24h y avisa a los inscriptos CONFIRMADO por push + in-app (email no, para no spamear). Se engancha en `app.js` tras conectar la DB.
+    *   **Idempotencia:** columna `Eventos.recordatorio_enviado_en` (migración `20260707000000`) + **claim atómico** (`UPDATE ... WHERE recordatorio_enviado_en IS NULL`) → no duplica ante reinicios, corridas superpuestas ni doble instancia. Ventana amplia (24h) → si el server estuvo caído, el aviso se recupera en la corrida siguiente.
+    *   **Hub:** método `recordatorioEvento`; handlers en push (con `timeZone America/Argentina/Jujuy`) e in-app (tipo `RECORDATORIO`, ya existía en el ENUM). Corridas aisladas con try/catch (una falla no tumba el proceso ni corta la lista).
+    *   Validado en vivo: el job encuentra eventos en ventana, hace el claim y **no re-toma** en la 2da corrida (idempotencia OK).
+    *   **Límite conocido:** el cron es in-process → si el hosting duerme el proceso (free tier), no dispara hasta el próximo request; para prod estable, ping externo o cron externo a un endpoint protegido.
 *   **2026-07-06 (Sesión 16):** Ampliación de notificaciones de eventos (rama `feature/notif-eventos`, análisis con modelo Fable).
     *   **🔴 Bug corregido:** `inscripcion.service.cancelar` llamaba `notificaciones.cupoLiberado(usuario)` **sin el evento** → el aviso no decía de qué evento se liberó el cupo. Ahora pasa el `evento` (in-app y push nombran el evento).
     *   **Nuevo `eventoCancelado`:** al cancelar un evento, se captura la lista de inscriptos activos **antes** del baja masiva (después quedan en CANCELADO, indistinguibles) y se les notifica personalmente por los 3 canales (antes solo había difusión grupal Telegram/Discord — el inscripto podía no enterarse). Cierra el hueco que el propio comentario del código prometía.

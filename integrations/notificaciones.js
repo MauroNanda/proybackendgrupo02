@@ -40,4 +40,6 @@ module.exports = {
   // Avisos sobre el evento en sí, dirigidos a sus inscriptos activos.
   eventoCancelado: (usuario, evento) => emitir('eventoCancelado', usuario, evento),
   eventoModificado: (usuario, evento, cambios) => emitir('eventoModificado', usuario, evento, cambios),
+  // Recordatorio 24h antes del inicio (lo dispara el cron, no una acción de usuario).
+  recordatorioEvento: (usuario, evento) => emitir('recordatorioEvento', usuario, evento),
 };

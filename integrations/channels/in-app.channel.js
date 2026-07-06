@@ -66,4 +66,13 @@ module.exports = {
       tipo: 'EVENTO_MODIFICADO',
     });
   },
+
+  async recordatorioEvento(usuario, evento) {
+    await Notificacion.create({
+      usuario_id: usuario.id,
+      titulo: 'Recordatorio de evento',
+      mensaje: `El evento${evento?.titulo ? ` "${evento.titulo}"` : ''} empieza pronto${evento?.fecha ? ` — ${fechaLegible(evento.fecha)}` : ''}.`,
+      tipo: 'RECORDATORIO',
+    });
+  },
 };
