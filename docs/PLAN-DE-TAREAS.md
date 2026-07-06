@@ -250,7 +250,7 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 | Tarea | Dominio | Dificultad | Toca Front | Estado |
 |---|---|---|---|---|
 | **T-11** | Google OAuth 2.0 (+ 2FA opcional) | 🟡 Media | Sí | `LIBRE` |
-| **T-12** | Telegram Bot | 🔴 Difícil | Sí | `LIBRE` |
+| **T-12** | Telegram Bot (difusión) | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-13** | Web Push (+ PWA opcional) | 🔴 Difícil | Sí | `LIBRE` |
 | **T-14** | Discord Bot | 🟢 Fácil-media | No | `✅ HECHO` |
 | **T-15** | Google Calendar | 🟢 Fácil | Solo front | `LIBRE` |
@@ -287,8 +287,9 @@ Algunos archivos los tocan todos (`models/index.js`, `routes/index.js`, `app.rou
 ---
 
 ### T-12 — Telegram Bot
-*   **Estado:** `LIBRE`
+*   **Estado:** `✅ HECHO` — mergeado a `main`. Circuito validado en vivo (canal `@convoca_unju_2026`: anuncio + cancelación).
 *   **Rama:** `feature/telegram-bot`
+*   **⚠️ Scope reducido (decisión de equipo):** se implementó **solo la difusión a nivel grupo** (anuncio de evento publicado + aviso de cancelación al canal, con baja de inscripciones activas al cancelar). **NO** incluye la vinculación de cuenta (`/start`, `telegram_id`), las notificaciones personales (QR, recordatorios) ni la entrega de 2FA descriptas abajo; esas quedan fuera del alcance actual.
 *   **Dificultad:** 🔴 Difícil (ciclo de vida del bot + vinculación de cuenta).
 *   **Descripción:** Bot de Telegram para vincular la cuenta y enviar notificaciones (confirmación de inscripción, QR, recordatorios). Además actúa como canal de entrega del código 2FA de T-11.
 *   **Circuito (vinculación):** usuario en su perfil → "Vincular Telegram" → el backend genera un token corto ligado a su `id` → el front muestra el deeplink `t.me/<bot>?start=<token>` → el usuario abre Telegram y hace `/start` → el bot resuelve el token → guarda `Usuario.telegram_id` → confirma en el chat.

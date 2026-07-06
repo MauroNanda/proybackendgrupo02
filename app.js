@@ -8,9 +8,7 @@ const sequelize = require('./config/db');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler.middleware');
 const sanitize = require('./middlewares/sanitize.middleware');
-// Integración con Discord para anuncios de eventos
-const discordService = require('./integrations/discord.service');
-const eventosHooks = require('./integrations/eventos.hooks');
+const registrarIntegraciones = require('./integrations/register');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -59,12 +57,9 @@ async function start() {
     await sequelize.authenticate();
     console.log('[DB] Conexión con Neon.tech establecida.');
 
-    // Conectar integraciones a los hooks antes de aceptar tráfico, así el
-    // primer evento publicado ya encuentra registrado el anuncio de Discord.
-    eventosHooks.onPublicado(async (evento) => {
-      await discordService.anunciarEvento(evento);
-    });
-    console.log('[Hooks] Escuchando publicaciones de eventos para el Bot de Discord.');
+    // Conectar integraciones externas a los hooks antes de aceptar tráfico
+    // (Telegram + Discord). Ver integrations/register.js.
+    registrarIntegraciones();
 
     app.listen(PORT, () => {
       console.log(`[Convoca API] Servidor corriendo en http://localhost:${PORT}`);
