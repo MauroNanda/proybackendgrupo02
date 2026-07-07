@@ -6,6 +6,7 @@ const eventoController = require('../controllers/evento.controller');
 
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
+const auditMiddleware = require('../middlewares/audit.middleware');
 const validate = require('../middlewares/validate.middleware');
 
 const validacionId = [
@@ -79,8 +80,8 @@ const validacionActualizar = [
 router.get('/', eventoController.listar);
 router.get('/:id', validacionId, eventoController.obtenerPorId);
 
-router.post('/', authMiddleware, roleMiddleware(['ORGANIZADOR']), validacionCrear, eventoController.crear);
-router.put('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), validacionActualizar, eventoController.actualizar);
-router.delete('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), validacionId, eventoController.eliminar);
+router.post('/', authMiddleware, roleMiddleware(['ORGANIZADOR']), auditMiddleware('Evento'), validacionCrear, eventoController.crear);
+router.put('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), auditMiddleware('Evento'), validacionActualizar, eventoController.actualizar);
+router.delete('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), auditMiddleware('Evento'), validacionId, eventoController.eliminar);
 
 module.exports = router;

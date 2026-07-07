@@ -5,6 +5,7 @@ const controller = require('../controllers/categoria.controller');
 const validate = require('../middlewares/validate.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
+const auditMiddleware = require('../middlewares/audit.middleware');
 
 const validationSchema = [
   body('nombre')
@@ -19,8 +20,8 @@ const validationSchema = [
 ];
 
 router.get('/', controller.listar);
-router.post('/', authMiddleware, roleMiddleware(['ORGANIZADOR']), validationSchema, controller.crear);
-router.put('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), validationSchema, controller.editar);
-router.delete('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), controller.eliminar);
+router.post('/', authMiddleware, roleMiddleware(['ORGANIZADOR']), auditMiddleware('Categoria'), validationSchema, controller.crear);
+router.put('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), auditMiddleware('Categoria'), validationSchema, controller.editar);
+router.delete('/:id', authMiddleware, roleMiddleware(['ORGANIZADOR']), auditMiddleware('Categoria'), controller.eliminar);
 
 module.exports = router;

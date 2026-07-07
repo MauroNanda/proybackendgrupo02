@@ -32,8 +32,8 @@ router.use(authMiddleware);
 
 router.get('/mis-inscripciones', inscripcionController.obtenerMisInscripciones);
 
-router.post('/', validacionInscribirse, inscripcionController.inscribirse);
-router.delete('/:eventoId', validacionCancelar, inscripcionController.cancelar);
+router.post('/', validacionInscribirse, auditMiddleware('Inscripcion'), inscripcionController.inscribirse);
+router.delete('/:eventoId', validacionCancelar, auditMiddleware('Inscripcion'), inscripcionController.cancelar);
 router.get('/estado/:eventoId', validacionEstado, inscripcionController.obtenerEstado);
 router.post('/check-in', validacionCheckIn, inscripcionController.checkIn);
 
