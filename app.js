@@ -15,6 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:4200';
 
+// Render (y otros PaaS) terminan TLS y envían X-Forwarded-For; express-rate-limit
+// lo requiere para identificar IPs correctamente.
+app.set('trust proxy', 1);
+
 // ===== Middlewares base =====
 app.use(helmet());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
