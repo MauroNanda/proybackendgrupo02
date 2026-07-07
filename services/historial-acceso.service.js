@@ -1,4 +1,4 @@
-const { HistorialAcceso } = require('../models');
+const { HistorialAcceso, Usuario } = require('../models');
 
 /**
  * Registra intentos de acceso (login exitoso o fallido) en HistorialAcceso.
@@ -35,7 +35,22 @@ async function registrar(usuarioId, exitoso, meta = {}) {
   }
 }
 
+/**
+ * Lista los accesos más recientes con el usuario asociado.
+ * Solo lectura; pensado para el panel de organizadores.
+ */
+async function listar(limite = 100) {
+  return HistorialAcceso.findAll({
+    include: [
+      { model: Usuario, as: 'usuario', attributes: ['id', 'nombre', 'email'] },
+    ],
+    order: [['fecha', 'DESC']],
+    limit: limite,
+  });
+}
+
 module.exports = {
   extraerMeta,
   registrar,
+  listar,
 };
