@@ -9,13 +9,14 @@ const client = new OAuth2Client(
 );
 
 const { setAuthCookie, clearAuthCookie, leerCookie } = require('../utils/cookie.util');
+const historialAccesoService = require('../services/historial-acceso.service');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4200';
 
 class AuthController {
   async registro(req, res, next) {
     try {
-      const resultado = await authService.registro(req.body);
+      const resultado = await authService.registro(req.body, historialAccesoService.extraerMeta(req));
       setAuthCookie(res, resultado.token);
       // TRANSICIÓN: seguimos devolviendo `token` en el body para el front viejo
       // (Bearer). El front nuevo usa la cookie httpOnly e ignora este campo.
@@ -27,7 +28,7 @@ class AuthController {
 
   async login(req, res, next) {
     try {
-      const resultado = await authService.login(req.body);
+      const resultado = await authService.login(req.body, historialAccesoService.extraerMeta(req));
       // Si pidió 2FA todavía no hay token → no hay cookie que setear.
       if (resultado.token) {
         setAuthCookie(res, resultado.token);
@@ -100,7 +101,7 @@ class AuthController {
         email: payload.email,
         displayName: payload.name,
         picture: payload.picture,
-      });
+      }, historialAccesoService.extraerMeta(req));
 
       // Si la cuenta tiene 2FA, no emitimos token: mandamos al front al paso
       // del segundo factor con el email (para que no se pueda saltear el 2FA).
@@ -124,7 +125,11 @@ class AuthController {
   async verificar2FA(req, res, next) {
     try {
       const { email, codigo } = req.body;
-      const resultado = await authService.validarCodigo2FA(email, codigo);
+      const resultado = await authService.validarCodigo2FA(
+        email,
+        codigo,
+        historialAccesoService.extraerMeta(req)
+      );
       setAuthCookie(res, resultado.token);
       res.json(resultado);
     } catch (err) {

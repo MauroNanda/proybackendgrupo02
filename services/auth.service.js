@@ -6,6 +6,7 @@ const HttpError = require('../utils/http-error');
 const { firmarToken } = require('../utils/jwt.util');
 const { serializarUsuario } = require('../utils/usuario.util');
 const { enviarEmail } = require('../integrations/email.service');
+const historialAccesoService = require('./historial-acceso.service');
 
 const BCRYPT_ROUNDS = 10;
 const CODIGO_2FA_MINUTOS = 10;
@@ -14,7 +15,7 @@ class AuthService {
   /**
    * Registra un usuario con password hasheada (bcrypt).
    */
-  async registro({ nombre, username, email, password }) {
+  async registro({ nombre, username, email, password }, meta) {
     const existe = await Usuario.findOne({ where: { email } });
     if (existe) {
       throw new HttpError('El correo electrónico ya está registrado', 409);
@@ -40,6 +41,7 @@ class AuthService {
     });
 
     const token = this._generarToken(usuario);
+    await historialAccesoService.registrar(usuario.id, true, meta);
 
     return {
       token,
@@ -53,7 +55,7 @@ class AuthService {
   /**
    * Login acepta username o email (el campo se llama "username" en el body).
    */
-  async login({ username, password }) {
+  async login({ username, password }, meta) {
     // Busca por username exacto o por email (para compatibilidad)
     const usuario = await Usuario.scope('conPassword').findOne({
       where: {
@@ -67,6 +69,7 @@ class AuthService {
 
     const passwordValida = await bcrypt.compare(password, usuario.password);
     if (!passwordValida) {
+      await historialAccesoService.registrar(usuario.id, false, meta);
       throw new HttpError('Credenciales inválidas', 401);
     }
 
@@ -75,6 +78,7 @@ class AuthService {
     }
 
     const token = this._generarToken(usuario);
+    await historialAccesoService.registrar(usuario.id, true, meta);
 
     return {
       token,
@@ -96,7 +100,7 @@ class AuthService {
   /**
    * Maneja el login vía Google.
    */
-  async loginGoogle({ id, email, displayName, picture }) {
+  async loginGoogle({ id, email, displayName, picture }, meta) {
     let usuario = await Usuario.findOne({ where: { google_id: id } });
 
     // Vinculación de cuenta: si no hay match por google_id pero ya existe un
@@ -124,6 +128,8 @@ class AuthService {
       return await this._iniciarFlujo2FA(usuario);
     }
 
+    await historialAccesoService.registrar(usuario.id, true, meta);
+
     return {
       token: this._generarToken(usuario),
       usuario: serializarUsuario(usuario),
@@ -133,7 +139,7 @@ class AuthService {
   /**
    * Valida el código 2FA ingresado por el usuario.
    */
-  async validarCodigo2FA(email, codigo) {
+  async validarCodigo2FA(email, codigo, meta) {
     const usuario = await Usuario.findOne({ where: { email } });
 
     // Sin flujo 2FA activo (o expirado) → inválido. Se chequea antes de comparar.
@@ -157,6 +163,8 @@ class AuthService {
     usuario.codigo_2fa = null;
     usuario.codigo_2fa_expira = null;
     await usuario.save();
+
+    await historialAccesoService.registrar(usuario.id, true, meta);
 
     return {
       token: this._generarToken(usuario),
