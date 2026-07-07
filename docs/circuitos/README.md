@@ -13,6 +13,8 @@ Cada archivo de esta carpeta explica un circuito del sistema para poder defender
 | Bot de Discord (difusión de eventos) | Seba Velázquez | [integracion-discord.md](./integracion-discord.md) |
 | Notificaciones web push y app instalable (PWA) | Gabriel Calisaya | [integracion-web-push.md](./integracion-web-push.md) |
 | Agregar evento a Google Calendar | Delia | [integracion-google-calendar.md](./integracion-google-calendar.md) |
+| Valoraciones de eventos (puntuación de 1 a 5 con comentario) | Gabriel Calisaya | [valoraciones.md](./valoraciones.md) |
+| Mis inscripciones y edición de perfil | Mauro | [mis-inscripciones-y-perfil.md](./mis-inscripciones-y-perfil.md) |
 | Dashboard administrativo (indicadores y gráficos) | Gabriel Calisaya | [dashboard.md](./dashboard.md) |
 
 ## Cómo usar estas guías

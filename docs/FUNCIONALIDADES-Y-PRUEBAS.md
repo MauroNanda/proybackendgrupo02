@@ -65,10 +65,10 @@ Detalle interno: [`circuitos/autenticacion.md`](./circuitos/autenticacion.md).
 - Qué se espera: con el código correcto entra; con uno incorrecto o vencido, 401. También aplica al login con Google si la cuenta tiene 2FA.
 - Ojo para la demo: el código viaja por email real vía Resend. Sin `RESEND_API_KEY` el envío se simula por consola: el backend imprime el cuerpo del correo (incluido el código de 6 dígitos), así que en desarrollo se lee en la terminal del backend y se completa el login igual.
 
-**Perfil**
-- Qué hace: ver los datos de la cuenta y cambiar el nombre visible.
-- Cómo probar: en `/perfil`, editar el nombre y guardar. Por API: `GET /api/auth/perfil` y `PUT /api/auth/perfil` con `{ "nombre": "Nuevo Nombre" }`.
-- Qué se espera: el nombre se actualiza y se refleja en el navbar.
+**Perfil y edición de datos**
+- Qué hace: ver los datos de la cuenta (nombre, email, rol, 2FA) y cambiar el nombre visible. Detalle: [`circuitos/mis-inscripciones-y-perfil.md`](./circuitos/mis-inscripciones-y-perfil.md).
+- Cómo probar: logueado, menú de usuario → "Perfil" (`/perfil`), editar el nombre en el campo de texto y guardar. Por API: `GET /api/auth/perfil` devuelve datos del usuario; `PUT /api/auth/perfil` con `{ "nombre": "Nuevo Nombre" }` actualiza el nombre.
+- Qué se espera: el nombre se actualiza en la base de datos y se refleja en el navbar y en el perfil al recargar. Otros campos (email, rol, 2FA) son de solo lectura desde el perfil.
 
 **Logout**
 - Qué hace: borra la cookie httpOnly de sesión (`POST /api/auth/logout`).
@@ -142,9 +142,9 @@ Detalle interno: [`circuitos/eventos-e-inscripciones.md`](./circuitos/eventos-e-
 - Qué se espera: la inscripción queda cancelada; se puede volver a inscribir después (reutiliza el registro con un QR nuevo).
 
 **Mis inscripciones**
-- Qué hace: historial del usuario con el estado de cada inscripción y datos del evento. `GET /api/inscripciones/mis-inscripciones`.
-- Cómo probar: logueado, menú de usuario → "Mis inscripciones" (`/mis-inscripciones`).
-- Qué se espera: tarjetas con badges Confirmado / En Espera / Asistió / Cancelado, ordenadas por fecha del evento.
+- Qué hace: pantalla que lista todas las inscripciones del usuario logueado con sus estados, datos del evento, pase de acceso con QR, descarga en PDF y opción de cancelación para eventos futuros. Detalle: [`circuitos/mis-inscripciones-y-perfil.md`](./circuitos/mis-inscripciones-y-perfil.md).
+- Cómo probar: logueado, menú de usuario → "Mis inscripciones" (`/mis-inscripciones`). Por API: `GET /api/inscripciones/mis-inscripciones` devuelve el listado.
+- Qué se espera: tarjetas de inscripciones con badges (Confirmado / En Espera / Asistió / Cancelado), ordenadas por fecha del evento. En cada inscripción con estado CONFIRMADO, hay botón "Ver Pase" que abre un modal con el código QR del pase y un botón "Descargar PDF" que genera el pase en PDF. En inscripciones de eventos futuros, hay ícono de basura para cancelar (requiere confirmación). Inscripciones pasadas (evento finalizado) no se pueden cancelar.
 
 **Pase de acceso con QR y descarga en PDF**
 - Qué hace: genera el pase del evento con un código QR (codifica el `qr_token` único de la inscripción) y permite bajarlo en PDF.
@@ -165,6 +165,11 @@ Detalle interno: [`circuitos/eventos-e-inscripciones.md`](./circuitos/eventos-e-
 - Qué hace: descarga el listado de inscriptos del evento como `.xlsx` (se genera en el frontend).
 - Cómo probar: en la pantalla de inscriptos, botón de exportar.
 - Qué se espera: se descarga un Excel con los inscriptos; sin inscriptos avisa que no hay datos.
+
+**Valoraciones de eventos**
+- Qué hace: los asistentes pueden valorar un evento con una puntuación de 1 a 5 y un comentario opcional (máximo 500 caracteres) si ya asistieron (estado `ASISTIO`) o si estaban confirmados y el evento ya finalizó. El sistema permite editar la valoración después. Detalle: [`circuitos/valoraciones.md`](./circuitos/valoraciones.md).
+- Cómo probar: como `laura`, inscribirse a un evento con cupo pequeño (ej. 1 lugar). Cuando el organizador marque asistencia (check-in o manual), la inscripción pasa a `ASISTIO`. Entrar al detalle del evento y aparecerá la sección "Valorá este evento" con un select de 1 a 5 (de "Malo" a "Excelente") y un textarea. Seleccionar puntuación, opcionalmente escribir un comentario, y hacer click en "Enviar valoración". Por API: `POST /api/valoraciones` con `{ "evento_id": "<uuid>", "puntuacion": 5, "comentario": "Muy bueno" }`. Para obtener las valoraciones del evento: `GET /api/valoraciones/evento/<uuid>` devuelve las del usuario actual.
+- Qué se espera: la valoración se guarda; si el usuario vuelve a entrar al detalle, el formulario muestra "Tu valoración" precargado con los valores anteriores. Haciendo click en "Actualizar valoración" puede cambiar su puntuación o comentario. El promedio aparece en el KPI del dashboard si hay valoraciones. No puede valorar si no está inscripto, o si está en lista de espera, o si canceló.
 
 ### 3.4 Notificaciones
 

@@ -97,17 +97,26 @@ Los modelos se registran automáticamente en `models/index.js`, que recorre la c
 
 Flujo de una petición: **ruta → middlewares → controlador → servicio → modelo**. Los controladores solo traducen HTTP (leen la request, responden JSON); los servicios contienen las reglas de negocio y hablan con los modelos.
 
+**Rutas principales implementadas:**
+*   `POST /api/auth/registro`, `POST /api/auth/login`, `GET /api/auth/perfil`, `PUT /api/auth/perfil`, `POST /api/auth/logout`
+*   `GET /api/eventos`, `GET /api/eventos/:id`, `POST /api/eventos`, `PUT /api/eventos/:id`, `DELETE /api/eventos/:id`
+*   `GET /api/inscripciones/mis-inscripciones`, `POST /api/inscripciones`, `DELETE /api/inscripciones/:eventoId`, `POST /api/inscripciones/check-in`
+*   `POST /api/valoraciones`, `GET /api/valoraciones/evento/:eventoId`
+*   `GET /api/dashboard/kpis`, `GET /api/dashboard/charts`
+*   Y más (categorías, notificaciones, push, usuarios).
+
 ```text
 proybackendgrupo02/
  ├── config/
  │   ├── db.js                      # Conexión Sequelize a Neon.tech
  │   └── sequelize-cli.config.js    # Configuración para migraciones (sequelize-cli)
  ├── controllers/
- │   ├── auth.controller.js         # Registro, login, OAuth Google, 2FA, sesión
+ │   ├── auth.controller.js         # Registro, login, OAuth Google, 2FA, sesión, perfil
  │   ├── usuario.controller.js
  │   ├── evento.controller.js
  │   ├── categoria.controller.js
  │   ├── inscripcion.controller.js
+ │   ├── valoracion.controller.js   # Guardado y consulta de valoraciones
  │   ├── notificacion.controller.js
  │   ├── push.controller.js         # Alta/baja de suscripciones Web Push
  │   └── dashboard.controller.js    # Métricas para el panel del organizador
@@ -131,6 +140,7 @@ proybackendgrupo02/
  │   ├── inscripcion.routes.js
  │   ├── notificacion.routes.js
  │   ├── push.routes.js
+ │   ├── valoracion.routes.js       # POST / actualizar, GET /evento/:eventoId
  │   ├── dashboard.routes.js
  │   ├── health.routes.js           # Verificación de estado del servidor
  │   └── index.js                   # Agrupa todas las rutas bajo /api
@@ -142,6 +152,7 @@ proybackendgrupo02/
  │   ├── inscripcion.service.js
  │   ├── notificacion.service.js
  │   ├── push.service.js
+ │   ├── valoracion.service.js
  │   └── dashboard.service.js
  ├── middlewares/
  │   ├── auth.middleware.js         # Verifica el JWT (viaja en cookie httpOnly)
