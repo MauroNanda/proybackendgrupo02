@@ -10,6 +10,7 @@ router.use(roleMiddleware(['ORGANIZADOR']));
 
 router.get('/kpis', dashboardController.kpis);
 router.get('/charts', dashboardController.charts);
+router.get('/accesos', dashboardController.accesos);
 
 // Exportamos con prefijo explícito para que el autoloader monte en /api/dashboard
 module.exports = { prefix: '/dashboard', router };
