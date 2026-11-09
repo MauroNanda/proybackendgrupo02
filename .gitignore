@@ -30,3 +30,6 @@ desktop.ini
 # Coverage / tests
 coverage/
 .nyc_output/
+
+# Credenciales del cluster
+infra/hia/.env

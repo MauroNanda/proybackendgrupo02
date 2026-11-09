@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  db-principal:
+    image: bitnami/postgresql:latest
+    container_name: hia_postgres_principal
+    env_file:
+      - .env
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+    ports:
+      - "5435:5432"
+    volumes:
+      - principal_data:/bitnami/postgresql
+    networks:
+      - convoca-red
+    restart: always
+
+  db-replica:
+    image: bitnami/postgresql:latest
+    container_name: hia_postgres_replica
+    env_file:
+      - .env
+    environment:
+      - POSTGRESQL_MASTER_HOST=db-principal
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_MODE=slave
+    ports:
+      - "5433:5432"
+    volumes:
+      - replica_data:/bitnami/postgresql
+    networks:
+      - convoca-red
+    depends_on:
+      - db-principal
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: hia_pgadmin
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - convoca-red
+    restart: always
+
+  backups:
+    image: prodrigestivill/postgres-backup-local:latest
+    container_name: hia_backups
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db-principal
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - SCHEDULE=@every 12h
+      - BACKUP_KEEP_DAYS=7
+    volumes:
+      - backups_data:/backups
+    networks:
+      - convoca-red
+    depends_on:
+      - db-principal
+    restart: always
+
+volumes:
+  principal_data:
+  replica_data:
+  pgadmin_data:
+  backups_data:
+
+networks:
+  convoca-red:
+    driver: bridge
