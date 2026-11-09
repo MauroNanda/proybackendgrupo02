@@ -1,11 +1,11 @@
 require('dotenv').config();
+const { postgresOptions } = require('./postgres-options');
+const connection = postgresOptions();
 
 const baseConfig = {
-  use_env_variable: 'DATABASE_URL',
+  url: connection.url,
   dialect: 'postgres',
-  dialectOptions: {
-    ssl: false,
-  },
+  dialectOptions: connection.dialectOptions,
 };
 
 module.exports = {

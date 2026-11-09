@@ -33,3 +33,5 @@ coverage/
 
 # Credenciales del cluster
 infra/hia/.env
+infra/hia/backups/
+infra/hia/resultados/

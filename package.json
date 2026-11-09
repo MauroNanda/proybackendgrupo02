@@ -13,7 +13,16 @@
     "seed:undo": "sequelize-cli db:seed:undo:all",
     "lint": "eslint .",
     "test": "echo \"No tests yet\" && exit 0",
-    "prepare": "node -e \"if(process.env.HUSKY==='0'||!require('fs').existsSync('node_modules/husky'))process.exit(0);require('child_process').execSync('husky',{stdio:'inherit'})\""
+    "prepare": "node -e \"if(process.env.HUSKY==='0'||!require('fs').existsSync('node_modules/husky'))process.exit(0);require('child_process').execSync('husky',{stdio:'inherit'})\"",
+    "lab:check": "node infra/hia/lab.js check",
+    "lab:up": "node infra/hia/lab.js up",
+    "lab:migrate": "node infra/hia/lab.js migrate",
+    "lab:seed": "node infra/hia/lab.js seed",
+    "lab:validate": "node infra/hia/lab.js validate",
+    "lab:analyze": "node infra/hia/lab.js analyze",
+    "lab:backup": "node infra/hia/lab.js backup",
+    "lab:restore-test": "node infra/hia/lab.js restore-test",
+    "test:lab": "node --test test/lab/*.test.js"
   },
   "keywords": [
     "convoca",

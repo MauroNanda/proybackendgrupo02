@@ -1,0 +1,172 @@
+{
+  "origen": "Ejecuciones locales reales; no capturas",
+  "rama": "fix/laboratorio-postgresql",
+  "commitBase": "c5b64d5d436d45bf2bcf8accf1d26da33393b70d",
+  "cambiosSinCommit": true,
+  "dataset": "convoca-v2.1",
+  "validacionCompleta": {
+    "validacion": "OK",
+    "database": "convoca_lab_v2",
+    "servidor": "17.11 (Debian 17.11-1.pgdg12+2)",
+    "control": {
+      "unico": true,
+      "version": "convoca-v2.1",
+      "perfil": "completo",
+      "usuarios": 100000,
+      "eventos": 10000,
+      "inscripciones": 6000000,
+      "referencia": "2026-01-01T00:00:00+00:00",
+      "ultimo": 6000000,
+      "iniciado": "2026-11-09T19:32:28.193535+00:00",
+      "actualizado": "2026-11-09T19:38:33.785486+00:00",
+      "completado": true
+    },
+    "conteos": {
+      "Usuarios": 100000,
+      "Eventos": 10000,
+      "Inscripciones": 6000000
+    },
+    "estados": {
+      "CONFIRMADO": 1553400,
+      "ESPERA": 2046300,
+      "CANCELADO": 875700,
+      "ASISTIO": 1524600
+    },
+    "popularidad": {
+      "min": 333,
+      "max": 3000,
+      "eventos_con_inscripciones": 10000
+    },
+    "tamano": [
+      {
+        "tabla": "Usuarios",
+        "datos_bytes": 13434880,
+        "total_bytes": 30539776
+      },
+      {
+        "tabla": "Eventos",
+        "datos_bytes": 1679360,
+        "total_bytes": 2129920
+      },
+      {
+        "tabla": "Inscripciones",
+        "datos_bytes": 702177280,
+        "total_bytes": 1326161920
+      }
+    ],
+    "restricciones": [
+      "\"Auditoria\":Auditoria_pkey:PRIMARY KEY (id)",
+      "\"Auditoria\":Auditoria_usuario_id_fkey:FOREIGN KEY (usuario_id) REFERENCES \"Usuarios\"(id) ON UPDATE CASCADE ON DELETE RESTRICT",
+      "\"Categorias\":Categorias_nombre_key:UNIQUE (nombre)",
+      "\"Categorias\":Categorias_pkey:PRIMARY KEY (id)",
+      "\"EventoCategorias\":EventoCategorias_categoriaId_fkey:FOREIGN KEY (\"categoriaId\") REFERENCES \"Categorias\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"EventoCategorias\":EventoCategorias_eventoId_fkey:FOREIGN KEY (\"eventoId\") REFERENCES \"Eventos\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"Eventos\":Eventos_pkey:PRIMARY KEY (id)",
+      "\"HistorialAcceso\":HistorialAcceso_pkey:PRIMARY KEY (id)",
+      "\"HistorialAcceso\":HistorialAcceso_usuario_id_fkey:FOREIGN KEY (usuario_id) REFERENCES \"Usuarios\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"Inscripciones\":Inscripciones_eventoId_fkey:FOREIGN KEY (\"eventoId\") REFERENCES \"Eventos\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"Inscripciones\":Inscripciones_pkey:PRIMARY KEY (id)",
+      "\"Inscripciones\":Inscripciones_qr_token_key:UNIQUE (qr_token)",
+      "\"Inscripciones\":Inscripciones_usuarioId_fkey:FOREIGN KEY (\"usuarioId\") REFERENCES \"Usuarios\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"Notificaciones\":Notificaciones_pkey:PRIMARY KEY (id)",
+      "\"Notificaciones\":Notificaciones_usuario_id_fkey:FOREIGN KEY (usuario_id) REFERENCES \"Usuarios\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"PushSubscriptions\":PushSubscriptions_endpoint_key:UNIQUE (endpoint)",
+      "\"PushSubscriptions\":PushSubscriptions_pkey:PRIMARY KEY (id)",
+      "\"PushSubscriptions\":PushSubscriptions_usuario_id_fkey:FOREIGN KEY (usuario_id) REFERENCES \"Usuarios\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"SequelizeMeta\":SequelizeMeta_pkey:PRIMARY KEY (name)",
+      "\"Usuarios\":Usuarios_email_key:UNIQUE (email)",
+      "\"Usuarios\":Usuarios_pkey:PRIMARY KEY (id)",
+      "\"Usuarios\":Usuarios_username_key:UNIQUE (username)",
+      "\"Valoracion\":Valoracion_evento_id_fkey:FOREIGN KEY (evento_id) REFERENCES \"Eventos\"(id) ON UPDATE CASCADE ON DELETE CASCADE",
+      "\"Valoracion\":Valoracion_pkey:PRIMARY KEY (id)",
+      "\"Valoracion\":Valoracion_usuario_id_fkey:FOREIGN KEY (usuario_id) REFERENCES \"Usuarios\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+    ],
+    "muestra": {
+      "usuarios": "caf2b1a7c057c9b7683b160d18f19600",
+      "eventos": "3fe07b58cb4fb7f9a2de4cfaa0758083",
+      "inscripciones": "85a8a3f7c009882eca21fcc4b8126a15"
+    }
+  },
+  "codigoValidado": {
+    "seeders/seed-masivo.sql": "06304522e7ee653e7740210bf10bdb7d7b7f1558e91c57f5e55878fcdce19ae6",
+    "infra/hia/dataset.json": "f338e4be39e630450ece55bfa5b6f0da34f6ce159bf3040d84c50a3fd4961688",
+    "infra/hia/lab.js": "f722a650ea03b4370078176c56f8d97e827f8c17333d7f256263b6cc4581fb9e",
+    "infra/hia/validar-dataset.sql": "f99b1d0e3c1d62d9caaf74109d58bf3bc8f11455fcb88a9577a4ab7f06506d49",
+    "infra/hia/docker-compose.yml": "d1e1e7cdd0175cb48bb90ea3efb4944a611324f8f2300980488c9b9d3e521017",
+    "infra/hia/backup.sh": "c98a93bd4cb2c48e000b888639aedfd3e38c40e451a5d3e41557cdf8f30c48f5"
+  },
+  "integracionPiloto": {
+    "inicio": "2026-11-09T19:30:37.706Z",
+    "perfil": "piloto",
+    "pruebas": [
+      "rechaza datos ajenos sin mezclarlos",
+      "al menos un lote confirmado antes de interrumpir",
+      "rechaza otra carga simultánea",
+      "interrupción real de la sesión de carga",
+      "filas y avance se confirman atómicamente",
+      "reanuda y completa los lotes faltantes",
+      "rechaza una versión incompatible",
+      "repetir una carga completa no duplica datos"
+    ],
+    "fin": "2026-11-09T19:30:40.054Z",
+    "resultado": "OK"
+  },
+  "ejecuciones": [
+    {
+      "carpeta": "2026-11-09T19-32-27-303Z-seed-completo",
+      "operacion": "seed",
+      "resultado": "OK",
+      "inicio": "2026-11-09T19:32:27.305Z",
+      "fin": "2026-11-09T19:39:16.050Z",
+      "segundos": 408.745
+    },
+    {
+      "carpeta": "2026-11-09T19-45-09-884Z-validate-completo",
+      "operacion": "validate",
+      "resultado": "OK",
+      "inicio": "2026-11-09T19:45:09.892Z",
+      "fin": "2026-11-09T19:45:33.368Z",
+      "segundos": 23.476
+    },
+    {
+      "carpeta": "2026-11-09T19-39-19-777Z-backup-completo",
+      "operacion": "backup",
+      "resultado": "OK",
+      "inicio": "2026-11-09T19:39:19.779Z",
+      "fin": "2026-11-09T19:40:54.565Z",
+      "segundos": 94.786,
+      "backup": "convoca_lab_v2-20261109T193945-1626"
+    },
+    {
+      "carpeta": "2026-11-09T19-40-54-647Z-restore-test-completo",
+      "operacion": "restore-test",
+      "resultado": "OK",
+      "inicio": "2026-11-09T19:40:54.649Z",
+      "fin": "2026-11-09T19:43:07.414Z",
+      "segundos": 132.765,
+      "backup": "convoca_lab_v2-20261109T193945-1626.dump",
+      "restauracion": "OK"
+    },
+    {
+      "carpeta": "2026-11-09T19-43-07-479Z-analyze-completo",
+      "operacion": "analyze",
+      "resultado": "OK",
+      "inicio": "2026-11-09T19:43:07.481Z",
+      "fin": "2026-11-09T19:43:51.466Z",
+      "segundos": 43.985
+    }
+  ],
+  "backupBytes": 586397191,
+  "backupVerificado": {
+    "sha256": "0be09028e3dc230f41abf62374270f8dd0f3693abf8ef3f16d973708efa71e04",
+    "fecha": "2026-11-09T19:43:06.643Z",
+    "resultado": "OK",
+    "evidencia": "2026-11-09T19-40-54-647Z-restore-test-completo"
+  },
+  "pendientes": [
+    "Reproducción del piloto por otro integrante",
+    "Aceptación académica del alcance",
+    "Commit/push y PR hacia develop",
+    "Actualización final de Drive"
+  ]
+}
