@@ -50,6 +50,8 @@ Guía de instalación detallada en [`docs/SETUP.md`](./docs/SETUP.md).
 
 ## Documentación
 
+Laboratorio local para HIA: seguir **[docs/base-datos.md](./docs/base-datos.md)**. Incluye Docker, piloto, carga masiva reanudable, pgAdmin, validación y backup/restauración; usa bases separadas de Neon.
+
 Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs) de este repositorio:
 
 | Archivo | Contenido |

@@ -1,0 +1,20 @@
+{
+  "version": "convoca-v2.1",
+  "referencia": "2026-01-01T00:00:00Z",
+  "lote": 10000,
+  "perfiles": {
+    "piloto": {
+      "database": "convoca_lab_piloto_v2",
+      "usuarios": 1000,
+      "eventos": 100,
+      "inscripciones": 10000
+    },
+    "completo": {
+      "database": "convoca_lab_v2",
+      "usuarios": 100000,
+      "eventos": 10000,
+      "inscripciones": 6000000
+    }
+  },
+  "demoHash": "$2b$10$MDc56.fXIaAzOmOMX5e2..tdH5tE1ucnkKuePNllS6T4Wm0gx1FL2"
+}

@@ -1,82 +1,87 @@
-version: '3.8'
-
+# Volúmenes v2 NUEVOS: no reutilizar el volumen /bitnami/postgresql anterior.
 services:
   db-principal:
-    image: bitnami/postgresql:latest
-    container_name: hia_postgres_principal
-    env_file:
-      - .env
+    image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
     environment:
-      - POSTGRESQL_REPLICATION_MODE=master
-    ports:
-      - "5435:5432"
+      POSTGRES_USER: ${POSTGRES_USER:?Configurar infra/hia/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configurar infra/hia/.env}
+      POSTGRES_DB: postgres
+    ports: ["127.0.0.1:${LAB_DB_PORT:-5435}:5432"]
     volumes:
-      - principal_data:/bitnami/postgresql
-    networks:
-      - convoca-red
-    restart: always
-
-  db-replica:
-    image: bitnami/postgresql:latest
-    container_name: hia_postgres_replica
-    env_file:
-      - .env
-    environment:
-      - POSTGRESQL_MASTER_HOST=db-principal
-      - POSTGRESQL_MASTER_PORT_NUMBER=5432
-      - POSTGRESQL_REPLICATION_MODE=slave
-    ports:
-      - "5433:5432"
-    volumes:
-      - replica_data:/bitnami/postgresql
-    networks:
-      - convoca-red
-    depends_on:
-      - db-principal
-    restart: always
+      - principal_v2:/var/lib/postgresql/data
+      - ./postgresql/logging.conf:/etc/postgresql/lab.conf:ro
+      - ./postgresql/pg_hba.conf:/etc/postgresql/lab_hba.conf:ro
+      - logs_v2:/var/log/postgresql
+      - ./backups:/backups
+      - ./backup.sh:/usr/local/bin/backup-lab:ro
+    entrypoint: [sh, -c, 'chown postgres:postgres /var/log/postgresql && exec docker-entrypoint.sh "$${@}"', '--']
+    command: [postgres, -c, config_file=/etc/postgresql/lab.conf]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d postgres']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    networks: [convoca-red]
+    restart: unless-stopped
 
   pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: hia_pgadmin
-    env_file:
-      - .env
+    image: dpage/pgadmin4:9.9@sha256:5d9624a93634d1c5e595619cc57b1d330758120d1baf445fa97300c0c1fc3c0a
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - convoca-red
-    restart: always
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:?Configurar infra/hia/.env}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:?Configurar infra/hia/.env}
+    ports: ["127.0.0.1:${LAB_PGADMIN_PORT:-5050}:80"]
+    volumes: [pgadmin_v2:/var/lib/pgadmin]
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O - http://127.0.0.1/misc/ping || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+    networks: [convoca-red]
+    restart: unless-stopped
 
-  backups:
-    image: prodrigestivill/postgres-backup-local:latest
-    container_name: hia_backups
-    env_file:
-      - .env
+  # Reservado para A6. No es aún una réplica configurada: no activarlo en A4.
+  db-replica:
+    image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
+    profiles: [replica]
+    entrypoint: [sh, -c, 'echo "Configurar replicación en actividad 6; no iniciar como servidor independiente" >&2; exit 1']
     environment:
-      - POSTGRES_HOST=db-principal
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - SCHEDULE=@every 12h
-      - BACKUP_KEEP_DAYS=7
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: [replica_v2:/var/lib/postgresql/data]
+    networks: [convoca-red]
+    restart: 'no'
+
+  # Optativo: misma rutina que lab:backup, cada doce horas.
+  backups:
+    image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
+    profiles: [backups]
+    environment:
+      PGHOST: db-principal
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - backups_data:/backups
-    networks:
-      - convoca-red
+      - ./backups:/backups
+      - ./backup.sh:/usr/local/bin/backup-lab:ro
+    entrypoint: [sh, -c, 'while true; do sh /usr/local/bin/backup-lab convoca_lab_v2; sleep 43200; done']
     depends_on:
-      - db-principal
-    restart: always
+      db-principal: {condition: service_healthy}
+    networks: [convoca-red]
+    restart: unless-stopped
+
+  pgbadger:
+    profiles: [analisis]
+    build: ./postgresql/pgbadger
+    volumes:
+      - logs_v2:/logs:ro
+      - ./resultados:/resultados
+    network_mode: none
 
 volumes:
-  principal_data:
-  replica_data:
-  pgadmin_data:
-  backups_data:
-
+  principal_v2:
+  replica_v2:
+  pgadmin_v2:
+  logs_v2:
 networks:
   convoca-red:
     driver: bridge
