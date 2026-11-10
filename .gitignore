@@ -5,6 +5,8 @@ node_modules/
 .env
 .env.local
 .env.*.local
+infra/hia/.env.*
+!infra/hia/.env.example
 
 # Build / output
 dist/
