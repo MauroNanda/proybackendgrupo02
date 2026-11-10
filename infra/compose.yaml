@@ -11,7 +11,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db-principal:5432/convoca_lab_piloto_v2
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${API_DB_HOST:-db-principal}:5432/convoca_lab_piloto_v2
       DB_SSL: "false"
       JWT_SECRET: ${API_JWT_SECRET:?Configurar API_JWT_SECRET en infra/hia/.env}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4200}

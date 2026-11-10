@@ -22,6 +22,7 @@
     "lab:analyze": "node infra/hia/lab.js analyze",
     "lab:backup": "node infra/hia/lab.js backup",
     "lab:restore-test": "node infra/hia/lab.js restore-test",
+    "lab:replica-up": "docker compose --env-file infra/hia/.env -f infra/hia/docker-compose.yml --profile replica up -d --wait db-principal replication-init db-replica",
     "test:lab": "node --test test/lab/*.test.js"
   },
   "keywords": [

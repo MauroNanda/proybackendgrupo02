@@ -77,6 +77,8 @@ Para publicación, usar `infra/compose.production.yaml` con `DATABASE_URL`, `JWT
 docker compose --env-file .env.production -f infra/compose.production.yaml up -d --build
 ```
 
+La configuración y recuperación manual del PostgreSQL principal/réplica de la actividad 6 están en [`docs/replicacion-postgresql.md`](./docs/replicacion-postgresql.md).
+
 ## Documentación
 
 Laboratorio local para HIA: seguir **[docs/base-datos.md](./docs/base-datos.md)**. Incluye Docker, piloto, carga masiva reanudable, pgAdmin, validación y backup/restauración; usa bases separadas de Neon.

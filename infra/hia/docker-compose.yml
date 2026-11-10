@@ -15,7 +15,7 @@ services:
       - ./backups:/backups
       - ./backup.sh:/usr/local/bin/backup-lab:ro
     entrypoint: [sh, -c, 'chown postgres:postgres /var/log/postgresql && exec docker-entrypoint.sh "$${@}"', '--']
-    command: [postgres, -c, config_file=/etc/postgresql/lab.conf]
+    command: [postgres, -c, config_file=/etc/postgresql/lab.conf, -c, wal_level=replica, -c, max_wal_senders=10, -c, max_replication_slots=5]
     healthcheck:
       test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d postgres']
       interval: 3s
@@ -40,17 +40,57 @@ services:
     networks: [convoca-red]
     restart: unless-stopped
 
-  # Reservado para A6. No es aún una réplica configurada: no activarlo en A4.
+  # A6: rol de replicación local. Solo se ejecuta al activar el perfil replica.
+  replication-init:
+    image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
+    profiles: [replica]
+    environment:
+      PGHOST: db-principal
+      PGPORT: 5432
+      PGDATABASE: postgres
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:?Configurar REPLICATION_PASSWORD en infra/hia/.env}
+    volumes:
+      - ./postgresql/crear-rol-replicacion.sql:/docker-entrypoint-initdb.d/crear-rol-replicacion.sql:ro
+    entrypoint: [psql]
+    command: [-X, -v, ON_ERROR_STOP=1, -f, /docker-entrypoint-initdb.d/crear-rol-replicacion.sql]
+    depends_on:
+      db-principal: {condition: service_healthy}
+    networks: [convoca-red]
+    restart: 'no'
+
+  # A6: standby físico persistente. No se inicia en el flujo normal de A4.
   db-replica:
     image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
     profiles: [replica]
-    entrypoint: [sh, -c, 'echo "Configurar replicación en actividad 6; no iniciar como servidor independiente" >&2; exit 1']
+    entrypoint: [sh, /usr/local/bin/replica-entrypoint.sh]
+    command: [postgres, -c, config_file=/etc/postgresql/lab.conf, -c, hot_standby=on]
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes: [replica_v2:/var/lib/postgresql/data]
+      REPLICATION_USER: convoca_replicator
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:?Configurar REPLICATION_PASSWORD en infra/hia/.env}
+      PGDATA: /var/lib/postgresql/data
+      PGPASSFILE: /var/lib/postgresql/.pgpass
+    ports: ["127.0.0.1:${LAB_REPLICA_DB_PORT:-5436}:5432"]
+    volumes:
+      - replica_v2:/var/lib/postgresql/data
+      - replica_logs_v2:/var/log/postgresql
+      - ./postgresql/logging.conf:/etc/postgresql/lab.conf:ro
+      - ./postgresql/pg_hba.conf:/etc/postgresql/lab_hba.conf:ro
+      - ./postgresql/replica-entrypoint.sh:/usr/local/bin/replica-entrypoint.sh:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d postgres']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      # La primera inicialización hace un pg_basebackup y puede tardar varios minutos.
+      start_period: 3m
+    depends_on:
+      db-principal: {condition: service_healthy}
+      replication-init: {condition: service_completed_successfully}
     networks: [convoca-red]
-    restart: 'no'
+    restart: unless-stopped
 
   # Optativo: misma rutina que lab:backup, cada doce horas.
   backups:
@@ -82,6 +122,7 @@ volumes:
   replica_v2:
   pgadmin_v2:
   logs_v2:
+  replica_logs_v2:
 networks:
   convoca-red:
     driver: bridge
