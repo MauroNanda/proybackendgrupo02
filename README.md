@@ -48,6 +48,35 @@ El servidor queda en `http://localhost:3000` (configurable con la variable `PORT
 
 Guía de instalación detallada en [`docs/SETUP.md`](./docs/SETUP.md).
 
+## Ejecutar la API en Docker (actividad 7 de HIA)
+
+Requisitos de desarrollo: Docker Desktop con Compose y Node.js 22.22.3/npm 11.12.1 para los comandos `lab:*`. El `Dockerfile` ofrece los objetivos `development` y `production`; el Compose de desarrollo integra el laboratorio PostgreSQL de `infra/hia/docker-compose.yml` mediante `infra/compose.yaml`.
+
+Desde la raíz del repositorio, preparar las dependencias locales del laboratorio y una configuración propia:
+
+```powershell
+npm ci
+if (-not (Test-Path infra/hia/.env)) { Copy-Item infra/hia/.env.example infra/hia/.env }
+```
+
+En `infra/hia/.env`, reemplazar las contraseñas de muestra y `API_JWT_SECRET` por valores locales propios. No subir ese archivo. Luego preparar la base piloto e iniciar los servicios:
+
+```powershell
+npm run lab:up
+npm run lab:migrate -- --perfil piloto
+npm run lab:seed -- --perfil piloto
+npm run lab:validate -- --perfil piloto
+docker compose --env-file infra/hia/.env -f infra/compose.yaml up -d --build
+```
+
+La API queda en `http://localhost:3000` y pgAdmin en `http://localhost:5050`. Dentro de Docker, la API se conecta a `db-principal:5432`; el navegador usa `localhost:3000`. La base del piloto es `convoca_lab_piloto_v2` y conserva sus datos en los volúmenes versionados del laboratorio. Verificar el estado con `docker compose --env-file infra/hia/.env -f infra/compose.yaml ps` y `Invoke-RestMethod http://localhost:3000/api/health`. Para detener los servicios sin borrar datos: `docker compose --env-file infra/hia/.env -f infra/compose.yaml stop`.
+
+Para publicación, usar `infra/compose.production.yaml` con `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN` y `FRONTEND_URL` provistos por el entorno de ejecución; opcionalmente definir `API_PORT` y `API_BIND_ADDRESS`. No incluir `.env` ni credenciales en la imagen. El Compose de publicación no inicia PostgreSQL local: requiere una base externa accesible desde el host de Docker.
+
+```powershell
+docker compose --env-file .env.production -f infra/compose.production.yaml up -d --build
+```
+
 ## Documentación
 
 Laboratorio local para HIA: seguir **[docs/base-datos.md](./docs/base-datos.md)**. Incluye Docker, piloto, carga masiva reanudable, pgAdmin, validación y backup/restauración; usa bases separadas de Neon.

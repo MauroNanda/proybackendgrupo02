@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: production
+    image: convoca-api:production
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL:?Configurar DATABASE_URL en el entorno de publicación}
+      DB_SSL: ${DB_SSL:-true}
+      JWT_SECRET: ${JWT_SECRET:?Configurar JWT_SECRET en el entorno de publicación}
+      CORS_ORIGIN: ${CORS_ORIGIN:?Configurar CORS_ORIGIN en el entorno de publicación}
+      FRONTEND_URL: ${FRONTEND_URL:?Configurar FRONTEND_URL en el entorno de publicación}
+    ports:
+      - "${API_BIND_ADDRESS:-127.0.0.1}:${API_PORT:-3000}:3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped

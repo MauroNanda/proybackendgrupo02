@@ -1,0 +1,14 @@
+.git
+.github
+.husky
+node_modules
+npm-debug.log*
+coverage
+.env
+.env.*
+!.env.example
+infra/hia/.env
+infra/hia/backups
+infra/hia/resultados
+test
+docs
