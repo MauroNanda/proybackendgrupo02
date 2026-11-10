@@ -1,7 +1,10 @@
+'use strict';
+
 const { Inscripcion, Evento, Usuario, sequelize } = require('../models');
 const HttpError = require('../utils/http-error');
 const crypto = require('crypto');
 const notificaciones = require('../integrations/notificaciones');
+const { Op, fn, literal } = require('sequelize');
 
 /**
  * Servicio para gestionar la lógica de negocio de Inscripciones.
@@ -20,10 +23,7 @@ class InscripcionService {
    * Registra un usuario a un evento con validación de cupo y lista de espera.
    */
   async inscribirse(usuarioId, eventoId) {
-    // La validación de cupo y la creación se hacen dentro de una transacción con
-    // bloqueo de fila del evento para evitar sobreventa por inscripciones concurrentes.
     const { inscripcionFinal, estadoFinal, evento } = await sequelize.transaction(async (t) => {
-      // 1. Verificar si el evento existe (bloqueando la fila hasta el commit)
       const evento = await Evento.findByPk(eventoId, {
         transaction: t,
         lock: t.LOCK.UPDATE,
@@ -32,24 +32,16 @@ class InscripcionService {
         throw new HttpError('El evento no existe', 404);
       }
 
-      // 1.b. Solo se admite inscripción a eventos PUBLICADOS y que aún no ocurrieron.
-      // BORRADOR se trata como inexistente (404) para no revelar eventos no visibles;
-      // CANCELADO y fecha pasada son conflictos con el estado del recurso (409).
-      // Se valida acá, con la fila ya bloqueada, para que una cancelación
-      // concurrente del evento no se cruce con esta inscripción.
       if (evento.estado === 'BORRADOR') {
         throw new HttpError('El evento no existe', 404);
       }
       if (evento.estado === 'CANCELADO') {
         throw new HttpError('El evento fue cancelado y no admite inscripciones', 409);
       }
-      // fecha es DataTypes.DATE (timestamptz): comparar con new Date() es seguro
-      // (ambas en UTC). El guard de null es defensivo ante datos legacy.
       if (evento.fecha && new Date(evento.fecha) < new Date()) {
         throw new HttpError('El evento ya se realizó y no admite nuevas inscripciones', 409);
       }
 
-      // 2. Verificar si el usuario ya tiene una inscripción activa
       const inscripcionExistente = await Inscripcion.findOne({
         where: { usuarioId, eventoId },
         transaction: t,
@@ -60,7 +52,6 @@ class InscripcionService {
         throw new HttpError('Ya te encuentras registrado en este evento con estado: ' + inscripcionExistente.estado, 400);
       }
 
-      // 3. Contar cupos ocupados dentro de la transacción
       const totalConfirmados = await Inscripcion.count({
         where: {
           eventoId,
@@ -69,19 +60,16 @@ class InscripcionService {
         transaction: t,
       });
 
-      // Determinar estado de la inscripción
       const estado = totalConfirmados >= evento.cupo_maximo ? 'ESPERA' : 'CONFIRMADO';
       const nuevoQrToken = crypto.randomUUID();
 
       let inscripcion;
       if (inscripcionExistente) {
-        // Reutilizar el registro cancelado
         inscripcionExistente.estado = estado;
         inscripcionExistente.qr_token = nuevoQrToken;
         await inscripcionExistente.save({ transaction: t });
         inscripcion = inscripcionExistente;
       } else {
-        // Crear nueva inscripción
         inscripcion = await Inscripcion.create({
           usuarioId,
           eventoId,
@@ -93,8 +81,6 @@ class InscripcionService {
       return { inscripcionFinal: inscripcion, estadoFinal: estado, evento };
     });
 
-    // --- NOTIFICACIÓN (fuera de la transacción; efecto secundario, no bloquea) ---
-    // El hub decide qué canales usar (in-app, email, y a futuro Telegram/Push).
     try {
       const usuario = await Usuario.findByPk(usuarioId);
       if (usuario) {
@@ -111,16 +97,11 @@ class InscripcionService {
     return inscripcionFinal;
   }
 
-
-
-
   /**
    * Cancela una inscripción y promueve al siguiente en lista de espera si corresponde.
    */
   async cancelar(usuarioId, eventoId) {
-    // Cancelación y promoción del siguiente en lista de espera se hacen atómicamente.
     const { inscripcion, promovidoId } = await sequelize.transaction(async (t) => {
-      // 1. Buscar la inscripción activa
       const insc = await Inscripcion.findOne({
         where: {
           usuarioId,
@@ -136,16 +117,14 @@ class InscripcionService {
 
       const estadoAnterior = insc.estado;
 
-      // 2. Cambiar estado a CANCELADO
       insc.estado = 'CANCELADO';
       await insc.save({ transaction: t });
 
-      // 3. Si estaba CONFIRMADO, promover al primero en lista de espera (ESPERA)
       let promovido = null;
       if (estadoAnterior === 'CONFIRMADO') {
         const siguienteEnEspera = await Inscripcion.findOne({
           where: { eventoId, estado: 'ESPERA' },
-          order: [['createdAt', 'ASC']],
+          order: [['createdAt', 'ASC'], ['id', 'ASC']], // Optimizado con desempate por id
           transaction: t,
           lock: t.LOCK.UPDATE,
         });
@@ -160,9 +139,6 @@ class InscripcionService {
       return { inscripcion: insc, promovidoId: promovido };
     });
 
-    // Notificar al usuario promovido fuera de la transacción (efecto secundario).
-    // Se pasa el evento para que el aviso diga de QUÉ evento se liberó el cupo
-    // (si no, un usuario en espera en varios eventos no sabe cuál se confirmó).
     if (promovidoId) {
       try {
         const [usuarioPromovido, evento] = await Promise.all([
@@ -215,7 +191,6 @@ class InscripcionService {
    */
   async obtenerInscriptosPorEvento(eventoId, queryParams = {}) {
     const { estado, search } = queryParams;
-    // Clamp de paginación para evitar valores fuera de rango (limit máx. 100).
     const limit = Math.min(Math.max(parseInt(queryParams.limit, 10) || 10, 1), 100);
     const page = Math.max(parseInt(queryParams.page, 10) || 1, 1);
     const offset = (page - 1) * limit;
@@ -225,7 +200,6 @@ class InscripcionService {
       where.estado = estado;
     }
 
-    const { Op } = require('sequelize');
     const includeUserWhere = {};
 
     if (search) {
@@ -247,15 +221,15 @@ class InscripcionService {
       ],
       limit: parseInt(limit, 10),
       offset: parseInt(offset, 10),
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC'], ['id', 'DESC']] // Optimizado con desempate por id
     });
 
-    // Calcular estadísticas agrupadas por estado para este evento
+    // Calcular estadísticas agrupadas por estado para este evento (Caso 04 optimizado con COUNT(*))
     const statsResult = await Inscripcion.findAll({
       where: { eventoId },
       attributes: [
         'estado',
-        [Inscripcion.sequelize.fn('COUNT', Inscripcion.sequelize.col('id')), 'count']
+        [fn('COUNT', literal('*')), 'count']
       ],
       group: ['estado']
     });

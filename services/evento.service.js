@@ -38,6 +38,7 @@ class EventoService {
         as: 'inscripciones',
         attributes: ['id', 'estado'],
         required: false,
+        separate: true, // <--- OPTIMIZACIÓN CASO 07: Separa la consulta para evitar JOIN masivo
       },
     ];
 
