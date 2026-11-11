@@ -15,6 +15,9 @@ services:
       FRONTEND_URL: ${FRONTEND_URL:?Configurar FRONTEND_URL en el entorno de publicación}
     ports:
       - "${API_BIND_ADDRESS:-127.0.0.1}:${API_PORT:-3000}:3000"
+    
+    networks:
+      - convoca-publicacion
     healthcheck:
       test:
         - CMD
@@ -26,3 +29,10 @@ services:
       retries: 6
       start_period: 30s
     restart: unless-stopped
+
+
+
+
+networks:
+  convoca-publicacion:
+    external: true
