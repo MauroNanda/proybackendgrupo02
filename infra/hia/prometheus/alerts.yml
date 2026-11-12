@@ -1,0 +1,33 @@
+groups:
+  - name: convoca
+    rules:
+      - alert: ConvocaApiNoDisponible
+        expr: probe_success{job="api-health"} == 0 or absent(probe_success{job="api-health"})
+        for: 30s
+        labels: {severity: critical}
+        annotations:
+          summary: API inaccesible o base no disponible durante 30 segundos
+      - alert: ConvocaPostgresNoDisponible
+        expr: pg_up == 0
+        for: 30s
+        labels: {severity: critical}
+        annotations:
+          summary: Exportador sin conexión a PostgreSQL durante 30 segundos
+      - alert: ConvocaExportadorCaido
+        expr: up{job=~"cadvisor|node-exporter|postgres-exporter"} == 0
+        for: 30s
+        labels: {severity: warning}
+        annotations:
+          summary: Exportador sin responder durante 30 segundos
+      - alert: ConvocaDiscoBajo
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes < 0.10
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: Menos de 10% libre durante cinco minutos
+      - alert: ConvocaEstadoDockerDesactualizado
+        expr: time() - convoca_docker_collection_timestamp_seconds > 45 or absent(convoca_docker_collection_timestamp_seconds)
+        for: 30s
+        labels: {severity: warning}
+        annotations:
+          summary: Recolector local de estado Docker detenido o sin muestras recientes

@@ -118,63 +118,88 @@ services:
     network_mode: none
 
   prometheus:
+    profiles: [monitoreo]
     image: prom/prometheus:v2.53.1
-    ports: ["9090:9090"]
+    ports: ["127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"]
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks: [convoca-red]
     restart: unless-stopped
 
   grafana:
+    profiles: [monitoreo]
     image: grafana/grafana:11.1.0
-    ports: ["3001:3000"]
+    entrypoint: [sh, -ec, 'if [ "$${#GF_SECURITY_ADMIN_PASSWORD}" -lt 16 ]; then echo "Configurar una clave local de Grafana de al menos 16 caracteres"; exit 1; fi; exec /run.sh']
+    ports: ["127.0.0.1:${GRAFANA_PORT:-3001}:3000"]
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-}
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     networks: [convoca-red]
     depends_on:
       - prometheus
     restart: unless-stopped
 
   node-exporter:
+    profiles: [monitoreo]
     image: prom/node-exporter:v1.8.1
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - ./resultados/docker-state:/textfile:ro
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.textfile.directory=/textfile'
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-    ports: ["9100:9100"]
+    expose: ["9100"]
     networks: [convoca-red]
     restart: unless-stopped
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    profiles: [monitoreo]
+    image: ghcr.io/google/cadvisor:0.60.6
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-    ports: ["8080:8080"]
+    expose: ["8080"]
+    privileged: true
+    command: ["--docker_only=true", "--housekeeping_interval=15s"]
     networks: [convoca-red]
     restart: unless-stopped
 
   postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.15.0
+    profiles: [monitoreo]
+    image: prometheuscommunity/postgres-exporter:v0.20.1
     environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db-principal:5432/postgres?sslmode=disable"
-    ports: ["9187:9187"]
+      DATA_SOURCE_NAME: "postgresql://convoca_monitor:${MONITOR_DB_PASSWORD:-}@db-principal:5432/postgres?sslmode=disable"
+    expose: ["9187"]
+    command: ["--extend.query-path=/etc/postgres-exporter/queries.yml"]
+    volumes:
+      - ./prometheus/queries.yml:/etc/postgres-exporter/queries.yml:ro
     networks: [convoca-red]
     depends_on:
       db-principal: {condition: service_healthy}
+    restart: unless-stopped
+
+  blackbox:
+    profiles: [monitoreo]
+    image: prom/blackbox-exporter:v0.25.0
+    volumes:
+      - ./prometheus/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks: [convoca-red, publicacion]
     restart: unless-stopped
 
 volumes:
@@ -186,5 +211,8 @@ volumes:
   prometheus_data:
   grafana_data:
 networks:
+  publicacion:
+    external: true
+    name: convoca-publicacion
   convoca-red:
     driver: bridge

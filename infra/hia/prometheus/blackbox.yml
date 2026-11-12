@@ -1,0 +1,9 @@
+modules:
+  convoca_health:
+    prober: http
+    timeout: 5s
+    http:
+      valid_status_codes: [200]
+      preferred_ip_protocol: ip4
+      fail_if_body_not_matches_regexp:
+        - '"database"\s*:\s*"up"'
