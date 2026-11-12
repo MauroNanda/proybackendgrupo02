@@ -32,5 +32,18 @@ La interfaz local http://127.0.0.1:8989/login_page.php respondió HTTP 200.
 Se restauró el respaldo 2026-10-18 únicamente sobre una base recién comprobada vacía; contiene cinco tickets históricos (IDs Mantis 1–5), no diez.
 El estado de Tailscale es NeedsLogin; la URL privada compartida no está disponible/verificada todavía. No se afirma que los compañeros puedan acceder.
 
+EVIDENCIA REUTILIZADA DE ACTIVIDADES ANTERIORES
+A4 — https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view
+El JSON de la prueba piloto, ejecutada el 2026-11-09, enumera rechazo de datos ajenos, rechazo de carga simultánea, interrupción real de sesión, reanudación de lotes, rechazo de versión incompatible y repetición sin duplicados. Resultado global del ensayo: OK. El archivo no conserva salida individual por escenario. El README de evidencias aclara que no es captura del instante de interrupción: https://drive.google.com/file/d/1eijeESFGBi5RS71SikBryXZ7aybuiH-A/view
+En el registro A11 se cuentan cuatro escenarios distintos: rechazo de datos ajenos, rechazo de concurrencia, interrupción/reanudación y versión incompatible. No se cuentan los preparativos ni el control de repetición como incidencias separadas.
+
+A5 — https://docs.google.com/document/d/1jPQREhVNm1DDiVr3olxqZM8qjWb4M7RLZgHVlikqWrg/edit
+Hallazgo de catálogo: 5.330,062 ms antes y 3.176,417 ms después de `separate: true`, comparando 725 eventos y 431.000 inscripciones equivalentes.
+Hallazgo de agregación mensual: 276,302 ms antes y 154,735 ms después de `COUNT(*)` e índice de fecha, con los mismos siete meses y totales.
+Son mediciones de laboratorio de A5 (no HTTP ni producción). La integración productiva de esas optimizaciones no se afirma en A11.
+
+A6 — https://drive.google.com/file/d/1h1qWxsSofjCCNY0wyCxTQ6iQ8a46unNj/view
+Se detuvo solo la réplica: cero conexiones standby; la API siguió HTTP 200 contra el principal. Tras reanudar el contenedor, ambas filas de prueba estuvieron visibles en la réplica, el estado volvió a `streaming` y los LSN coincidieron. Se limpiaron las filas temporales desde el principal y la limpieza se propagó. Responsable de ejecución original: Gabriel Calisaya.
+
 ESTADO DE A11
-Hay 3 incidencias reproducibles verificadas en el registro actual: 1 defecto de Convoca y 2 simulaciones controladas (seguridad y rendimiento). Las 10 comprobaciones correctas del registro anterior no se cuentan como incidencias. Faltan al menos 7 incidencias reproducibles con seguimiento y evidencia antes/después, y la gestión de tickets compartida en Mantis.
+El registro contiene 10 casos con evidencia previa o reproducida en el laboratorio, incluyendo seguridad y rendimiento. A4/A5 se citan como evidencia preexistente de las actividades correspondientes, no como ejecución original de Gabriel. Los diez casos todavía no están cargados y seguidos en el Mantis compartido. La instancia local solo tiene cinco tickets históricos y Tailscale sigue en NeedsLogin; por eso A11 permanece EN PROGRESO, sin afirmar que ya se cerró.
