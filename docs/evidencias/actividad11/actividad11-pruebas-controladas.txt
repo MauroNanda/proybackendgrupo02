@@ -1,0 +1,36 @@
+ACTIVIDAD 11 — EVIDENCIA DE PRUEBAS CONTROLADAS
+Fecha: 2026-11-12
+Responsable: Gabriel Calisaya
+Revisor propuesto: Mauro Nanda
+Entorno: Docker local de prueba convoca-lab-v2-a6test; API 127.0.0.1:13000; PostgreSQL aislado. Sin datos ni solicitudes a producción.
+
+SEGURIDAD (antes de la corrección)
+Acción: GET http://127.0.0.1:13000/api/dashboard/kpis sin encabezado Authorization.
+Resultado observado: HTTP 401, mensaje "Token de autenticación requerido" y campo "stack" con rutas internas porque el laboratorio usa NODE_ENV=development.
+Alcance: respuesta de la instancia local de desarrollo. No se consultó producción y no se obtuvo información de KPI.
+Tratamiento en la rama: el middleware deja de incluir stack en JSON para todos los entornos; el error completo sigue en el log del servidor.
+TDD: la prueba test/lab/error-handler.test.js falló antes del cambio con `Expected values to be strictly equal: true !== false` al verificar la presencia de stack. Después del cambio pasó.
+
+RENDIMIENTO (simulación nueva, no reutiliza A10)
+Acción controlada: en la base de prueba se mantuvo un bloqueo ACCESS EXCLUSIVE sobre la tabla Eventos mientras dormía una transacción por 25 s. Durante el bloqueo se pidió GET /api/eventos.
+Resultado durante condición anormal: HTTP 200, demora medida 8687 ms, respuesta vacía (2 bytes).
+Recuperación: se liberó la transacción con COMMIT; una nueva solicitud GET /api/eventos respondió HTTP 200 en 193 ms.
+Clasificación: simulación de contención de base de datos; no prueba un defecto espontáneo de Convoca ni un resultado de producción. No se alteraron filas.
+
+REGRESIÓN DE EVENTO (defecto de aplicación ya informado)
+Antes: POST crear evento omitiendo descripcion devolvía HTTP 400 por Evento.descripcion cannot be null.
+Cambio propuesto: normalizar descripcion ausente a cadena vacía y probar la regresión.
+Después: la prueba automatizada de la lógica pasó en el conjunto aislado. El PR #49 permanece abierto hacia develop, pendiente de revisión; todavía no se considera integrado.
+
+SUITE AUTOMATIZADA ACTUALIZADA
+Entorno: Node v22.22.3 en contenedor efímero; red Docker deshabilitada; DATABASE_URL ficticia (no se conectó); pruebas y fuentes montadas de solo lectura.
+Resultado: 9 pruebas aprobadas, 0 fallidas. Salida completa: actividad11-tests-node.txt.
+La ejecución directa en Windows no se contabiliza: faltaba el binding nativo de bcrypt en node_modules del host.
+
+MANTIS
+La interfaz local http://127.0.0.1:8989/login_page.php respondió HTTP 200.
+Se restauró el respaldo 2026-10-18 únicamente sobre una base recién comprobada vacía; contiene cinco tickets históricos (IDs Mantis 1–5), no diez.
+El estado de Tailscale es NeedsLogin; la URL privada compartida no está disponible/verificada todavía. No se afirma que los compañeros puedan acceder.
+
+ESTADO DE A11
+Hay 3 incidencias reproducibles verificadas en el registro actual: 1 defecto de Convoca y 2 simulaciones controladas (seguridad y rendimiento). Las 10 comprobaciones correctas del registro anterior no se cuentan como incidencias. Faltan al menos 7 incidencias reproducibles con seguimiento y evidencia antes/después, y la gestión de tickets compartida en Mantis.

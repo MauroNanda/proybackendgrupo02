@@ -1,48 +1,52 @@
-# Actividad 11 — Registro de incidencias y verificaciones
+# Actividad 11 — Incidencias reproducidas y estado
 
-**Proyecto:** Convoca G02
+**Fecha:** 12/11/2026
 **Responsable de ejecución:** Gabriel Calisaya
 **Revisor propuesto:** Mauro Nanda
-**Fecha de consolidación:** 2026-11-12
-**Repositorio/base:** `MauroNanda/proybackendgrupo02`, rama local `chore/gestion-incidencias`, derivada de `develop` actualizado (`b7e2ba7`).
-**Entorno:** Docker Compose de prueba aislado `convoca-lab-v2-a6test`; API solo en `127.0.0.1:13000`; PostgreSQL aislado en puerto 55435 y réplica en 55436. Sin conexión a producción. Datos sintéticos. Después de las pruebas se verificó `Eventos=0`, `Inscripciones=0`, `Usuarios=6`.
+**Backend:** `MauroNanda/proybackendgrupo02`; PR #49 con base `develop`.
+**Laboratorio Convoca:** Compose aislado `convoca-lab-v2-a6test`; API en `127.0.0.1:13000`; PostgreSQL sintético, sin conexión a producción.
+**Herramienta de tickets:** Mantis local disponible en `localhost`; el nodo Tailscale está `NeedsLogin`, por lo que el acceso privado compartido aún no se verifica.
 
-## Alcance y herramienta de registro
+## Corrección del registro anterior
 
-No hay un servicio Mantis/GLPI disponible en el laboratorio actual. De acuerdo con la consigna de A11, se conserva el registro en Drive hasta que la herramienta esté disponible. Este documento no inventa números de tickets ni presenta los registros de Drive como tickets GLPI/Mantis. Para resultados correctos, se registran como controles superados; solo se etiqueta como defecto el comportamiento reproducido y corregido.
+El archivo anterior enumeraba doce filas, pero diez eran controles con resultado esperado, A11-11 reutilizaba la prueba de rendimiento de A10 y A11-12 era el único defecto real de Convoca. Las diez comprobaciones se conservan como verificaciones, pero no se cuentan como incidencias. El conteo anterior de doce incidencias queda rectificado.
 
-Cada registro incluye reproducción/resumen, resultado, tratamiento y verificación posterior. Los registros A11-01 a A11-10 cubren controles funcionales y de seguridad verificados en el entorno aislado. A11-11 reutiliza la comprobación de consulta lenta ya realizada y documentada en A10. A11-12 registra un defecto real hallado en el contrato de descripción opcional y su corrección.
+## Incidencias reproducidas
 
-## Registros
-
-| ID | Categoría y reproducción | Resultado observado y evidencia | Tratamiento / verificación | Estado |
+| ID | Categoría / prioridad | Reproducción y resultado observado | Tratamiento y verificación | Estado |
 |---|---|---|---|---|
-| A11-01 | Disponibilidad: consultar `GET /api/health` con PostgreSQL levantado. | HTTP 200; `status=ok`, `database=up`. API y DB aisladas saludables. | Control esperado. Se repitió tras reconstruir la API con el cambio de A11. | Superado |
-| A11-02 | Seguridad/autenticación: `GET /api/dashboard/kpis` sin token. | HTTP 401. | Acceso sin sesión rechazado como corresponde; no se corrigió porque no era defecto. | Superado |
-| A11-03 | Seguridad/autorización: solicitar KPIs con usuario autenticado de rol `ASISTENTE`. | HTTP 403. | La ruta administrativa exige rol organizador. Resultado esperado; sin cambio. | Superado |
-| A11-04 | Control de autorización positiva: solicitar KPIs con usuario de rol `ORGANIZADOR`. | HTTP 200. | Se comprobó que el control de rol no bloquea al rol permitido. | Superado |
-| A11-05 | Integridad de métricas: comparar KPIs con conteos de la DB sembrada con 6 usuarios, 2 eventos publicados y 2 inscripciones activas. | API: `totalUsuarios=6`, `totalEventos=2`, `totalInscripciones=2`; coincide con los conteos directos. | No se detectó inconsistencia en esta muestra controlada. | Superado |
-| A11-06 | Cupos/lista de espera: inscribir dos usuarios en evento de un cupo. | Primera inscripción `CONFIRMADO`; segunda `ESPERA`. | El límite de cupo se respetó. | Superado |
-| A11-07 | Promoción de lista: cancelar la inscripción confirmada del caso anterior. | Cancelación HTTP 200; la inscripción en espera pasó a `CONFIRMADO`. | Se verificó el estado posterior de la inscripción promovida. | Superado |
-| A11-08 | Asistencia por QR: validar el QR de una inscripción confirmada por primera vez. | HTTP 200; estado cambió a `ASISTIO`. | Primera marcación registrada correctamente. | Superado |
-| A11-09 | Duplicación de asistencia por QR: volver a validar el mismo QR. | HTTP 400; mensaje de asistencia ya registrada. | Se evitó contabilizar dos veces la asistencia. | Superado |
-| A11-10 | Asistencia manual duplicada: registrar manualmente la misma inscripción dos veces. | Primera marcación HTTP 200; repetición HTTP 400. | Se evitó la doble marcación. | Superado |
-| A11-11 | Rendimiento: ejecutar la consulta controlada con `pg_sleep(30)` y observar el monitor de consultas activas. | A10 registró la consulta como activa/lenta durante la demora controlada. La métrica representa consultas en curso, no historial SQL. | Incidencia inducida y controlada para comprobar visibilidad; terminó al finalizar la consulta. Referencia: evidencia y sección A10 del informe. | Verificada en A10 |
-| A11-12 | Defecto de datos: crear evento omitiendo `descripcion`, que el frontend presenta como opcional. | Antes: HTTP 400, `Evento.descripcion cannot be null`. La ruta aceptaba ausencia pero el modelo la persistía como NOT NULL. | Se añadió `datosEvento.descripcion = datosEvento.descripcion ?? ''` y una prueba de regresión. Tras reconstruir la API, la creación respondió HTTP 201 con descripción vacía; se borró el evento de prueba. | Corregido y verificado |
+| A11-01 | Eventos · normal | En el laboratorio, crear un evento sin `descripcion` devolvía HTTP 400 (`Evento.descripcion cannot be null`) aunque el campo es opcional en el contrato del formulario. | `evento.service.js` normaliza el valor ausente a cadena vacía; `test/lab/event-description.test.js` verifica la regresión. Suite aislada 9/9. PR #49 abierto hacia `develop`; falta revisión e integración para considerarlo cerrado. | Corregido en rama; pendiente de aprobación/merge |
+| A11-02 | Seguridad · alta condicional | Simulación local: `GET /api/dashboard/kpis` sin token devolvió HTTP 401, pero en `NODE_ENV=development` la respuesta incluía el stack de Express y rutas internas. No se accedió a datos. | Se eliminó `stack` de los cuerpos JSON en el middleware de errores; el error completo se conserva en logs del servidor. La prueba de regresión falló antes del cambio y pasó después; la suite aislada terminó 9/9. No se probó producción. | Corregido en rama; pendiente de aprobación/merge |
+| A11-03 | Rendimiento · normal, simulación controlada | En PostgreSQL aislado se mantuvo un bloqueo `ACCESS EXCLUSIVE` sobre `Eventos` durante 25 s. `GET /api/eventos` respondió HTTP 200 en 8.687 ms. Tras liberar la transacción, la misma consulta respondió HTTP 200 en 193 ms. | Se liberó el bloqueo con `COMMIT`; la latencia volvió a la línea base observada. No se atribuye el retraso a un defecto espontáneo de Convoca ni a producción. | Simulación resuelta y medida |
 
-## Verificación automatizada posterior
+**Conteo verificado hasta ahora: 3 incidencias reproducibles (1 defecto de aplicación y 2 simulaciones controladas).** A11 sigue incompleta: faltan siete incidencias reproducibles con seguimiento y verificación de tratamiento, incluyendo los casos que se carguen y resuelvan en Mantis. No se inventan defectos para completar el mínimo.
 
-Se ejecutó el conjunto de pruebas de laboratorio Node en un contenedor efímero, con red deshabilitada, variables ficticias y la carpeta `test` montada como solo lectura. Resultado: **8 pruebas, 8 aprobadas, 0 fallidas**. Incluye políticas de TLS, credenciales de demostración, distribución de datos, regresión de descripción opcional y healthcheck con DB disponible/caída. El comando y salida completa están en `actividad11-tests-node.txt`.
+## Controles superados que no se cuentan
 
-La DB de pruebas aislada quedó sin eventos ni inscripciones temporales. No se ejecutó ninguna prueba contra producción ni se incluyeron contraseñas, tokens o secretos en este registro.
+El registro previo observó respuestas HTTP 200/401/403, coherencia de KPI en una muestra, cupos/lista de espera y rechazo de asistencia duplicada. En el alcance ensayado se comportaron como se esperaba; son controles funcionales/de seguridad, no incidencias.
+
+## Mantis: estado comprobado
+
+El Compose de Mantis se levantó localmente. Se restauró `mantis-precompartir-20261018-120121.sql` únicamente después de comprobar que la base objetivo estaba vacía. El respaldo contiene cinco tickets históricos (INC-001–INC-005 / IDs 1–5), no diez. La interfaz de login respondió HTTP 200 en `http://127.0.0.1:8989/login_page.php`. La URL compartida no se declara disponible: el nodo Tailscale informa `NeedsLogin` y requiere autenticación interactiva.
+
+## Verificación automatizada
+
+La suite de `test/lab/*.test.js` se ejecutó en Node 22 dentro de un contenedor efímero, con red deshabilitada, `DATABASE_URL` ficticia y fuentes/pruebas montadas como solo lectura. Resultado: **9 pruebas aprobadas, 0 fallidas**. La ejecución directa en Windows no es un resultado válido de la suite porque el `bcrypt` nativo del `node_modules` del host no está disponible; por eso se usó el contenedor con su binding Linux correspondiente.
+
+La salida completa está en `actividad11-tests-node.txt`. La prueba controlada de latencia y el estado de Mantis/Tailscale se registran en este documento. No se realizaron pruebas contra producción ni se incluyeron claves, tokens o secretos.
 
 ## Cambios de código asociados
 
-- `services/evento.service.js`: normaliza la descripción omitida a cadena vacía, consistente con el formulario frontend y el modelo.
-- `test/lab/event-description.test.js`: prueba de regresión para descripción opcional.
+- `services/evento.service.js`: admite la descripción opcional indicada por el formulario.
+- `middlewares/error-handler.middleware.js`: evita enviar stacks al cliente; conserva el log del error en el servidor.
+- `test/lab/event-description.test.js`: regresión de descripción opcional.
+- `test/lab/error-handler.test.js`: regresión para evitar exposición de stacks.
 
-La corrección se preparó en la rama `chore/gestion-incidencias` a partir de `develop`. El flujo de integración acordado exige que el PR use base `develop` y solicite a Mauro Nanda como revisor.
+## Pendiente para cerrar A11
 
-## Límites
+1. Cargar y resolver al menos siete incidencias adicionales reproducibles en Mantis, con categoría, prioridad, responsable, seguimiento y evidencia antes/después; incluir rendimiento y seguridad.
+2. Completar la autenticación interactiva de Tailscale y verificar la URL compartida desde otro dispositivo/red.
+3. Adjuntar capturas reales de Mantis y la evolución de los tickets; revisar las transiciones antes de cerrar cada caso.
+4. Mantener el PR #49 con base `develop`; esperar revisión de Mauro antes de integrar. El PR por sí solo no cierra A11.
 
-Las verificaciones de seguridad y negocio de esta tabla son sobre una base sintética aislada, no constituyen una auditoría de seguridad. A11-11 depende del ensayo de rendimiento documentado en A10 y se cita como evidencia reutilizada, no como una nueva ejecución. Mantis/GLPI no estaba instalado, por eso este es un registro de contingencia en Drive conforme a la guía.
+**Estado de la actividad 11: EN PROGRESO.**

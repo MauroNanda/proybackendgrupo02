@@ -2,57 +2,64 @@ TAP version 13
 # Subtest: Neon exige TLS con certificados y la URL no puede reemplazar la política
 ok 1 - Neon exige TLS con certificados y la URL no puede reemplazar la política
   ---
-  duration_ms: 3.825047
+  duration_ms: 3.831376
   type: 'test'
   ...
 # Subtest: Local permite conexión sin TLS; valores ambiguos o contradictorios se rechazan
 ok 2 - Local permite conexión sin TLS; valores ambiguos o contradictorios se rechazan
   ---
-  duration_ms: 1.653085
+  duration_ms: 1.977771
   type: 'test'
   ...
 # Subtest: Destinos del laboratorio fijos y credenciales con caracteres especiales
 ok 3 - Destinos del laboratorio fijos y credenciales con caracteres especiales
   ---
-  duration_ms: 1.000894
+  duration_ms: 1.8764
   type: 'test'
   ...
 # Subtest: Distribución mantiene pares únicos, cupos y suficiente cantidad de usuarios
 ok 4 - Distribución mantiene pares únicos, cupos y suficiente cantidad de usuarios
   ---
-  duration_ms: 13.283977
+  duration_ms: 13.488891
   type: 'test'
   ...
 # Subtest: Las dos cuentas de demostración tienen un hash compatible con el login
 ok 5 - Las dos cuentas de demostración tienen un hash compatible con el login
   ---
-  duration_ms: 202.23464
+  duration_ms: 229.362469
   type: 'test'
   ...
-# Subtest: crear evento sin descripcion guarda cadena vacia porque es opcional
-ok 6 - crear evento sin descripcion guarda cadena vacia porque es opcional
+# Subtest: los errores de autenticación no exponen el stack al cliente en desarrollo
+ok 6 - los errores de autenticación no exponen el stack al cliente en desarrollo
   ---
-  duration_ms: 3.223153
+  duration_ms: 4.191384
+  type: 'test'
+  ...
+# ⚠️  [EmailService] RESEND_API_KEY no configurado en .env. Envío de correos desactivado (se simulará por consola).
+# Subtest: crear evento sin descripcion guarda cadena vacia porque es opcional
+ok 7 - crear evento sin descripcion guarda cadena vacia porque es opcional
+  ---
+  duration_ms: 3.11211
   type: 'test'
   ...
 # Subtest: health con base disponible
-ok 7 - health con base disponible
+ok 8 - health con base disponible
   ---
-  duration_ms: 3.052679
+  duration_ms: 5.045242
   type: 'test'
   ...
 # Subtest: health con base caída
-ok 8 - health con base caída
+ok 9 - health con base caída
   ---
-  duration_ms: 0.426085
+  duration_ms: 0.664252
   type: 'test'
   ...
-1..8
-# tests 8
+1..9
+# tests 9
 # suites 0
-# pass 8
+# pass 9
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 702.76369
+# duration_ms 716.350711

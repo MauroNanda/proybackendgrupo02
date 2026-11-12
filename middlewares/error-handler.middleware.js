@@ -52,8 +52,6 @@ function errorHandler(err, _req, res, _next) {
     return res.status(mapeado.status).json({
       error: {
         message: mapeado.message,
-        // En desarrollo exponemos el stack para facilitar debug. En producción NO.
-        ...(isProd ? {} : { stack: err.stack }),
       },
     });
   }
@@ -68,7 +66,6 @@ function errorHandler(err, _req, res, _next) {
   res.status(status).json({
     error: {
       message,
-      ...(isProd ? {} : { stack: err.stack }),
     },
   });
 }
