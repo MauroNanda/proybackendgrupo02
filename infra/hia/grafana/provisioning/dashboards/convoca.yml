@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: Convoca
+    folder: Convoca
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

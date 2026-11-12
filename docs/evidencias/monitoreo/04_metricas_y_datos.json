@@ -1,0 +1,365 @@
+{
+  "fecha": "2026-11-12T13:12:43.693Z",
+  "source": "bbfdefa1ddca311867d743be68b21cc2bde69ddf",
+  "rama": "fix/monitoreo-integrado",
+  "tipo": "Prueba local con cambios de la rama todavía sin commit",
+  "consultas": {
+    "max_over_time(convoca_activity_slow_active[30m])": [
+      {
+        "metric": {
+          "instance": "postgres-exporter:9187",
+          "job": "postgres-exporter",
+          "server": "db-principal:5432"
+        },
+        "value": [
+          1794489163.757,
+          "1"
+        ]
+      }
+    ],
+    "convoca_replication_replicas": [
+      {
+        "metric": {
+          "__name__": "convoca_replication_replicas",
+          "instance": "postgres-exporter:9187",
+          "job": "postgres-exporter",
+          "server": "db-principal:5432"
+        },
+        "value": [
+          1794489163.767,
+          "1"
+        ]
+      }
+    ],
+    "convoca_replication_lag_bytes": [
+      {
+        "metric": {
+          "__name__": "convoca_replication_lag_bytes",
+          "instance": "postgres-exporter:9187",
+          "job": "postgres-exporter",
+          "server": "db-principal:5432"
+        },
+        "value": [
+          1794489163.769,
+          "0"
+        ]
+      }
+    ],
+    "convoca_container_running": [
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-frontend-production"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-blackbox-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-cadvisor-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-db-principal-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-db-replica-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-grafana-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-node-exporter-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-pgadmin-1"
+        },
+        "value": [
+          1794489163.772,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-postgres-exporter-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-prometheus-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-replication-init-1"
+        },
+        "value": [
+          1794489163.772,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_running",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-publicacion-api-api-1"
+        },
+        "value": [
+          1794489163.772,
+          "1"
+        ]
+      }
+    ],
+    "convoca_container_engine_restarts_total": [
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-frontend-production"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-blackbox-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-cadvisor-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-db-principal-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-db-replica-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-grafana-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-node-exporter-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-pgadmin-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-postgres-exporter-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-prometheus-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-lab-v2-replication-init-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "convoca_container_engine_restarts_total",
+          "instance": "node-exporter:9100",
+          "job": "node-exporter",
+          "name": "convoca-publicacion-api-api-1"
+        },
+        "value": [
+          1794489163.775,
+          "0"
+        ]
+      }
+    ]
+  },
+  "piloto": {
+    "Usuarios": 1000,
+    "Eventos": 100,
+    "Inscripciones": 10000
+  },
+  "replicacion": [
+    {
+      "application_name": "convoca-replica",
+      "state": "streaming",
+      "sync_state": "async",
+      "lag_bytes": 0
+    }
+  ],
+  "recreacionProxy": {
+    "descripcion": "API recreada con compose --force-recreate; frontend no reiniciado",
+    "health": {
+      "status": "ok",
+      "database": "up",
+      "environment": "production",
+      "commit": null,
+      "version": null,
+      "timestamp": "2026-11-12T13:12:44.063Z"
+    }
+  }
+}
