@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: Neon exige TLS con certificados y la URL no puede reemplazar la política
+ok 1 - Neon exige TLS con certificados y la URL no puede reemplazar la política
+  ---
+  duration_ms: 3.825047
+  type: 'test'
+  ...
+# Subtest: Local permite conexión sin TLS; valores ambiguos o contradictorios se rechazan
+ok 2 - Local permite conexión sin TLS; valores ambiguos o contradictorios se rechazan
+  ---
+  duration_ms: 1.653085
+  type: 'test'
+  ...
+# Subtest: Destinos del laboratorio fijos y credenciales con caracteres especiales
+ok 3 - Destinos del laboratorio fijos y credenciales con caracteres especiales
+  ---
+  duration_ms: 1.000894
+  type: 'test'
+  ...
+# Subtest: Distribución mantiene pares únicos, cupos y suficiente cantidad de usuarios
+ok 4 - Distribución mantiene pares únicos, cupos y suficiente cantidad de usuarios
+  ---
+  duration_ms: 13.283977
+  type: 'test'
+  ...
+# Subtest: Las dos cuentas de demostración tienen un hash compatible con el login
+ok 5 - Las dos cuentas de demostración tienen un hash compatible con el login
+  ---
+  duration_ms: 202.23464
+  type: 'test'
+  ...
+# Subtest: crear evento sin descripcion guarda cadena vacia porque es opcional
+ok 6 - crear evento sin descripcion guarda cadena vacia porque es opcional
+  ---
+  duration_ms: 3.223153
+  type: 'test'
+  ...
+# Subtest: health con base disponible
+ok 7 - health con base disponible
+  ---
+  duration_ms: 3.052679
+  type: 'test'
+  ...
+# Subtest: health con base caída
+ok 8 - health con base caída
+  ---
+  duration_ms: 0.426085
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 702.76369

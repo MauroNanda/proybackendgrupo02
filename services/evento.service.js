@@ -77,6 +77,7 @@ async _conCategorias(id) {
 
 async crear(datos) {
   const { categorias, ...datosEvento } = datos;
+  datosEvento.descripcion = datosEvento.descripcion ?? '';
 
   const evento = await Evento.create(datosEvento);
 
