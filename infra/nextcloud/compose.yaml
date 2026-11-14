@@ -30,11 +30,11 @@ services:
       NEXTCLOUD_TRUSTED_DOMAINS: localhost 127.0.0.1
       REDIS_HOST: redis
       NC_OWNER_PASSWORD: ${NC_OWNER_PASSWORD:?Generar configuracion local}
-      NC_MAURO_PASSWORD: ${NC_MAURO_PASSWORD:?Generar configuracion local}
-      NC_GABRIEL_PASSWORD: ${NC_GABRIEL_PASSWORD:?Generar configuracion local}
-      NC_JUAN_PASSWORD: ${NC_JUAN_PASSWORD:?Generar configuracion local}
-      NC_DELIA_PASSWORD: ${NC_DELIA_PASSWORD:?Generar configuracion local}
-      NC_DUMBI_PASSWORD: ${NC_DUMBI_PASSWORD:?Generar configuracion local}
+      NC_USER1_PASSWORD: ${NC_USER1_PASSWORD:?Generar configuracion local}
+      NC_USER2_PASSWORD: ${NC_USER2_PASSWORD:?Generar configuracion local}
+      NC_USER3_PASSWORD: ${NC_USER3_PASSWORD:?Generar configuracion local}
+      NC_USER4_PASSWORD: ${NC_USER4_PASSWORD:?Generar configuracion local}
+      NC_USER5_PASSWORD: ${NC_USER5_PASSWORD:?Generar configuracion local}
       NC_OUTSIDER_PASSWORD: ${NC_OUTSIDER_PASSWORD:?Generar configuracion local}
       PHP_MEMORY_LIMIT: 512M
     ports: ["127.0.0.1:${NC_PORT:-8082}:80"]

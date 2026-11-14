@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
-const owner='archivo-convoca',team=['mauro-nanda','gabriel-calisaya','juan-carrizo','delia-cusipuma','dumbi34'];
+const owner='archivo-convoca',team=['usuario1','usuario2','usuario3','usuario4','usuario5'];
 const work='Convoca - Trabajo',release='Convoca - Entregas';
 function check(ok,message){if(!ok)throw new Error(message);}
 async function put(c,user,file,bytes,headers={}){const r=await c.dav(user,'PUT',file,bytes,headers);check([201,204].includes(r.status),'PUT '+file+': '+r.status);return r;}

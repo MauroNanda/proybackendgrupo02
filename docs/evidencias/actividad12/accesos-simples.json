@@ -1,0 +1,111 @@
+{
+  "executedAt": "2026-11-14T20:01:24.645Z",
+  "project": "A12",
+  "results": [
+    {
+      "name": "Ingreso usuario1",
+      "ok": true,
+      "detail": 207
+    },
+    {
+      "name": "Ingreso usuario2",
+      "ok": true,
+      "detail": 207
+    },
+    {
+      "name": "Ingreso usuario3",
+      "ok": true,
+      "detail": 207
+    },
+    {
+      "name": "Ingreso usuario4",
+      "ok": true,
+      "detail": 207
+    },
+    {
+      "name": "Ingreso usuario5",
+      "ok": true,
+      "detail": 207
+    },
+    {
+      "name": "Edicion colaborativa entre cuentas",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "Entrega solo lectura usuario1",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Entrega solo lectura usuario2",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Entrega solo lectura usuario3",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Entrega solo lectura usuario4",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Entrega solo lectura usuario5",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Eliminar entrega denegado",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Enlace publico denegado",
+      "ok": true,
+      "detail": 403
+    },
+    {
+      "name": "Acceso denegado anonimo",
+      "ok": true,
+      "detail": 401
+    },
+    {
+      "name": "Acceso denegado prueba-ajena",
+      "ok": true,
+      "detail": 404
+    },
+    {
+      "name": "Ruta conocida de otro usuario",
+      "ok": true,
+      "detail": 404
+    },
+    {
+      "name": "Restaurar version anterior",
+      "ok": true,
+      "detail": 201
+    },
+    {
+      "name": "Contenido restaurado coincide con V1",
+      "ok": true,
+      "detail": "fd199f96875d1b0a1269c6ff9d5f40463fe4cd77ab6ff0243496b9cfbfac1dc2"
+    },
+    {
+      "name": "Sin enlaces publicos",
+      "ok": true,
+      "detail": "Comparte exclusivamente con convoca-g02"
+    },
+    {
+      "name": "Permisos de ambas raices",
+      "ok": true,
+      "detail": "Trabajo 15 / Entregas 1"
+    }
+  ],
+  "versionTest": {
+    "file": "Convoca - Trabajo/Prueba-versiones-1794686470448.txt",
+    "fileId": "1087",
+    "sha256": "fd199f96875d1b0a1269c6ff9d5f40463fe4cd77ab6ff0243496b9cfbfac1dc2"
+  }
+}

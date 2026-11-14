@@ -4,9 +4,9 @@ const {spawnSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..'),dir=path.join(root,'infra/nextcloud');
 const envFile=process.env.NC_ENV_FILE?path.resolve(process.env.NC_ENV_FILE):path.join(dir,'.env');
 const command=process.argv[2];
-const users={'archivo-convoca':'OWNER','mauro-nanda':'MAURO','gabriel-calisaya':'GABRIEL',
-  'juan-carrizo':'JUAN','delia-cusipuma':'DELIA','dumbi34':'DUMBI','prueba-ajena':'OUTSIDER'};
-function env(){return Object.fromEntries(fs.readFileSync(envFile,'utf8').split(/\r?\n/).filter(l=>/^[A-Z_]+=/.test(l)).map(l=>{const i=l.indexOf('=');return [l.slice(0,i),l.slice(i+1).trim()];}));}
+const users={'archivo-convoca':'OWNER','usuario1':'USER1','usuario2':'USER2',
+  'usuario3':'USER3','usuario4':'USER4','usuario5':'USER5','prueba-ajena':'OUTSIDER'};
+function env(){return Object.fromEntries(fs.readFileSync(envFile,'utf8').split(/\r?\n/).filter(l=>/^[A-Z0-9_]+=/.test(l)).map(l=>{const i=l.indexOf('=');return [l.slice(0,i),l.slice(i+1).trim()];}));}
 function compose(args,{capture=false,input}={}){
   const r=spawnSync('docker',['compose','--env-file',envFile,'-f',path.join(dir,'compose.yaml'),...args],{
     cwd:root,encoding:'utf8',windowsHide:true,input,stdio:input||capture?'pipe':'inherit',maxBuffer:256*1024*1024});
@@ -44,7 +44,7 @@ async function main(){
   if(command==='restore-test'){await require('./nextcloud-respaldo').run(command,{root,dir,envFile,save,compose,occ,env});return;}
   if(command==='up'&&!fs.existsSync(envFile))fs.writeFileSync(envFile,fs.readFileSync(path.join(dir,'.env.example'),'utf8').replace(/generar-localmente/g,()=>crypto.randomBytes(24).toString('hex')),{mode:0o600,flag:'wx'});
   const cfg=env();if(!/^convoca-nextcloud-a12(?:-[a-z0-9]+)?$/.test(cfg.COMPOSE_PROJECT_NAME))throw new Error('Proyecto no autorizado.');
-  for(const [key,value]of Object.entries(cfg))if(key.endsWith('_PASSWORD')&&!/^[A-Za-z0-9!._-]{16,128}$/.test(value))throw new Error('Configurar clave local '+key+' (16 a 128 letras, numeros o ! . _ -).');
+  for(const [key,value]of Object.entries(cfg))if(key.endsWith('_PASSWORD')&&!(new RegExp('^[A-Za-z0-9!._-]{'+(/^NC_USER[1-5]_PASSWORD$/.test(key)?8:16)+',128}$')).test(value))throw new Error('Configurar clave local '+key+' (8 caracteres personales o 16 tecnicos como minimo; letras, numeros o ! . _ -).');
   if(command==='stop'){compose(['stop']);return;}
   if(command==='public-url'){
     const url=new globalThis.URL(process.argv[3]);if(url.protocol!=='https:'||!url.hostname.endsWith('.trycloudflare.com')||url.username||url.password||url.pathname!=='/')throw new Error('Indicar URL HTTPS temporal de Cloudflare, sin credenciales ni ruta.');
