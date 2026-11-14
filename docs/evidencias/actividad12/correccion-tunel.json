@@ -1,0 +1,13 @@
+{
+  "cause": "cloudflared resolvio localhost a ::1, pero Docker publica 127.0.0.1:8082",
+  "fix": "Origen del tunel fijado a http://127.0.0.1:8082",
+  "url": "https://grade-gear-johnny-wait.trycloudflare.com",
+  "publicHttpChecks": [
+    200,
+    200,
+    200,
+    200
+  ],
+  "realBrowserLogin": true,
+  "executedAt": "2026-11-14T19:28:30.861221+00:00"
+}
