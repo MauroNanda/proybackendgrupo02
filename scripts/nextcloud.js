@@ -35,7 +35,7 @@ async function share(folder,permissions){
   const base='/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json';
   const r=await request('archivo-convoca','GET',base,null,{'OCS-APIRequest':'true'});const d=JSON.parse(r.text);
   if(d.ocs.data.some(s=>s.path==='/'+folder&&s.share_with==='convoca-g02'&&Number(s.permissions)===permissions))return;
-  const body=new URLSearchParams({path:'/'+folder,shareType:'1',shareWith:'convoca-g02',permissions:String(permissions)});
+  const body=new globalThis.URLSearchParams({path:'/'+folder,shareType:'1',shareWith:'convoca-g02',permissions:String(permissions)});
   const x=await request('archivo-convoca','POST',base,body,{'OCS-APIRequest':'true'});const j=JSON.parse(x.text);
   if(j.ocs.meta.status!=='ok')throw new Error('No se pudo compartir '+folder);
 }
@@ -47,7 +47,7 @@ async function main(){
   for(const [key,value]of Object.entries(cfg))if(key.endsWith('_PASSWORD')&&!/^[a-f0-9]{32,}$/.test(value))throw new Error('Configurar clave local '+key);
   if(command==='stop'){compose(['stop']);return;}
   if(command==='public-url'){
-    const url=new URL(process.argv[3]);if(url.protocol!=='https:'||!url.hostname.endsWith('.trycloudflare.com')||url.username||url.password||url.pathname!=='/')throw new Error('Indicar URL HTTPS temporal de Cloudflare, sin credenciales ni ruta.');
+    const url=new globalThis.URL(process.argv[3]);if(url.protocol!=='https:'||!url.hostname.endsWith('.trycloudflare.com')||url.username||url.password||url.pathname!=='/')throw new Error('Indicar URL HTTPS temporal de Cloudflare, sin credenciales ni ruta.');
     const r=spawnSync('docker',['network','inspect',cfg.COMPOSE_PROJECT_NAME+'_default','--format','{{(index .IPAM.Config 0).Gateway}}'],{encoding:'utf8',windowsHide:true});
     if(r.status!==0)throw new Error('No se pudo identificar gateway del proxy');
     occ(['config:system:set','trusted_domains','2','--value='+url.hostname]);

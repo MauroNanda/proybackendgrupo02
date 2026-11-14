@@ -61,7 +61,7 @@ exports.validate=async c=>{
   for(const user of team){const r=await c.dav(user,'PUT',release+'/no-permitido-'+id+'.txt',v1);record('Entrega solo lectura '+user,r.status===403,r.status);}
   const readonly=release+'/control-permisos.txt';await put(c,owner,readonly,v1);
   const deletion=await c.dav(team[0],'DELETE',readonly);record('Eliminar entrega denegado',deletion.status===403,deletion.status);
-  const reshare=await c.request(team[0],'POST','/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json',new URLSearchParams({path:'/'+work,shareType:'3'}),{'OCS-APIRequest':'true'});
+  const reshare=await c.request(team[0],'POST','/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json',new globalThis.URLSearchParams({path:'/'+work,shareType:'3'}),{'OCS-APIRequest':'true'});
   record('Enlace publico denegado',JSON.parse(reshare.text).ocs.meta.status==='failure',reshare.status);
   for(const user of [null,'prueba-ajena']){const r=user?await c.dav(user,'GET',file):await c.request(null,'GET','/remote.php/dav/files/'+team[0]+'/'+encodeURIComponent(work)+'/Prueba-versiones-'+id+'.txt');record('Acceso denegado '+(user||'anonimo'),[401,403,404].includes(r.status),r.status);}
   const cross=await c.request('prueba-ajena','GET','/remote.php/dav/files/'+team[0]+'/'+encodeURIComponent(work)+'/Prueba-versiones-'+id+'.txt');record('Ruta conocida de otro usuario',cross.status===401||cross.status===403||cross.status===404,cross.status);

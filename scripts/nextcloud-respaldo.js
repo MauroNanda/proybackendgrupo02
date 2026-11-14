@@ -51,7 +51,7 @@ exports.run=async(command,c)=>{
   if(!publication?.files?.length)throw new Error('El respaldo no contiene manifiesto de publicacion. Generar otro con la version actual del script.');
   const auth='Basic '+Buffer.from('archivo-convoca:'+payload.config.NC_OWNER_PASSWORD).toString('base64');let count=0;
   for(const x of publication.files){const url='http://localhost:8083/remote.php/dav/files/archivo-convoca/Convoca%20-%20Entregas/'+publication.version+'/'+x.path.split('/').map(encodeURIComponent).join('/');
-    const response=await fetch(url,{headers:{Authorization:auth},signal:AbortSignal.timeout(60000)});const b=Buffer.from(await response.arrayBuffer());
+    const response=await globalThis.fetch(url,{headers:{Authorization:auth},signal:globalThis.AbortSignal.timeout(60000)});const b=Buffer.from(await response.arrayBuffer());
     if(response.status!==200||crypto.createHash('sha256').update(b).digest('hex')!==x.sha256)throw new Error('No coincide restauracion '+x.path);count++;}
   c.save('restauracion.json',{executedAt:new Date().toISOString(),project,isolated:true,filesVerified:count,allChecksumsMatch:true,accessAndVersionsValidated:true});
   run(['stop']);console.log('Restauracion aislada correcta: '+count+' archivos coinciden. Proyecto de prueba detenido; original disponible.');
