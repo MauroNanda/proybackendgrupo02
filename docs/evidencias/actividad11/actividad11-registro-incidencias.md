@@ -5,7 +5,7 @@
 **Revisor propuesto:** Mauro Nanda
 **Backend:** `MauroNanda/proybackendgrupo02`; PR #49 con base `develop`.
 **Laboratorio Convoca:** Compose aislado `convoca-lab-v2-a6test`; API en `127.0.0.1:13000`; PostgreSQL sintético, sin conexión a producción.
-**Herramienta de tickets:** Mantis local disponible en `localhost`; el nodo Tailscale está `NeedsLogin`, por lo que el acceso privado compartido aún no se verifica.
+**Herramienta de tickets:** Mantis local disponible en `localhost`; Tailscale Serve está configurado por HTTP solo en la tailnet; falta incorporar a otros dispositivos del equipo y probar acceso remoto.
 
 ## Corrección del registro anterior
 
@@ -30,7 +30,7 @@ El archivo anterior enumeraba doce filas, pero diez eran controles con resultado
 
 **Fuentes enlazadas:** A4 [JSON de reanudación y ensayos](https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view) y [README de evidencias](https://drive.google.com/file/d/1eijeESFGBi5RS71SikBryXZ7aybuiH-A/view); A5 [resultados de ocho consultas](https://docs.google.com/document/d/1jPQREhVNm1DDiVr3olxqZM8qjWb4M7RLZgHVlikqWrg/edit); A6 [salida de corte y recuperación de réplica](https://drive.google.com/file/d/1h1qWxsSofjCCNY0wyCxTQ6iQ8a46unNj/view); A11 [pruebas controladas](https://drive.google.com/file/d/1HGSn6WC2LlZVqDhKS5qL3BWucXohc0It/view).
 
-**A11 aún no está cerrada.** Los diez casos A11-01–10 están cargados en Mantis local (IDs 11–20), con categoría, prioridad, responsable Gabriel Calisaya y notas de procedencia/evidencia. Todos pasaron a Resolved (80), ninguno está Closed. A11-01/02 tienen corrección en la rama y PR #49 pendiente de revisión/integración; A11-03–10 tienen resolución documentada con las limitaciones indicadas. Se adjuntó captura de la pantalla de inicio de sesión de Mantis local (no muestra tickets): https://drive.google.com/file/d/10DSNJuRXI-HGfktaKpcGKx5USmQqy5bD/view. Siguen pendientes capturas del listado/detalle del ciclo y acceso compartido: Tailscale sigue NeedsLogin.
+**A11 aún no está cerrada.** Los diez casos A11-01–10 están cargados en Mantis local (IDs 11–20), con categoría, prioridad, responsable Gabriel Calisaya y notas de procedencia/evidencia. Todos pasaron a Resolved (80), ninguno está Closed. A11-01/02 tienen corrección en la rama y PR #49 pendiente de revisión/integración; A11-03–10 tienen resolución documentada con las limitaciones indicadas. Se adjuntó captura de la pantalla de inicio de sesión de Mantis local (no muestra tickets): https://drive.google.com/file/d/10DSNJuRXI-HGfktaKpcGKx5USmQqy5bD/view. Siguen pendientes capturas del listado/detalle del ciclo y probar el acceso desde otros dispositivos; Serve ya está en tailnet only, pero solo hay un nodo.
 
 ## Controles superados que no se cuentan
 
@@ -44,7 +44,7 @@ El proyecto `Convoca - mantenimiento` (ID 1) contiene veinte tickets: INC-001–
 
 La correspondencia A11→Mantis es: A11-01→11, A11-02→12, A11-03→13, A11-04→14, A11-05→15, A11-06→16, A11-07→17, A11-08→18, A11-09→19 y A11-10→20. Los diez tickets están Resolved, ninguno Closed. La consulta de ID/resumen/responsable/categoría/prioridad/estado/resolución/notas quedó guardada en [actividad11-mantis-verificacion.txt](actividad11-mantis-verificacion.txt). A4/A5/A6 son evidencia previa y mantienen su atribución original; los tickets A11 no afirman que Gabriel haya ejecutado esos ensayos por primera vez.
 
-**A11 sigue en progreso.** Mantis muestra los diez tickets A11 como Resolved, no Closed. A11-01/02 esperan revisión e integración a `develop`; sus notas no afirman despliegue. A11-03–10 tienen resolución y evidencia/procedencia registradas con sus límites. No se capturaron nuevas pantallas de la lista/detalle. Tailscale continúa en `NeedsLogin`; la app solo escucha en localhost y el equipo no tiene acceso compartido desde esta PC.
+**A11 sigue en progreso.** Mantis muestra los diez tickets A11 como Resolved, no Closed. A11-01/02 esperan revisión e integración a `develop`; sus notas no afirman despliegue. A11-03–10 tienen resolución y evidencia/procedencia registradas con sus límites. No se capturaron nuevas pantallas de la lista/detalle. Tailscale Serve publica la app solo en la tailnet; falta incorporar y verificar dispositivos de compañeros.
 
 ## Verificación automatizada
 
@@ -64,6 +64,6 @@ La salida completa está en `actividad11-tests-node.txt`. Las pruebas controlada
 1. Esperar la revisión de Mauro e integración a `develop` del PR #49 antes de considerar integradas las correcciones A11-01/02.
 2. Revisar las resoluciones de A11-03–10 con las fuentes A4/A5/A6 enlazadas; mantener clara la diferencia entre evidencia previa y pruebas nuevas de A11.
 3. Capturar la lista y el detalle de tickets resueltos desde la interfaz Mantis, con datos sensibles ocultos, y añadir esas capturas al Drive.
-4. Si el equipo necesita acceso durante la actividad, volver a autenticar el nodo Tailscale y comprobarlo desde otro dispositivo. Hoy Mantis es solo local.
+4. Incorporar los dispositivos de los compañeros a la tailnet y verificar desde al menos un equipo remoto el acceso a http://hia-mantis-convoca.tailcc7820.ts.net:8080. Serve quedó privado; el PC anfitrión y Docker deben permanecer activos.
 
 **Estado de la actividad 11: EN PROGRESO.**
