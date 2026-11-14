@@ -22,6 +22,8 @@ Convoca es una plataforma web para la gestión de eventos universitarios (charla
 
 ## Cómo levantarlo
 
+**Gestión documental (HIA A12):** [Nextcloud: arranque, cuentas, permisos y respaldo](docs/nextcloud-a12.md). Es un laboratorio Docker independiente; no requiere iniciar la API ni el frontend.
+
 **Para el equipo de HIA:** seguir [Levantar el proyecto y mostrar los avances](docs/GUIA_DEMOSTRACION.md). Centraliza el setup local de ambos repositorios, las cuentas del piloto y el recorrido de demostración de aplicación e infraestructura.
 
 Requisitos: Node.js y una base de datos PostgreSQL (por ejemplo, en Neon).

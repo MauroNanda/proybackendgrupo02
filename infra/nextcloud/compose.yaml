@@ -1,0 +1,65 @@
+name: ${COMPOSE_PROJECT_NAME:-convoca-nextcloud-a12}
+services:
+  db:
+    image: postgres:17-bookworm@sha256:665dc7b37ac52a17e298511414c21d23ffa4e6a6ef6225b3e5d59c7afb35e994
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: ${NC_DB_PASSWORD:?Generar configuracion local}
+      POSTGRES_INITDB_ARGS: --locale=C --encoding=UTF8
+    volumes: [db:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U nextcloud -d nextcloud]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+  redis:
+    image: redis:7.4-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+    command: [redis-server, --save, "", --appendonly, "no"]
+    restart: unless-stopped
+  app:
+    image: nextcloud:34.0.6-apache@sha256:25d07d3091844c87c5f812037f5281b5d61fbb47f2c3f125274baabfe6f3ed1b
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: ${NC_DB_PASSWORD:?Generar configuracion local}
+      NEXTCLOUD_ADMIN_USER: admin-convoca
+      NEXTCLOUD_ADMIN_PASSWORD: ${NC_ADMIN_PASSWORD:?Generar configuracion local}
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost 127.0.0.1
+      REDIS_HOST: redis
+      NC_OWNER_PASSWORD: ${NC_OWNER_PASSWORD:?Generar configuracion local}
+      NC_MAURO_PASSWORD: ${NC_MAURO_PASSWORD:?Generar configuracion local}
+      NC_GABRIEL_PASSWORD: ${NC_GABRIEL_PASSWORD:?Generar configuracion local}
+      NC_JUAN_PASSWORD: ${NC_JUAN_PASSWORD:?Generar configuracion local}
+      NC_DELIA_PASSWORD: ${NC_DELIA_PASSWORD:?Generar configuracion local}
+      NC_DUMBI_PASSWORD: ${NC_DUMBI_PASSWORD:?Generar configuracion local}
+      NC_OUTSIDER_PASSWORD: ${NC_OUTSIDER_PASSWORD:?Generar configuracion local}
+      PHP_MEMORY_LIMIT: 512M
+    ports: ["127.0.0.1:${NC_PORT:-8082}:80"]
+    volumes:
+      - app:/var/www/html
+      - ./bootstrap.php:/opt/a12/bootstrap.php:ro
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_started}
+    healthcheck:
+      test: [CMD, php, -r, '$$s=json_decode(@file_get_contents("http://127.0.0.1/status.php"), true); exit(($$s["installed"]??false) && !($$s["maintenance"]??true)?0:1);']
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 60
+    restart: unless-stopped
+  cron:
+    image: nextcloud:34.0.6-apache@sha256:25d07d3091844c87c5f812037f5281b5d61fbb47f2c3f125274baabfe6f3ed1b
+    entrypoint: /cron.sh
+    environment:
+      REDIS_HOST: redis
+      PHP_MEMORY_LIMIT: 512M
+    volumes: [app:/var/www/html]
+    depends_on: [app]
+    restart: unless-stopped
+volumes:
+  db:
+  app:

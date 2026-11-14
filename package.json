@@ -29,7 +29,11 @@
     "mantis:up": "node scripts/mantis.js up",
     "mantis:validate": "node scripts/mantis.js validate",
     "mantis:stop": "node scripts/mantis.js stop",
-    "mantis:export": "node scripts/mantis.js export"
+    "mantis:export": "node scripts/mantis.js export",
+    "nextcloud:up": "node scripts/nextcloud.js up",
+    "nextcloud:sync": "node scripts/nextcloud.js sync",
+    "nextcloud:validate": "node scripts/nextcloud.js validate",
+    "nextcloud:stop": "node scripts/nextcloud.js stop"
   },
   "keywords": [
     "convoca",

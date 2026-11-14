@@ -1,0 +1,14 @@
+{
+  "node": "24.15.0",
+  "compose": "5.3.1",
+  "eslint": {
+    "scope": "Repositorio completo con eslint.config.js del proyecto",
+    "errors": 0,
+    "warnings": 2,
+    "existingWarnings": "Parametros Sequelize sin usar en migrations/20261109232106-agregar-indices-optimizacion.js"
+  },
+  "phpBootstrapSyntax": "correcta, comprobada dentro de la imagen Nextcloud fijada",
+  "composeConfig": "valido",
+  "gitDiffCheck": "sin errores",
+  "knownNextcloudCredentialsInVersionedFiles": 0
+}
