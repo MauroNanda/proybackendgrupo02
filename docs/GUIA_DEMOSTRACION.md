@@ -229,7 +229,16 @@ Las alertas se ven en Prometheus, no se envían por correo en esta etapa. El det
 
 ### Alcance de la demostración
 
-El circuito local permite mostrar aplicación, base, réplica y monitoreo. HTTPS público requiere el despliegue/túnel de A9; `localhost:4200` solo demuestra ejecución local. Google, correo real, Telegram, Discord y push requieren sus credenciales específicas y no quedan habilitados por este setup. **A11/Mantis todavía no está integrado en `develop`**: no se levanta con estos comandos ni debe presentarse como terminado.
+El circuito local permite mostrar aplicación, base, réplica y monitoreo. HTTPS público requiere el despliegue/túnel de A9; `localhost:4200` solo demuestra ejecución local. Google, correo real, Telegram, Discord y push requieren sus credenciales específicas y no quedan habilitados por este setup.
+
+**A11/Mantis ya está integrado en `develop` mediante el PR #49.** Se inicia por separado desde el backend, con Docker Desktop abierto:
+
+```powershell
+npm run mantis:up
+npm run mantis:validate
+```
+
+Abrir **http://localhost:8989**. La [guía de Mantis](mantis-a11.md) indica usuarios, claves locales y cómo mostrar los diez tickets con su historial. Usa MariaDB en un Compose independiente; no cambia PostgreSQL ni requiere levantar Convoca. Los tickets reproducen retrospectivamente ensayos documentados, no una validación productiva.
 
 **Comprobación de esta guía (13/11/2026):** setup ensayado en un proyecto Docker separado, con una base nueva y puertos de base/pgAdmin alternativos. Pasaron migraciones, carga y validación del piloto; API saludable; login real desde Angular con ambos roles; creación, inscripción, QR generado, asistencia manual, dashboard y rechazo del asistente; backup y restauración. Base: backend `b7e2ba7`, frontend `2c0de57`; Node del host 24.15.0 y API en Node 22.22.3. Los apartados opcionales de réplica y monitoreo describen lo integrado, pero no se repitieron en este ensayo.
 

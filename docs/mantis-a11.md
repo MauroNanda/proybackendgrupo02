@@ -6,15 +6,15 @@ Esta instalación permite que cada integrante reproduzca el trabajo desde el bac
 
 Requisitos: **Docker Desktop abierto con motor Linux, Git y Node.js 22.22.3 o superior**. Usar PowerShell en la raíz de `proybackendgrupo02`, donde está `package.json`.
 
-Mientras PR #49 esté abierto, guardar los cambios propios y obtener esta rama:
+El PR #49 está integrado. Guardar los cambios propios y actualizar `develop`:
 
 ```powershell
 git fetch origin
-git switch chore/gestion-incidencias
-git pull --ff-only origin chore/gestion-incidencias
+git switch develop
+git pull --ff-only origin develop
 ```
 
-Después de integrar el PR, usar `develop` actualizado. No hace falta crear una tarea ni otra base de Convoca para levantar Mantis.
+No hace falta crear una tarea ni otra base de Convoca para levantar Mantis.
 
 ```powershell
 npm run mantis:up
