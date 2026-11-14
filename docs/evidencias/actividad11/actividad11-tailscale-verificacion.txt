@@ -1,0 +1,14 @@
+ACTIVIDAD 11 — VERIFICACIÓN DE TAILSCALE SERVE LOCAL
+Fecha: 14/11/2026
+
+Nodo autenticado: hia-mantis-convoca (100.115.125.5), cuenta Gabriel Calisaya.
+Comando aplicado: tailscale serve --bg --http=8080 http://mantis:80
+Direcciones anunciadas como tailnet only:
+- http://hia-mantis-convoca:8080
+- http://hia-mantis-convoca.tailcc7820.ts.net:8080
+
+Verificación del proxy dentro del contenedor Tailscale: GET http://mantis:80/login_page.php respondió HTTP/1.1 200 OK.
+Estado `tailscale serve status`: / proxy http://mantis:80; modo tailnet only.
+No se habilitó Funnel ni HTTPS/certificados públicos. Así se evita publicar el nombre del nodo en el registro público de certificados. La dirección HTTP solo enruta desde dispositivos de esta tailnet.
+
+Límite: el panel de Tailscale lista 1 máquina, hia-mantis-convoca. Todavía no se comprobó la conexión desde una PC de compañero ni se agregaron otros miembros. Para usarlo, el anfitrión debe mantener Docker activo y el compañero debe conectarse a la misma tailnet. Estado de A11 sigue EN PROGRESO hasta comprobar al menos un acceso de equipo y completar la evidencia visual del ciclo en Mantis.

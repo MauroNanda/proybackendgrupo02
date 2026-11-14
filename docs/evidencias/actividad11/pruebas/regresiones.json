@@ -1,0 +1,23 @@
+{
+  "fecha": "2026-11-14T13:53:26.845Z",
+  "tipo": "Regresiones de código con dependencias reales y persistencia sustituida; no son mediciones HTTP",
+  "A11-01": {
+    "antes": "descripcion ausente",
+    "despues": "cadena vacia",
+    "ok": true
+  },
+  "A11-02": {
+    "antesExponeStack": true,
+    "despuesExponeStack": false,
+    "http": 401,
+    "ok": true
+  },
+  "A11-04": {
+    "antesHttp": 200,
+    "antesStatus": "ok",
+    "despuesHttp": 503,
+    "despuesDatabase": "down",
+    "ok": true
+  },
+  "ok": true
+}

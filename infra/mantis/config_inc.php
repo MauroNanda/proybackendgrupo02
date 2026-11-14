@@ -1,0 +1,21 @@
+<?php
+$g_hostname = 'mariadb';
+$g_db_type = 'mysqli';
+$g_database_name = 'mantis';
+$g_db_username = 'mantis';
+$g_db_password = getenv('MANTIS_DB_PASSWORD');
+$g_crypto_master_salt = getenv('MANTIS_CRYPTO_SALT');
+$g_path = getenv('MANTIS_URL');
+$g_default_timezone = 'America/Argentina/Buenos_Aires';
+$g_default_language = 'spanish';
+$g_window_title = 'Convoca G02 - A11';
+$g_enable_email_notification = OFF;
+$g_allow_signup = OFF;
+$g_send_reset_password = OFF;
+$g_anonymous_login = OFF;
+$g_webservice_rest_api_enabled = OFF;
+$g_allow_file_upload = OFF;
+$g_show_detailed_errors = OFF;
+$g_show_realname = ON;
+$g_hide_status_default = META_FILTER_NONE;
+$g_display_errors = array(E_WARNING => 'halt', E_NOTICE => 'none');

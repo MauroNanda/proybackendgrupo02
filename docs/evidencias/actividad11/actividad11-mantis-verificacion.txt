@@ -1,0 +1,40 @@
+ACTIVIDAD 11 — VERIFICACIÓN DE MANTIS LOCAL
+Fecha: 2026-11-14 (America/Argentina/Buenos_Aires)
+Responsable del registro A11: Gabriel Calisaya
+Revisor propuesto del PR: Mauro Nanda
+Entorno: Docker Compose local de HIA-2026-TP-MantisBT-Convoca; MantisBT 2.28.4; MariaDB 11.8.9. Sin Oracle, acceso público ni conexión a producción.
+
+COMPROBACIONES DE SERVICIO
+- Contenedores Mantis y MariaDB en ejecución; MariaDB healthy.
+- GET http://localhost:8989/login_page.php: HTTP 200.
+- GET http://localhost:8989/api/rest/ sin autenticación: HTTP 401; API REST permanece deshabilitada.
+- Apache mod_rewrite habilitado desde Dockerfile. Se reconstruyó la imagen y recreó Mantis conservando el volumen.
+- Docker publica Mantis solo en 127.0.0.1:8989; la base no publica puerto.
+
+ESTADO DE PROYECTO Y TICKETS
+Proyecto Mantis: Convoca - mantenimiento (ID 1).
+Tickets totales del proyecto: 20.
+INC-001–005 (IDs Mantis 1–5): registros anteriores de Gabriel, conservados.
+INC-006–010 (IDs Mantis 6–10): escenarios del reparto de Juan; responsable juan-carrizo. Sus notas iniciales mantienen las pruebas pendientes.
+A11-01–10 (IDs Mantis 11–20): registros específicos del informe A11; responsable gabriel-calisaya; categoría, prioridad y nota de seguimiento. Todos están en estado Resolved (código 80), no Closed.
+
+ID Mantis | ID A11 | Categoría | Prioridad | Resolución | Estado | Notas
+11 | A11-01 | Eventos | Normal (30) | Fixed (20), código en PR #49 | Resolved (80) | 2
+12 | A11-02 | Permisos | Alta (40) | Fixed (20), código en PR #49 | Resolved (80) | 2
+13 | A11-03 | Eventos | Normal (30) | Not a bug (70), simulación terminada | Resolved (80) | 2
+14 | A11-04 | Cupos e inscripciones | Alta (40) | Not a bug (70), prueba previa A4 | Resolved (80) | 2
+15 | A11-05 | Cupos e inscripciones | Normal (30) | Not a bug (70), prueba previa A4 | Resolved (80) | 2
+16 | A11-06 | Cupos e inscripciones | Normal (30) | Not a bug (70), recuperación A4 | Resolved (80) | 2
+17 | A11-07 | Cupos e inscripciones | Alta (40) | Not a bug (70), prueba previa A4 | Resolved (80) | 2
+18 | A11-08 | Eventos | Alta (40) | Not a bug (70), recuperación A6 | Resolved (80) | 2
+19 | A11-09 | Estadisticas | Normal (30) | Fixed (20), mejora medida A5 | Resolved (80) | 2
+20 | A11-10 | Estadisticas | Normal (30) | Fixed (20), mejora medida A5 | Resolved (80) | 2
+
+LÍMITES Y ESTADO
+- A11-01/02 están resueltos en la rama `chore/gestion-incidencias`; PR #49 espera revisión de Mauro e integración a develop. No se afirma despliegue productivo.
+- A11-03 es una simulación controlada; A11-04–08 referencian pruebas previas A4/A6 con las limitaciones de sus registros; A11-09/10 referencian mediciones de laboratorio A5. Las notas conservan esas procedencias y no atribuyen a Gabriel ejecuciones originales ajenas.
+- Ningún ticket A11 se cerró. La resolución de Mantis no sustituye revisión/integración del PR ni la validación final.
+- Se capturó la pantalla de inicio de sesión de Mantis local. No se capturó el listado ni el detalle de tickets; esas capturas del ciclo siguen pendientes. Imagen en Drive: https://drive.google.com/file/d/10DSNJuRXI-HGfktaKpcGKx5USmQqy5bD/view
+- Tailscale ya tiene conectado el nodo local y Serve publica Mantis solo dentro de la tailnet en http://hia-mantis-convoca.tailcc7820.ts.net:8080. La verificación del upstream mantis:80 devolvió HTTP 200. No se activaron Funnel ni certificados HTTPS; el modo HTTP evita publicar el nombre del dispositivo en el registro público de certificados. La consola muestra un solo dispositivo (el servidor), por lo que todavía no se verificó acceso desde equipos de compañeros; deben incorporarse a la tailnet. Evidencia: actividad11-tailscale-verificacion.txt.
+
+Consulta realizada dentro del contenedor Mantis sobre el proyecto ID 1; se recuperaron ID, resumen, responsable, categoría, prioridad, estado, resolución y cantidad de notas. No se leyeron ni registraron contraseñas, tokens, hashes o datos personales.

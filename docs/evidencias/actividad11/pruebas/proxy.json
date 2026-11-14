@@ -1,0 +1,13 @@
+{
+  "fecha": "2026-11-14T13:52:06.203Z",
+  "tipo": "Regresion Docker DNS con backend HTTP minimo",
+  "antes": {
+    "anterior": 200,
+    "corregido": 200
+  },
+  "despues": {
+    "anterior": 504,
+    "corregido": 200
+  },
+  "ok": true
+}

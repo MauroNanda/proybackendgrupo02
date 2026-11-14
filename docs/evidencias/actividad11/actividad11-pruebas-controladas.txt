@@ -1,0 +1,55 @@
+ACTIVIDAD 11 — EVIDENCIA DE PRUEBAS CONTROLADAS
+Fecha: 2026-11-12
+Responsable: Gabriel Calisaya
+Revisor propuesto: Mauro Nanda
+Entorno: Docker local de prueba convoca-lab-v2-a6test; API 127.0.0.1:13000; PostgreSQL aislado. Sin datos ni solicitudes a producción.
+
+SEGURIDAD (antes de la corrección)
+Acción: GET http://127.0.0.1:13000/api/dashboard/kpis sin encabezado Authorization.
+Resultado observado: HTTP 401, mensaje "Token de autenticación requerido" y campo "stack" con rutas internas porque el laboratorio usa NODE_ENV=development.
+Alcance: respuesta de la instancia local de desarrollo. No se consultó producción y no se obtuvo información de KPI.
+Tratamiento en la rama: el middleware deja de incluir stack en JSON para todos los entornos; el error completo sigue en el log del servidor.
+TDD: la prueba test/lab/error-handler.test.js falló antes del cambio con `Expected values to be strictly equal: true !== false` al verificar la presencia de stack. Después del cambio pasó.
+
+RENDIMIENTO (simulación nueva, no reutiliza A10)
+Acción controlada: en la base de prueba se mantuvo un bloqueo ACCESS EXCLUSIVE sobre la tabla Eventos mientras dormía una transacción por 25 s. Durante el bloqueo se pidió GET /api/eventos.
+Resultado durante condición anormal: HTTP 200, demora medida 8687 ms, respuesta vacía (2 bytes).
+Recuperación: se liberó la transacción con COMMIT; una nueva solicitud GET /api/eventos respondió HTTP 200 en 193 ms.
+Clasificación: simulación de contención de base de datos; no prueba un defecto espontáneo de Convoca ni un resultado de producción. No se alteraron filas.
+
+REGRESIÓN DE EVENTO (defecto de aplicación ya informado)
+Antes: POST crear evento omitiendo descripcion devolvía HTTP 400 por Evento.descripcion cannot be null.
+Cambio propuesto: normalizar descripcion ausente a cadena vacía y probar la regresión.
+Después: la prueba automatizada de la lógica pasó en el conjunto aislado. El PR #49 permanece abierto hacia develop, pendiente de revisión; todavía no se considera integrado.
+
+SUITE AUTOMATIZADA ACTUALIZADA
+Entorno: Node v22.22.3 en contenedor efímero; red Docker deshabilitada; DATABASE_URL ficticia (no se conectó); pruebas y fuentes montadas de solo lectura.
+Resultado: 9 pruebas aprobadas, 0 fallidas. Salida completa: actividad11-tests-node.txt.
+La ejecución directa en Windows no se contabiliza: faltaba el binding nativo de bcrypt en node_modules del host.
+
+MANTIS LOCAL
+La interfaz local http://localhost:8989/login_page.php respondió HTTP 200 después de reconstruir Dockerfile con Apache mod_rewrite habilitado. MariaDB está healthy; Mantis expone solo 127.0.0.1:8989, la base no publica puerto y la API REST permanece deshabilitada.
+La base conserva INC-001–005. Se agregaron INC-006–010 (IDs 6–10, responsables juan-carrizo) y A11-01–10 (IDs 11–20, responsables gabriel-calisaya, con categorías, prioridades y notas). Todos los A11 están Resolved (80), no Closed: #11–12 Fixed (20) en la rama PR #49; #13–18 Not a bug (70) por simulación/comportamiento esperado; #19–20 Fixed (20) como mejoras medidas en A5.
+Se capturó únicamente la pantalla de inicio de sesión; no muestra el listado ni el detalle de tickets. Imagen: https://drive.google.com/file/d/10DSNJuRXI-HGfktaKpcGKx5USmQqy5bD/view. El estado de IDs/responsables/resoluciones/notas está en actividad11-mantis-verificacion.txt. Tailscale conectó el nodo y Serve está activo solo en la tailnet: http://hia-mantis-convoca.tailcc7820.ts.net:8080. El upstream interno respondió HTTP 200. No se habilitaron Funnel ni HTTPS público. La consola muestra un dispositivo; el acceso desde otros miembros todavía no está verificado. Detalle: actividad11-tailscale-verificacion.txt.
+
+EVIDENCIA REUTILIZADA DE ACTIVIDADES ANTERIORES
+A4 — https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view
+El JSON de la prueba piloto, ejecutada el 2026-11-09, enumera rechazo de datos ajenos, rechazo de carga simultánea, interrupción real de sesión, reanudación de lotes, rechazo de versión incompatible y repetición sin duplicados. Resultado global del ensayo: OK. El archivo no conserva salida individual por escenario. El README de evidencias aclara que no es captura del instante de interrupción: https://drive.google.com/file/d/1eijeESFGBi5RS71SikBryXZ7aybuiH-A/view
+En el registro A11 se cuentan cuatro escenarios distintos: rechazo de datos ajenos, rechazo de concurrencia, interrupción/reanudación y versión incompatible. No se cuentan los preparativos ni el control de repetición como incidencias separadas.
+
+A5 — https://docs.google.com/document/d/1jPQREhVNm1DDiVr3olxqZM8qjWb4M7RLZgHVlikqWrg/edit
+Hallazgo de catálogo: 5.330,062 ms antes y 3.176,417 ms después de `separate: true`, comparando 725 eventos y 431.000 inscripciones equivalentes.
+Hallazgo de agregación mensual: 276,302 ms antes y 154,735 ms después de `COUNT(*)` e índice de fecha, con los mismos siete meses y totales.
+Son mediciones de laboratorio de A5 (no HTTP ni producción). La integración productiva de esas optimizaciones no se afirma en A11.
+
+A6 — https://drive.google.com/file/d/1h1qWxsSofjCCNY0wyCxTQ6iQ8a46unNj/view
+Se detuvo solo la réplica: cero conexiones standby; la API siguió HTTP 200 contra el principal. Tras reanudar el contenedor, ambas filas de prueba estuvieron visibles en la réplica, el estado volvió a `streaming` y los LSN coincidieron. Se limpiaron las filas temporales desde el principal y la limpieza se propagó. Responsable de ejecución original: Gabriel Calisaya.
+
+ESTADO DE A11
+El registro contiene diez casos respaldados por evidencia previa o reproducida. A4/A5/A6 conservan su atribución original; Gabriel realizó el seguimiento A11. Los diez casos A11 están cargados y en estado Resolved (Mantis 11–20), ninguno Closed, con notas de resolución y límites. A11 sigue EN PROGRESO: PR #49 espera revisión/integración; falta captura del listado/detalle Mantis y acceso desde un dispositivo de compañero. Tailscale Serve ya está configurado solo en la tailnet, pero la consola muestra un único dispositivo.
+
+ACTUALIZACIÓN DE MANTIS LOCAL — 2026-11-14
+
+Se dejó Oracle de lado y se continuó en Docker Compose local; la imagen se reconstruyó desde Dockerfile y el contenedor se recreó conservando el volumen. GET /login_page.php responde HTTP 200; la API REST está deshabilitada. En el proyecto Convoca, los tickets A11-01–10 son Mantis #11–20: responsable gabriel-calisaya, categoría/prioridad y dos notas; estado Resolved (80), no Closed. #11–12 tienen resolución Fixed (20) en la rama PR #49, pendiente de revisión/integración; #13–18 Not a bug (70) como simulación o comportamiento esperado según evidencia; #19–20 Fixed (20) como mejora medida en A5. INC-006–010 (IDs 6–10) están asignados a juan-carrizo y las pruebas de esos casos siguen pendientes.
+
+Mantis escucha en localhost:8989 y Tailscale Serve está activo en la tailnet por http://hia-mantis-convoca.tailcc7820.ts.net:8080. Se capturó la pantalla de inicio de sesión, pero no el listado/detalle de tickets. IDs/estados: actividad11-mantis-verificacion.txt; Tailscale: actividad11-tailscale-verificacion.txt. A11 permanece EN PROGRESO hasta revisión del PR, evidencia del ciclo y verificación desde un dispositivo de compañero.

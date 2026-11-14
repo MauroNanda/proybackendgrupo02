@@ -37,3 +37,7 @@ coverage/
 infra/hia/.env
 infra/hia/backups/
 infra/hia/resultados/
+infra/mantis/.env
+infra/mantis/.env.*
+!infra/mantis/.env.example
+infra/mantis/resultados/

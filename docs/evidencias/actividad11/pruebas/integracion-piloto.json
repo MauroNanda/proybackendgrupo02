@@ -1,0 +1,16 @@
+{
+  "inicio": "2026-11-14T13:48:29.065Z",
+  "perfil": "piloto",
+  "pruebas": [
+    "rechaza datos ajenos sin mezclarlos",
+    "al menos un lote confirmado antes de interrumpir",
+    "rechaza otra carga simultánea",
+    "interrupción real de la sesión de carga",
+    "filas y avance se confirman atómicamente",
+    "reanuda y completa los lotes faltantes",
+    "rechaza una versión incompatible",
+    "repetir una carga completa no duplica datos"
+  ],
+  "fin": "2026-11-14T13:48:31.755Z",
+  "resultado": "OK"
+}

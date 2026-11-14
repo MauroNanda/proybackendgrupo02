@@ -12,3 +12,6 @@ infra/hia/backups
 infra/hia/resultados
 test
 docs
+infra/mantis/.env*
+infra/mantis/resultados
+infra/mantis/*.log

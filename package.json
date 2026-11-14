@@ -25,7 +25,11 @@
     "lab:replica-up": "docker compose --env-file infra/hia/.env -f infra/hia/docker-compose.yml --profile replica up -d --wait db-principal replication-init db-replica",
     "test:lab": "node --test test/lab/*.test.js",
     "monitor:up": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/levantar-monitoreo.ps1",
-    "monitor:validate": "node scripts/validar-monitoreo.js"
+    "monitor:validate": "node scripts/validar-monitoreo.js",
+    "mantis:up": "node scripts/mantis.js up",
+    "mantis:validate": "node scripts/mantis.js validate",
+    "mantis:stop": "node scripts/mantis.js stop",
+    "mantis:export": "node scripts/mantis.js export"
   },
   "keywords": [
     "convoca",

@@ -1,0 +1,511 @@
+{
+  "database": "convoca_lab_v2",
+  "dataset": "convoca-v2.1",
+  "protocolo": "1 calentamiento + 5 EXPLAIN ANALYZE BUFFERS; mediana; cambios aislados en transaccion y rollback",
+  "fixture": {
+    "evento": "3c2199eb-9fdf-c505-0430-7d01735d108f",
+    "usuario": "4ef9de8f-3798-4dd0-80b5-05970a439a01"
+  },
+  "procedencia": "Extracto sin modificar los resultados de casos 05 y 07 del archivo original de A5, 09/11/2026. No se reejecutó el conjunto masivo durante A11.",
+  "casos": [
+    {
+      "id": "05",
+      "name": "Inscripciones por mes",
+      "sql": "SELECT date_trunc('month',\"createdAt\") AS mes,COUNT(id) AS total FROM \"Inscripciones\" WHERE \"createdAt\">=TIMESTAMPTZ '2026-06-01 00:00:00+00' GROUP BY date_trunc('month',\"createdAt\") ORDER BY mes",
+      "afterSql": "SELECT date_trunc('month',\"createdAt\") AS mes,COUNT(*) AS total FROM \"Inscripciones\" WHERE \"createdAt\">=TIMESTAMPTZ '2026-06-01 00:00:00+00' GROUP BY date_trunc('month',\"createdAt\") ORDER BY mes",
+      "ddl": [
+        "CREATE INDEX idx_a5_inscripciones_fecha ON \"Inscripciones\" (\"createdAt\")"
+      ],
+      "before": {
+        "times": [
+          264.555,
+          288.779,
+          276.677,
+          276.302,
+          265.999
+        ],
+        "median": 276.302,
+        "plan": {
+          "Plan": {
+            "Node Type": "Aggregate",
+            "Strategy": "Sorted",
+            "Partial Mode": "Finalize",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 122688.38,
+            "Total Cost": 122882.32,
+            "Plan Rows": 758,
+            "Plan Width": 16,
+            "Actual Startup Time": 253.081,
+            "Actual Total Time": 265.575,
+            "Actual Rows": 7,
+            "Actual Loops": 1,
+            "Group Key": [
+              "(date_trunc('month'::text, \"createdAt\"))"
+            ],
+            "Shared Hit Blocks": 23329,
+            "Shared Read Blocks": 62402,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Gather Merge",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 122688.38,
+                "Total Cost": 122865.26,
+                "Plan Rows": 1516,
+                "Plan Width": 16,
+                "Actual Startup Time": 253.064,
+                "Actual Total Time": 265.555,
+                "Actual Rows": 21,
+                "Actual Loops": 1,
+                "Workers Planned": 2,
+                "Workers Launched": 2,
+                "Shared Hit Blocks": 23329,
+                "Shared Read Blocks": 62402,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Sort",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 121688.36,
+                    "Total Cost": 121690.26,
+                    "Plan Rows": 758,
+                    "Plan Width": 16,
+                    "Actual Startup Time": 237.212,
+                    "Actual Total Time": 237.213,
+                    "Actual Rows": 7,
+                    "Actual Loops": 3,
+                    "Sort Key": [
+                      "(date_trunc('month'::text, \"createdAt\"))"
+                    ],
+                    "Sort Method": "quicksort",
+                    "Sort Space Used": 25,
+                    "Sort Space Type": "Memory",
+                    "Shared Hit Blocks": 23329,
+                    "Shared Read Blocks": 62402,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Workers": [
+                      {
+                        "Worker Number": 0,
+                        "Sort Method": "quicksort",
+                        "Sort Space Used": 25,
+                        "Sort Space Type": "Memory"
+                      },
+                      {
+                        "Worker Number": 1,
+                        "Sort Method": "quicksort",
+                        "Sort Space Used": 25,
+                        "Sort Space Type": "Memory"
+                      }
+                    ],
+                    "Plans": [
+                      {
+                        "Node Type": "Aggregate",
+                        "Strategy": "Hashed",
+                        "Partial Mode": "Partial",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Startup Cost": 121642.63,
+                        "Total Cost": 121652.11,
+                        "Plan Rows": 758,
+                        "Plan Width": 16,
+                        "Actual Startup Time": 237.186,
+                        "Actual Total Time": 237.19,
+                        "Actual Rows": 7,
+                        "Actual Loops": 3,
+                        "Group Key": [
+                          "date_trunc('month'::text, \"createdAt\")"
+                        ],
+                        "Planned Partitions": 0,
+                        "HashAgg Batches": 1,
+                        "Peak Memory Usage": 49,
+                        "Disk Usage": 0,
+                        "Shared Hit Blocks": 23313,
+                        "Shared Read Blocks": 62402,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Workers": [
+                          {
+                            "Worker Number": 0,
+                            "HashAgg Batches": 1,
+                            "Peak Memory Usage": 49,
+                            "Disk Usage": 0
+                          },
+                          {
+                            "Worker Number": 1,
+                            "HashAgg Batches": 1,
+                            "Peak Memory Usage": 49,
+                            "Disk Usage": 0
+                          }
+                        ],
+                        "Plans": [
+                          {
+                            "Node Type": "Seq Scan",
+                            "Parent Relationship": "Outer",
+                            "Parallel Aware": true,
+                            "Async Capable": false,
+                            "Relation Name": "Inscripciones",
+                            "Alias": "Inscripciones",
+                            "Startup Cost": 0,
+                            "Total Cost": 118524.21,
+                            "Plan Rows": 623684,
+                            "Plan Width": 24,
+                            "Actual Startup Time": 4.051,
+                            "Actual Total Time": 190.402,
+                            "Actual Rows": 499713,
+                            "Actual Loops": 3,
+                            "Filter": "(\"createdAt\" >= '2026-06-01 00:00:00+00'::timestamp with time zone)",
+                            "Rows Removed by Filter": 1500287,
+                            "Shared Hit Blocks": 23313,
+                            "Shared Read Blocks": 62402,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0,
+                            "Workers": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.076,
+          "Triggers": [],
+          "JIT": {
+            "Functions": 27,
+            "Options": {
+              "Inlining": false,
+              "Optimization": false,
+              "Expressions": true,
+              "Deforming": true
+            },
+            "Timing": {
+              "Generation": {
+                "Deform": 0.358,
+                "Total": 1.322
+              },
+              "Inlining": 0,
+              "Optimization": 0.793,
+              "Emission": 11.353,
+              "Total": 13.468
+            }
+          },
+          "Execution Time": 265.999
+        }
+      },
+      "after": {
+        "times": [
+          151.381,
+          154.735,
+          173.814,
+          164.097,
+          141.91
+        ],
+        "median": 154.735,
+        "plan": {
+          "Plan": {
+            "Node Type": "Aggregate",
+            "Strategy": "Sorted",
+            "Partial Mode": "Finalize",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 28306.97,
+            "Total Cost": 28500.91,
+            "Plan Rows": 758,
+            "Plan Width": 16,
+            "Actual Startup Time": 135.502,
+            "Actual Total Time": 141.871,
+            "Actual Rows": 7,
+            "Actual Loops": 1,
+            "Group Key": [
+              "(date_trunc('month'::text, \"createdAt\"))"
+            ],
+            "Shared Hit Blocks": 2854,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0,
+            "Plans": [
+              {
+                "Node Type": "Gather Merge",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Startup Cost": 28306.97,
+                "Total Cost": 28483.85,
+                "Plan Rows": 1516,
+                "Plan Width": 16,
+                "Actual Startup Time": 135.497,
+                "Actual Total Time": 141.863,
+                "Actual Rows": 21,
+                "Actual Loops": 1,
+                "Workers Planned": 2,
+                "Workers Launched": 2,
+                "Shared Hit Blocks": 2854,
+                "Shared Read Blocks": 0,
+                "Shared Dirtied Blocks": 0,
+                "Shared Written Blocks": 0,
+                "Local Hit Blocks": 0,
+                "Local Read Blocks": 0,
+                "Local Dirtied Blocks": 0,
+                "Local Written Blocks": 0,
+                "Temp Read Blocks": 0,
+                "Temp Written Blocks": 0,
+                "Plans": [
+                  {
+                    "Node Type": "Sort",
+                    "Parent Relationship": "Outer",
+                    "Parallel Aware": false,
+                    "Async Capable": false,
+                    "Startup Cost": 27306.95,
+                    "Total Cost": 27308.84,
+                    "Plan Rows": 758,
+                    "Plan Width": 16,
+                    "Actual Startup Time": 121.397,
+                    "Actual Total Time": 121.398,
+                    "Actual Rows": 7,
+                    "Actual Loops": 3,
+                    "Sort Key": [
+                      "(date_trunc('month'::text, \"createdAt\"))"
+                    ],
+                    "Sort Method": "quicksort",
+                    "Sort Space Used": 25,
+                    "Sort Space Type": "Memory",
+                    "Shared Hit Blocks": 2854,
+                    "Shared Read Blocks": 0,
+                    "Shared Dirtied Blocks": 0,
+                    "Shared Written Blocks": 0,
+                    "Local Hit Blocks": 0,
+                    "Local Read Blocks": 0,
+                    "Local Dirtied Blocks": 0,
+                    "Local Written Blocks": 0,
+                    "Temp Read Blocks": 0,
+                    "Temp Written Blocks": 0,
+                    "Workers": [
+                      {
+                        "Worker Number": 0,
+                        "Sort Method": "quicksort",
+                        "Sort Space Used": 25,
+                        "Sort Space Type": "Memory"
+                      },
+                      {
+                        "Worker Number": 1,
+                        "Sort Method": "quicksort",
+                        "Sort Space Used": 25,
+                        "Sort Space Type": "Memory"
+                      }
+                    ],
+                    "Plans": [
+                      {
+                        "Node Type": "Aggregate",
+                        "Strategy": "Hashed",
+                        "Partial Mode": "Partial",
+                        "Parent Relationship": "Outer",
+                        "Parallel Aware": false,
+                        "Async Capable": false,
+                        "Startup Cost": 27261.22,
+                        "Total Cost": 27270.69,
+                        "Plan Rows": 758,
+                        "Plan Width": 16,
+                        "Actual Startup Time": 121.371,
+                        "Actual Total Time": 121.374,
+                        "Actual Rows": 7,
+                        "Actual Loops": 3,
+                        "Group Key": [
+                          "date_trunc('month'::text, \"createdAt\")"
+                        ],
+                        "Planned Partitions": 0,
+                        "HashAgg Batches": 1,
+                        "Peak Memory Usage": 49,
+                        "Disk Usage": 0,
+                        "Shared Hit Blocks": 2838,
+                        "Shared Read Blocks": 0,
+                        "Shared Dirtied Blocks": 0,
+                        "Shared Written Blocks": 0,
+                        "Local Hit Blocks": 0,
+                        "Local Read Blocks": 0,
+                        "Local Dirtied Blocks": 0,
+                        "Local Written Blocks": 0,
+                        "Temp Read Blocks": 0,
+                        "Temp Written Blocks": 0,
+                        "Workers": [
+                          {
+                            "Worker Number": 0,
+                            "HashAgg Batches": 1,
+                            "Peak Memory Usage": 49,
+                            "Disk Usage": 0
+                          },
+                          {
+                            "Worker Number": 1,
+                            "HashAgg Batches": 1,
+                            "Peak Memory Usage": 49,
+                            "Disk Usage": 0
+                          }
+                        ],
+                        "Plans": [
+                          {
+                            "Node Type": "Index Only Scan",
+                            "Parent Relationship": "Outer",
+                            "Parallel Aware": true,
+                            "Async Capable": false,
+                            "Scan Direction": "Forward",
+                            "Index Name": "idx_a5_inscripciones_fecha",
+                            "Relation Name": "Inscripciones",
+                            "Alias": "Inscripciones",
+                            "Startup Cost": 0.43,
+                            "Total Cost": 24142.8,
+                            "Plan Rows": 623684,
+                            "Plan Width": 8,
+                            "Actual Startup Time": 0.062,
+                            "Actual Total Time": 76.555,
+                            "Actual Rows": 499713,
+                            "Actual Loops": 3,
+                            "Index Cond": "(\"createdAt\" >= '2026-06-01 00:00:00+00'::timestamp with time zone)",
+                            "Rows Removed by Index Recheck": 0,
+                            "Heap Fetches": 0,
+                            "Shared Hit Blocks": 2838,
+                            "Shared Read Blocks": 0,
+                            "Shared Dirtied Blocks": 0,
+                            "Shared Written Blocks": 0,
+                            "Local Hit Blocks": 0,
+                            "Local Read Blocks": 0,
+                            "Local Dirtied Blocks": 0,
+                            "Local Written Blocks": 0,
+                            "Temp Read Blocks": 0,
+                            "Temp Written Blocks": 0,
+                            "Workers": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.078,
+          "Triggers": [],
+          "Execution Time": 141.91
+        }
+      },
+      "buildMs": 2617.244599999998,
+      "indexSizes": [
+        {
+          "indexrelname": "idx_a5_inscripciones_fecha",
+          "bytes": "42008576"
+        }
+      ],
+      "equivalent": true,
+      "rows": 7,
+      "ratio": 1.7856464277635957
+    },
+    {
+      "id": "07",
+      "name": "Catalogo ORM completo",
+      "tipoTiempo": "Wall-clock Sequelize, SQL+transferencia+hidratacion; no endpoint HTTP",
+      "cutoff": "2026-11-09T00:00:00Z",
+      "where": "PUBLICADO/CANCELADO; fecha>=corte",
+      "tieBreak": "fecha,id",
+      "before": {
+        "times": [
+          5330.062399999995,
+          5540.518499999998,
+          5532.370299999995,
+          5285.372900000002,
+          5172.944499999998
+        ],
+        "median": 5330.062399999995,
+        "sqls": [
+          "Executing (default): SELECT \"Evento\".\"id\", \"Evento\".\"titulo\", \"Evento\".\"descripcion\", \"Evento\".\"fecha\", \"Evento\".\"ubicacion\", \"Evento\".\"cupo_maximo\", \"Evento\".\"estado\", \"Evento\".\"recordatorio_enviado_en\", \"Evento\".\"createdAt\", \"Evento\".\"updatedAt\", \"categorias\".\"id\" AS \"categorias.id\", \"categorias\".\"nombre\" AS \"categorias.nombre\", \"categorias\".\"createdAt\" AS \"categorias.createdAt\", \"categorias\".\"updatedAt\" AS \"categorias.updatedAt\", \"inscripciones\".\"id\" AS \"inscripciones.id\", \"inscripciones\".\"estado\" AS \"inscripciones.estado\" FROM \"Eventos\" AS \"Evento\" LEFT OUTER JOIN ( \"EventoCategorias\" AS \"categorias->EventoCategoria\" INNER JOIN \"Categorias\" AS \"categorias\" ON \"categorias\".\"id\" = \"categorias->EventoCategoria\".\"categoriaId\") ON \"Evento\".\"id\" = \"categorias->EventoCategoria\".\"eventoId\" LEFT OUTER JOIN \"Inscripciones\" AS \"inscripciones\" ON \"Evento\".\"id\" = \"inscripciones\".\"eventoId\" WHERE \"Evento\".\"estado\" IN ('PUBLICADO', 'CANCELADO') AND \"Evento\".\"fecha\" >= '2026-11-09 00:00:00.000 +00:00' ORDER BY \"Evento\".\"fecha\" ASC, \"Evento\".\"id\" ASC;"
+        ]
+      },
+      "after": {
+        "times": [
+          3382.9511000000057,
+          3176.416900000011,
+          3132.9380999999994,
+          3149.8157999999967,
+          3225.362200000003
+        ],
+        "median": 3176.416900000011,
+        "sqls": [
+          "Executing (default): SELECT \"Evento\".\"id\", \"Evento\".\"titulo\", \"Evento\".\"descripcion\", \"Evento\".\"fecha\", \"Evento\".\"ubicacion\", \"Evento\".\"cupo_maximo\", \"Evento\".\"estado\", \"Evento\".\"recordatorio_enviado_en\", \"Evento\".\"createdAt\", \"Evento\".\"updatedAt\", \"categorias\".\"id\" AS \"categorias.id\", \"categorias\".\"nombre\" AS \"categorias.nombre\", \"categorias\".\"createdAt\" AS \"categorias.createdAt\", \"categorias\".\"updatedAt\" AS \"categorias.updatedAt\" FROM \"Eventos\" AS \"Evento\" LEFT OUTER JOIN ( \"EventoCategorias\" AS \"categorias->EventoCategoria\" INNER JOIN \"Categorias\" AS \"categorias\" ON \"categorias\".\"id\" = \"categorias->EventoCategoria\".\"categoriaId\") ON \"Evento\".\"id\" = \"categorias->EventoCategoria\".\"eventoId\" WHERE \"Evento\".\"estado\" IN ('PUBLICADO', 'CANCELADO') AND \"Evento\".\"fecha\" >= '2026-11-09 00:00:00.000 +00:00' ORDER BY \"Evento\".\"fecha\" ASC, \"Evento\".\"id\" ASC;",
+          "Executing (default): SELECT \"id\", \"estado\", \"eventoId\" FROM \"Inscripciones\" AS \"Inscripcion\" WHERE \"Inscripcion\".\"eventoId\" IN ('127b3997-f55e-7028-b317-18ccbfa53fe2', '16c4e051-f30a-d1d9-8211-714354c26d39', '1b6bc326-3376-13f4-22e8-e637e5614872', '20aa78f0-0ff9-2cc5-2ebd-1d2958fb7580', '36701a93-b271-1eaf-3dc0-85837a0a7643', '65a60f72-0ee5-dd9d-d5d7-1e063545b9c9', '8067ec4e-31a7-c871-9014-1e6b50b71fd0', '897f01f4-e90c-a2a3-00e4-96ed0fa12787', '92e5c400-66d4-a8aa-64f9-dc26870e5851', 'a34f413c-6868-45d7-a197-87a28a933e0a', 'cce24d09-519b-23d0-2c9d-0eddf4456024', 'e9240cb0-fdda-6721-f852-1429cb067174', 'ec05367b-940e-5add-9c61-78cb530b89a3', '2a195f3d-09df-1d22-5e4f-92dad2d48382', '404875fc-9e74-d4d7-6af6-12ccb7d1c965', '4ea42a56-7d4a-3e3c-c525-0458b3da2d46', '64d655a7-32d1-31ba-fe42-282430e3c9c3', '7f4a749c-24fa-b834-1875-b81338f4e56a', '9add3c8f-1058-1e3a-7f4b-0904cdd0fc55', 'a09cfcac-32aa-2219-efaa-1991e010b356', 'a8396247-94f4-b3e6-2280-509367fcc67b', 'acaf8456-c41c-a281-872c-fe3aafdb4e8c', 'b16fea9d-89fd-ec09-f72a-088db7fcda2f', 'b91cc7ca-5953-5fa1-c3d5-22e36f59f8c8', 'd454ea6a-9093-7cf8-747c-380267ccd9f7', 'eb5f40ec-87b9-0fab-f110-23895d42151b', 'ed86230e-5752-206a-a693-99aebc9a63c9', '0758c88e-d0f1-8ee7-686b-c794f4f3c56b', '1456c9de-2039-7bae-74f0-0e29c4010c4c', '379e7322-5855-9a6d-5083-29089f5f7d3c', '5ec974bc-887f-1e64-dc31-1cec34202f25', '61235cfa-77a2-7de2-3b93-6a78cc1684b8', '69ba2f92-9bef-2e4c-4697-38536a64befd', '78fb9b85-adbb-9809-8e3b-c359b5d67e28', '79172a3f-a555-fbbe-dd47-114d525533aa', '7ea7865a-493e-32d0-d5e4-5d782d88efdd', '812ba0fb-fef2-6c99-62be-155bf2b72cef', '8a5c5ea3-479e-f0af-6630-60eb8a8c3fa8', 'a1208f96-578b-0d9b-833f-25af565c3004', 'f681ea36-367f-f347-2d4f-7684240ee42f', 'fbe2d68a-a33a-fbc9-e320-1fc1664ae4af', '10c3d0d8-c02c-e388-7fca-0c6ece1fda88', '1c7db8fc-e0e6-4e99-2741-1d4e865d0f04', '379e4265-436a-0048-495f-8d008e32d717', '39641ed3-1558-f60d-7bcf-e894890289e1', '4794e464-dfff-91ae-df90-d6d9e3dc290f', '73602359-0f87-4647-fb54-1bc27f09b00c', 'b0edd9f5-cc0d-dc58-b243-b3992ef4f610', 'ba5bbfeb-ef6d-7617-e5b5-dabfaa1adcc0', 'c3546494-ffb2-41bf-6f7a-787cae21e01e', 'c9837b91-78ef-6c6f-38c7-4aceb47fbb10', 'd3abc756-9d11-3baa-a2e6-17f4143e2530', 'e155553b-3729-a11a-0c9d-cfe724e8a3bc', 'f486aff4-4340-c646-d031-16653d98d667', '20d9c138-936f-eaf2-9f7f-0dcefbe1b71b', '3927eeb1-5fc1-6432-e1cf-de67bdd49405', '433a116d-1d43-6021-2018-7212339ca23c', '61ea2b08-bb90-e3be-1907-aa868bc40b4d', '662db6fb-5416-819f-91ec-67728b2fc0b2', '686948a4-3d80-4701-f0ab-6ad8379b1e9b', '73222c60-490b-7d8c-3247-e10967c30aae', '7d515b71-c3be-89f4-bf2b-6df49fdb1c71', '7e237851-3896-a7a1-032a-77e8b6e1638a', 'c2981c79-9ce0-faaa-45c9-8dcdb95b8d93', 'c3bef66d-3b3c-a7c0-d0ba-8b21dbca1e8d', 'd55f446d-0e04-ee57-1be2-522e1272bd69', 'f47ec7d2-5520-4b3b-1aee-57f8b47bee59', 'fd4a8889-623f-5d9f-c6fc-962c90efa4fb', '209f97cb-9277-545d-5edf-627b279b9782', '496f84c3-793c-a838-75ed-d4ab1e14aef9', '690f647a-daeb-940e-66b5-4ce2133229ab', '897ce9f1-a994-fd67-6afb-53b8798cc94a', 'a2da2e39-3bf2-7075-f9b2-ed5a5e0ae6e6', 'a732f35b-dd3f-d56c-212c-4f5efa2c13bc', 'a7803080-1ed1-3078-e326-bf23a05d5c43', 'a8576aa9-cd64-4155-4ff0-5eb452532fc3', 'ad219d6f-d0dd-ecad-77a6-2c8368c530a3', 'c3231899-e11b-3037-d14b-b6a09afbf80b', 'c633b27f-c7ca-8025-f429-f5f71d17b114', 'cab33f76-63b7-a6f6-5214-7091519f1a09', 'e2e31ecd-26d2-98b8-13b7-cce51aaea67e', 'eb862bf1-215a-4162-4ae6-f07ff890a6c9', '08cc1d26-2343-2d85-3370-ddd994f84b70', '0b217a91-6e9b-b546-9e22-08d384739015', '1123e7ca-4927-4cac-9d84-936645ec7ff9', '2811af4c-b244-e08c-a849-ff4d450f0490', '4d84a09f-0026-1330-5441-0f8e9005c099', '4f4d3233-beaf-89f0-088f-f3feefed9f78', '4fb7b22e-dca2-57d6-2bee-24090b39a692', '662c4047-6c0c-7953-1f73-df09e9ca3765', '8e315aa2-51dd-1b42-3527-7e95462953ba', '93cc5c03-f5f6-9a60-dece-89eb54e367f8', 'a4cc50c4-0aa4-e9fe-73f8-bc73ca9996c0', 'c4ccc380-ff26-8af1-3554-64896130786e', 'd38106b6-fade-4ffa-76cd-ff715fa27a40', '0ff7ebd3-aeca-4564-542d-329baba409bb', '1763ccaf-be96-fc81-4781-96907822f844', '37b94b36-2c4c-a84d-017c-38d77f9d61c1', '37c799cb-777b-28b7-89ef-95df618b0ee0', '5256a3b7-8dd1-be74-cd5c-c664cf108f1e', '7da0c90f-8a55-f677-3720-f94ccd3f2dfd', '902ac2fb-9e85-3ddd-307b-f4c0cd089d33', '90c10cf6-95b3-a77d-3785-c320a29136ff', '923ef280-9bb2-4419-fae6-ba2eea93651b', '94f594bb-f8e4-a593-90b7-b474e09c7c1b', '9cbd50ce-8e06-8637-e39b-5cc1ce5b7576', 'a67ff087-b0ea-39f6-d848-c29ca52511cd', 'b4728347-85b5-74f1-db02-90b8a6807bd7', 'b9ccbe46-3d16-d911-5dd3-17a45fbc5dd0', '1d37fa9b-a90f-bb07-0c1c-e299702e5f43', '29fe6629-4fcd-372f-360f-75c4ace08a53', '3b0016c7-84be-33ea-ecab-2efc9f2ff93b', '4717d8b8-a121-04e0-ac36-a3e65c690d22', '4f2b0931-b959-3785-1107-2227a15e3181', '5e1a1f65-8ee9-7419-79df-5c31afabafe2', '68d17f64-b83f-1de5-117d-339d8d65e302', '7697eb32-ec9e-f616-dbec-ee534a8a3f67', '90d845c7-ea62-1390-496a-34e264cde98f', '994cc262-6dca-ed28-a021-35d90839e2e2', '9e802180-3224-a768-e28b-d9ea094fc182', 'c3aaabdc-9c54-1ada-fa0a-93cafa75cea4', 'c448d666-4f45-ed3b-912b-2da4e556d96d', 'cf7f0a50-819f-5c2a-34bf-c1817b3b803f', '0849f499-9720-3986-57cd-a5e937eba5c1', '25e345d3-37f0-570e-f043-0c79b2d4f269', '2e7055c4-8d7d-4413-1eeb-3b9f66b2332c', '3f096026-cfe6-b344-e5a3-c0d7c75c6651', '4435b2ce-975d-6bd8-7e05-d444d5a57f9c', '5cfbb945-458b-90f9-d6af-b6a84ac401bf', '5df25d17-d85e-86c4-dc56-ab19da3f8157', '72666dd0-4452-eff6-2e2f-81003592f276', '7bb4d34b-bb4e-0916-35ec-14735bb649da', '944d0271-5925-fa0c-7ffd-1efd61c00309', 'afeb2131-1420-72b9-65ef-27a924e1398c', 'c98761dc-7d14-039c-5fd2-47dc00f9e1c1', 'e122e808-5fda-d76b-0195-e733663cf147', 'f2230fad-6428-7ab8-d51b-f04837586698', '09357933-8da4-5931-6ee5-18816c4a064c', '1f48d9cb-1af3-14e6-e96d-4388b60fdcd1', '2a6984a9-c7b8-053d-7558-07c94eabfa62', '2f68ec01-0969-c944-e84b-b9adfd2012b1', '4c899c2f-da10-a569-b3c4-4e5aa849f563', '61af1780-69a6-db0b-bc2e-65f5e0ec0a97', '78f746b0-f179-feab-9345-779f394f7e1a', '87f7791c-73a7-b177-95e4-913da2574b3b', '98af7f95-2edf-a3b6-0cfc-7adf3fbfa1ef', '98e2b691-0ce7-a4a6-019b-bed7e4effec1', '9fe9ef4e-f8b1-a8e0-20b6-a2437e011717', 'ae9f1799-427f-ecff-848d-1c0fcbb2bad5', 'e2fa60c0-31cd-8f29-694e-f36c413d0804', '1f293216-17a3-939b-895a-10d07aa90dac', '1f318100-cf6d-4daf-8dee-26079437503d', '2ddc24a1-9988-06f9-97da-c58d1da67c60', '4629f3a7-9a63-c4fa-9000-338bbfb504b8', '4881e4c8-9354-ed33-ec07-34e0bb6c8a40', '5aebad94-cf57-4fb1-ea1b-1d556ea3a6b4', '643a097b-9f70-8208-f259-be734fc1ebb1', '73bde33a-380f-f767-e03e-fd22ce03c3d8', '776bec39-01fa-12f0-6145-e42e57e5d303', '82623380-b5a1-2025-85d1-6c3e9e7c402a', '851d588c-43b5-d128-cd2e-dd68dc304c14', 'bd583892-fdcd-ab2a-b139-c46f4c1bd8f2', 'c3311d40-107c-ffa3-6f1a-93b1743aef36', 'fc2a724a-52be-426e-4a32-998e09d16219', '00288350-b35c-8ebc-5efd-5ce4fb102c4e', '14b8651d-7939-7bce-686f-4b7022ce20c3', '29e852b7-30ca-aabd-7a4b-4438369c7edf', '383d5b81-525a-cbdc-1647-804b592d0d9f', '55e4dbfe-fa3d-a4ab-b3bf-d472088dd9de', '5dd59ae5-0efa-5b80-7f0d-e5a30f5d45e4', '72a493d6-7650-7152-97c4-92262f790607', '7ba78de3-8890-6d6c-088b-2f8cdc1ce8e5', '847afd4c-aca9-1ce5-bf1b-d368e5a7c392', 'a42cbe32-2477-b691-81de-24d10d03fdab', 'caa066a5-b768-f766-982d-9b6659d836ac', 'd708919f-62a7-afda-5776-f69085fea4b9', 'dde2a294-9a08-1c94-6344-c5acdfca7c06', 'fcbbe115-f5c0-8df8-1707-194f7c05798c', '16f8f882-df80-8f13-7e3e-8f1a9111496f', '1fbc8c7c-9a94-255d-4c80-fa0d359a97b2', '2d0fb692-61f8-4989-8192-fcb23bd1da3d', '497685f4-b20d-e4d2-d0a8-2446648f89f1', '636c8f6f-57fc-a95b-fb20-3e5daf20b89c', '74af8c29-a4b6-1715-4825-fe4846b2651a', '8bc3bd25-b910-b1a2-e302-9bd02fd3c8ff', '93bfb2a7-9b73-b25e-32b7-69e39b792c35', '9481a678-7237-a07c-7cf3-494dbc226325', 'a8f36442-a937-f060-3feb-c31518b9b12f', 'b6f0b669-f748-8605-116b-ea30ca7ed6f2', 'd04560ef-86f0-1062-527f-22186432ffe1', 'f7f94af3-f3ca-4447-2336-f69ad6cb8bfd', '0188e62a-89bd-aa4d-c8b1-d33cf9ad4d47', '02312014-5786-b6a7-2270-4ae33c534d86', '3b02cb0e-726d-dec0-b5d1-18a45c70f28f', '3c85ebe7-3e97-7fb2-ccab-14879f225c5d', '49c14bd9-1c56-5fb3-d5df-cdbcadba49f6', '51f4cd4c-6b8c-9d7d-0c3d-d3dbca8b7cba', '703cb56d-0cd4-3b31-0925-5d05c0ebb9fa', '9ccf728f-6efa-bd23-49d2-6479898767c7', 'a2cd075a-c4a9-f525-4b0e-309a1f84ad52', 'ad4115a0-961b-43fe-194f-6a75f2d0c202', 'ad67a3e0-e0ad-69c2-47b7-ca8cbb5822ca', 'c25e2c50-d28e-7aec-7b5b-0ed0fc928e4d', 'd2fa510e-4fdc-2724-bf07-f0069d0547ee', 'dea2216b-1df5-7436-f829-a09213366888', '03ff5099-e018-37af-48e8-372765e9f230', '194da011-8101-0254-7808-6fa9c146f8d8', '247d94c6-e9cb-c03d-39d4-0419b325f17d', '2a4041fa-13fd-b3c3-0647-a1e49e8c4d08', '2a7ca613-25f9-812d-c90b-a99ea7e77176', '6932b85f-db74-54ff-fb31-24b5470fa27d', '779551fd-33a7-42dd-4cc8-c4e8e5e13072', '84251521-312a-5256-1cbc-113d4fc59e59', '9a3a7ca4-6a6a-32e5-9bc6-5c873c7bf106', 'a55e692d-a4ad-c673-d076-4dbd5739aa97', 'af78924c-0d2f-3bb2-1857-b01de1517163', 'bd8dc906-0aaf-a4c3-b477-c25c12b79433', 'd6c421b1-0e5d-bf17-10e3-acc78787d8e0', 'f527f0be-d524-384d-21d9-b24ed55e4abf', '16faa0c0-92d4-458d-8b4d-a395de6ae04d', '1ab06f0f-a478-7ce9-502d-bf17a36893c8', '22e8ca4c-d7b5-886a-eea6-b817518142b2', '2c1bf223-6fb1-8478-2a39-2e64434012dd', '34c1218a-bca1-c7db-5a19-5f542367d18d', '53846a65-d033-58ad-2de7-adae3a378b2e', '6f8834c7-21c6-8ffb-49a0-5533bbf07e88', '71359f77-ed51-5b72-716e-faef5a15f888', '80771a5e-b8c4-0ff6-a453-7f3b2cabc33c', 'b65bc043-901a-c4be-d9c3-2cddce414d2a', 'b7983c06-6a26-9d80-3237-c8f46ec8829f', 'bb69485a-1542-768f-46ee-21a87c9677f1', 'de5a7b0c-4ab4-7223-1748-6bff5c2bdbf8', '16200f7d-4fa9-acd8-4d9d-e4112cfdc41f', '3d5eda56-ff83-82df-7c7a-52183e8ae609', '4dc6ceba-6037-caff-01d1-b2ec9066d416', '657b4108-2869-89d4-1e47-4549e70a09a0', '88e3d9c3-b8d9-84ff-cc79-c066ff0adf17', 'a5b16d65-d7d2-94f6-0e82-d7009ebc0b6d', 'b8b52291-a479-c8a1-777f-feb465e34c73', 'c245baf3-1275-466e-c488-1df95a2f0697', 'c2f5cfa5-cc57-b582-4580-1791d8b56198', 'c372a276-9591-004b-fecc-5c8a79e7646c', 'ca642d52-a693-98b2-0f4d-5fefad5963ef', 'ddb7030f-e10b-f918-616e-5f65ac2e2a55', 'f33b0097-0c19-c3ea-96c6-6ea0560e1f60', '0bfbe6f5-6f6a-77a6-568f-5f9b9376278d', '15e55c45-3729-5396-bfbb-e44290cb19d9', '1eff614f-c88f-8f48-407c-0f249e7853c7', '1fd16fb1-5e40-45be-1e5b-fb98272927f2', '25d6e2b2-f252-c8ba-581c-3fabbb4db452', '2b284080-b336-d585-2eaa-cf5b6c63f458', '426f6093-2752-e5ab-3d47-41202bb5a971', '5cf4fc93-c7cc-6f7f-0012-587ebb80b3f6', '6fdce0a2-6c98-1e3b-ab6c-31c621489674', '7a739b79-272d-d9c8-d3da-b44e9b9bbfee', '80c3a164-7b61-9572-b12c-b883abc76e94', '96bf6c66-ca94-2f4b-002a-03733fbc947e', 'bae8ed81-55e8-85a2-cfdf-b4cdcbee69e2', 'c155946f-967b-4850-b28d-8346492042c4', '08af0f60-1238-7b48-7eee-9f124b05ebbc', '10251352-afaa-76b0-a4b5-445eefd8e7bd', '30481eb6-e32d-ad01-144e-5c0ad74ce975', '3f4c5a5a-f054-33ab-bdee-01b9e0fa9c0c', '40bb21cb-ee69-115f-2876-513985ee1b8b', '5df300dc-f54d-5bb6-bdf3-e4d1b25d0058', '7a8c919a-3f11-bf62-257c-f6de5a73f99c', '7ce64399-a0f0-4f0e-976c-0ec570689af6', '82f303e9-0c2d-29a1-74a6-6d31e422f29a', '969fac1d-590c-a77b-b432-1337180f4573', '9e86f096-d4a9-bb7f-893d-cef45d7e8500', '9fca76cc-1c0e-eeef-0e83-26e71e4d140f', 'a32e6599-3267-eba1-59d7-1d1ce312e3d5', 'f05e22f3-49c4-578e-8f13-704ac1442f8c', '169ae72c-17cf-f466-1f3b-70850de9501e', '3d1a4697-2481-4fe2-ffbb-e76f43e333fe', '57532455-63bb-9f61-49df-02f4ca441724', '61e8de74-f752-70f8-e90b-8d7adcfdf8d9', '648a555a-bd9f-ff53-95de-893df7a6da85', '699c2dd6-9a3a-1137-eaaf-562348816f9a', 'aa57294e-5d81-7b66-be16-594cba450603', 'c18512b3-077c-3ad0-1ac5-a3b1c15cc12b', 'ca154321-d475-7e54-6799-b8b3e9fd6e6f', 'ed7fb58d-e3d3-f8ee-8cd7-14af2f3c314a', 'f8b99cda-e646-81e3-430a-dcd59ab8290d', 'f8d698a7-a786-e81c-6b6d-2efbb56f1646', 'fb6a917a-09d5-081a-9b27-ed10406e4929', '00181373-5f64-6133-3d40-f9dee2439228', '046744a4-1fc7-113d-54fb-8bb25335cf55', '0774419b-8bf3-0c45-5489-5dc619b7a865', '13bd464b-1229-36b1-bd0e-8be8f79d1df5', '426cf6c1-7b9c-71f3-3891-1abbbc0da06c', '53f9e5cf-c095-8787-bbd5-d5a2052dc5a2', '5555ca08-7370-32c2-f1c7-b4644c274b82', '7c25eff4-218a-690e-a953-3c232f4b2ad0', '7cd34239-bf48-d30d-c488-6a72f9673bcc', 'ae7a2696-1cef-43a0-2ac2-11533af441aa', 'ae9f2029-2172-6a6e-d9d0-0cd6a2942554', 'd04da18b-9e4a-2cb8-8f16-3ae306077a03', 'd42e5f80-f21c-e97f-2193-2776b72c2466', 'e52de12c-abae-9d8c-ab85-87192308fccb', '19ee53ca-4abc-8c50-9a0c-7e71bba9e906', '31e33a4c-9e81-46ea-feb2-d1679feb72af', '35ca4047-4e57-2c81-ca52-0967c9d33dfe', '3db21189-22ba-afe6-ad41-1d19d9b0b433', '592ef3b0-4e1f-8922-e490-da009bd679b1', '64164e6f-de77-d307-5e04-a3dbd249e4a7', '74116519-22ec-0fe3-f08f-25837fd9f0de', '78d8f678-2131-6118-0900-2f296502a9a7', '7c1c0b90-9b12-7fc1-3115-13590c5ad6ad', '7ee5cb41-8cb8-322b-7985-f6f53140fa26', '97723faa-a2a7-ac16-c1f7-745f2ecbddb3', 'c48765e4-8811-c4cb-16ba-a06ed3b2809e', 'c5a30e54-5af2-b581-d5c1-a53afb6807e2', 'f9ca8396-2ad5-4c87-a87d-c6347aea2bac', '02e348d8-c2cc-e403-db6c-be0cc169354f', '34f06a97-89ae-88a6-9187-a9d5bcdd1cbd', '45cb1e73-2403-c35b-748d-d7f800e5b6eb', '5242db93-a140-1c1f-800b-39addb2a3bf6', '61cecd27-3b2e-6b69-fe05-5aae195e3bfc', '6b0136a5-57ed-70b1-e0cc-5e7411a3c37a', '7be2b5ab-ea07-3099-3742-328af52f93cb', 'a5f2e11e-101a-a6a5-a148-83651d357e78', 'a773058d-36dc-c7eb-80ef-eca117640449', 'b6d8c7fe-bc89-73c2-4590-0f52b3b8eee0', 'cea530ed-fcae-cee3-f397-9d326a453ad3', 'd0632a95-2fc0-cd17-5c65-03556f2e5540', 'd2f60431-067a-a0bb-1da4-9fe52d95fdec', '105a8f73-b694-e79b-96c5-7bcd4fe2f7f6', '14cadd4f-3247-a798-c006-4e7b157b54bb', '2d000787-5cd0-ff64-89f2-d3b11e5cf408', '2d291dc4-b9ce-d840-0d21-83f8489ae7c9', '4f1b3527-fb6a-5524-22d0-25a30550d18d', '4fb6c468-3d41-3396-0da2-bc8ac195f139', '5daabb08-56da-9afd-87b4-4617ffa65303', '7d3c72d2-2479-beff-4a1d-80e34ba86400', '9ec918b9-194b-0542-f110-6ddaedf090ea', 'b9db322e-38ec-5c6c-f14b-cc7c34760a1e', 'cce3305f-50a4-2ed1-d560-c1d7988925ae', 'd985fee9-6048-244c-e8c2-8468ff7bbc29', 'e6b5b3a9-0297-b0e6-9b35-f93df5fa04cd', 'e723ea4f-6dea-1d1c-d509-c8a864fdc222', '29e41578-36c4-a698-ed36-7f8830ca1272', '2f087131-6bed-8342-ff67-a69d86b37f2e', '3c1563db-ac67-8c8d-5e7e-82e3b46f1afe', '447d01a5-2312-9fdc-e57e-610df39b143e', '60e1691a-fb0f-a2bb-9b60-a0e8cbbaad7d', '6b555a9d-a184-b5b9-12ea-07162f3a9fea', '728787bd-67ab-377f-43d8-05ff4fa3446c', '7936f1a8-0905-eac2-ad95-7dad6e4e0084', '824e6e7b-eadf-4096-8e83-331a2f0502d9', '86d100ea-09c6-336e-2f78-7f84c2a2e645', '917dad4c-7d33-4ca4-45d4-bfd5ffe2edf4', 'f5eaa7d8-0a7e-f3c9-5053-1e674f24f2ec', 'f5fd3819-6a5c-88c9-4af8-e62456f8232e', 'f8d36c14-de42-e252-bd3c-95710ec7feb2', '04f21204-3ab2-1df0-d2a4-06d59bd952eb', '10d5a5de-88a9-0cdb-6e29-e5e72ffb93ed', '19189bde-6da7-b1ed-8401-986e38b4a3d6', '1e985bbf-2d11-41dd-101f-40e5ec40e89b', '1edc5e69-11ce-e9fb-d976-7e20a5b79726', '23a133e1-d5e3-46e6-5936-5a986f7ee989', '3c3bd769-f450-4008-871a-eb56c4b81e94', '81bd1e59-40bc-e6b9-15d3-716e31176b20', '97c1758d-5a99-eadc-5499-4741a143460f', 'be2008e4-59ec-987a-1062-32bddd31e125', 'c4af85ce-d335-39fd-3ec7-47db41d9a333', 'c7b2afc1-6be5-43d1-41fd-d25b2c5b9b9b', 'e448b0c3-255f-685f-3258-4575949fcfa2', 'fa6ab0b9-3ed5-ac85-e30b-19774c188225', '030f2562-aac9-4f51-1a2c-e42710cf62ca', '0e53d379-2983-6ecd-58dd-4ffe04d3523c', '153c2902-59d9-cc0b-ebee-141257de5b7f', '18aea535-a474-92dc-f58a-175a28601129', '4aba7e3c-cefa-8ebf-eb03-7a515e43123b', '4ca9bf55-7555-478e-d326-b5e59c727192', '88875788-ee86-4480-63ad-499412202af3', 'b07d3a13-74c5-c19a-8228-569aa5bd1d0d', 'c05a47a6-a864-adff-a66a-c3aebd99883a', 'c16d68ab-68ef-bc6d-351c-d4fde9023e52', 'd5beead8-cb0f-167c-28bd-ee48dce110e8', 'e785c601-0f8e-629a-bb3f-fbf0682e51bf', 'ef8b9651-3d40-16e1-6dff-1f44c969cb2d', '16b287cb-dfdc-817d-c4f1-ce28124ab7bf', '53589cac-88df-5425-8cb6-2eede3011eba', '64f3fd8e-9523-3f0b-bed0-65dada346b0d', '742c26d9-8e9f-b79a-d0a0-aaf796d59f52', '77c00237-3250-2942-5bf7-5218174e3a97', '85566673-c0ea-d79f-e625-6ebaf0489f16', '90f9fcb4-aee3-cd42-54bf-75996d694815', '9e45b9e3-d761-cfc7-d072-1da48b7c1166', '9fd04edc-242b-5cd2-dfa8-e4cec084d2e1', 'b53b7a2e-043c-2517-c2ac-a0b49a704f27', 'bbce1e60-72a9-7af2-0ecb-9a183a70b170', 'd14afe7d-79dd-d0f7-c98d-a1c3f3c6a7dd', 'd472960c-9266-5915-0fdc-fcb1a1b6b2ef', 'e77addfb-e9b4-1b04-f104-4f3a08c73549', '119444ec-0315-8937-1e1b-99aff41659ef', '2ae71544-226e-ee9b-60b7-e9b3410fc608', '3b2138f5-8e36-73bb-acb7-15f7a380bb7e', '50f89ca7-d0ad-2775-c003-230aa46339e3', '5acd0fee-d815-9ada-25c5-9f7c72771029', '6e993d85-f39d-58e8-7633-f4af5a5dc7b7', '77b8b411-7855-acfc-13bc-dadfc912fe26', 'b8e304cb-7ebb-4ac8-07ed-32784258a302', 'd9fab44a-bb78-c4d4-0a7d-bc49f8b56092', 'df2a73fe-3afe-c51c-04a0-a6024be60995', 'e9d1d6db-3288-b258-6f06-07badcc436e9', 'eac80404-d41e-639d-8e21-510872b3d6bd', 'f4a1b411-ba93-3c8d-a06e-d732efeb2139', 'f57c9257-e192-5389-573b-27a5e9cc048b', '2ebf0da5-4eb8-6b0d-581f-43c16c7a0ebf', '3697c229-8f39-7855-42b8-5b138014baaa', '63523d3c-c2ec-aaca-fee2-9460e82528b2', '651b0b2f-8ffd-411d-c00a-931d133e0a96', '663de357-340e-199d-fec9-bf6186254f39', '7004f3c5-27eb-5099-931d-294a50c9fd85', '798ee0ac-8cb0-b65c-d9e0-741911a3c31b', '83124036-7345-a0db-e3f9-6638401edf2f', '8a8dd9b6-ed94-6d75-cdc3-9f142ad425b4', '92f25601-a0e2-203c-392c-65e321c20b74', 'a0466d88-1db3-4224-2759-e4c06fd4aa4a', 'ba8f508b-8008-21e7-ed45-649c0a4c8ab9', 'f1e293a1-1ab7-5508-1ce7-e748783b9833', '15bc507c-8fd8-db0f-e2d8-dfc2c8f38f52', '20169f5b-2102-92f1-0747-f3b7f52bc96a', '3f70b16c-cb8a-4648-03b4-45770d69b26b', '8b5f6aac-c230-d047-a368-e45464beceb2', '929d999c-b609-7962-890d-c9d64490c6b1', '97b1ada1-c466-f466-f0b4-015e728e6708', 'a05a40c6-ffa9-a21f-d57a-79e672495fd5', 'ae7ac114-f693-fc63-5264-b4e810e13ead', 'aee1d8f7-c355-be42-f377-21d36956f886', 'afae340b-943a-ca9b-6bba-a27a469dcd94', 'd78e573d-7f83-78bd-605d-a777efcc4762', 'e242b5c5-64b9-8c82-9edb-61b3fa938fe5', 'e2b4107c-d0a0-1f3a-0bc4-842fb2741ef4', 'e50ed1c8-21fd-52a7-c441-a7aa72d3f813', '1788e900-d602-4ac8-83f9-18a039485b31', '358b3375-377f-fdc9-1223-e63ea292ec7f', '5039cb02-5992-3aa0-bd3e-2207dc03bb05', '5c846923-0b64-7e19-36dd-d8cd0655fb6c', '6028b00c-4704-bb1d-5c45-8d1e0ab3a700', '75a672e0-7e9e-1e98-056f-85f9f3326622', '8fddcf79-64c5-cc7e-4a08-fecb83201ff9', '9ffe47e0-b996-3acc-4b57-1fbb51c660a3', 'a43d89d4-4c53-2a79-7144-8350be77bd5b', 'a6a3cf6c-83e7-92ce-bca7-4506c2d23218', 'aa8033d8-a010-d5d0-70d1-9ca9479d2469', 'b24a86fb-c1e1-d6c1-c633-a93a5f6481cc', 'b79a34ff-c22c-29c4-dd71-cf1a5697f170', 'e4d73a52-842c-4542-7c1b-42d5f0673895', '047b250d-2263-92a0-62d7-452e9771696f', '0b9c70da-bb8b-27a1-10e5-334137af19cb', '358c5484-f880-5cfa-ef4f-68b927edd78a', '623c1fed-a5ea-3d65-9ea3-fd897be52485', '85e1be33-cc99-3e18-ee80-218bd307c6d6', '9354c3e9-28a4-681f-6b33-13712293d72a', '9d10a404-99da-7ef6-7b0e-ce147280bcc1', 'ddd376e1-4bce-f23f-b33f-cfdd223e200e', 'de4bd46a-bd94-d8c9-2158-80b7b6ea4cde', 'df8fdde4-f525-ef22-c099-d5bc5a889231', 'dffd09b5-9acb-dfb2-2de3-0057f15c80ee', 'e46d3684-11a0-76b0-2d60-a33eddcd38c5', 'e4999eb5-1874-9e6b-a318-60cc09c55ccc', '0b6de9a5-64cb-f1a4-f344-6abd685e5424', '1afc58b3-9ce7-3fbb-6c98-904e46ce7054', '648632d4-5305-11e5-a92b-0e2199bef376', '6a47b3d8-d852-1a19-5e2e-83201b80c50a', '6eae5fe4-149c-4a5e-da2c-a5768207ce94', '75cc9f62-79de-8e68-1076-bd4cb53020c6', '96e3c70d-027e-ef4f-eb3f-63f912179685', 'a28e585f-b45f-4d6f-fbd3-e51d6c35011d', 'a378acd5-e7d1-024e-a849-964cc2f8c027', 'a6b97d91-dc9b-ff89-f81f-87b666c54891', 'b7d7b222-0726-387e-ba4a-9f44c696111a', 'bd866413-7665-b82a-bd27-1e722c16ea4e', 'd7160d42-321f-0843-9661-89a14ab5bb0d', 'e1f96a0c-44b1-102a-13b6-26b709b21879', '3293c95a-09f6-5fd1-ad3c-ce827dff7a34', '5f069260-abd4-71ae-024d-5fbe00af3e9e', '60f81525-b4a3-c928-7285-b616f083f2bb', '6725f63f-a056-7c80-d616-7fc0f6708332', '746ca024-ef61-c5ac-a483-2eee4aae7ca9', '7a3e693c-3cf4-4579-7232-5ae90dc7e719', '97e7351b-4f8d-eed3-0cdb-4e88290c9466', 'a7a0d2e0-f3f7-0200-4667-3235817ee447', 'af7fa1c4-a5c8-31f4-d469-93b790986a4b', 'bd29b98b-e289-05c1-876f-0e8d0e09eb60', 'bfde2e20-49b4-14d4-c873-62e441906e45', 'c423bcdd-18fd-2bca-85a3-8ed8b8eb7890', 'd6029127-4960-1748-320a-0b00415b068c', 'ea74895e-bc17-3181-34d2-3e4ad54bd6dc', '0171a65b-efc1-e127-feb1-ac441d5f4393', '18d525a4-c8a0-5a81-3a13-d8878f42937c', '1c0d59f8-13b9-efa3-9e80-b4bef86bc4cb', '5dfbebff-4c59-b842-d3fa-6a12df74f282', '8c846739-946d-e9c4-f96b-7725e3031270', '9d577e51-0265-bf29-1c0c-a2ba2491a31b', '9dc66e48-1d68-1c26-2e57-644ed984cd96', 'b366ec36-7a8b-0f25-f770-9c2da2d1064d', 'bf90cc9f-ee9a-308d-e10b-751f2412cb3f', 'd92f69d9-bb8d-e2ec-34aa-4557b252095d', 'da8f2c63-1cc9-e380-fd05-6549ce31d6de', 'e937c228-b89b-e88b-d78a-88437f749047', 'eca18394-b952-94a2-2693-ea9a07454012', 'f210304c-c6f4-cdc9-9e44-11138d9ff667', '014b1ae3-f320-1f29-00bf-387185f68bb7', '10594901-270a-ab23-df06-f18edd6bc648', '2287f1ab-2c5d-9537-b6d0-a703ce61e8f6', '2475a896-84a2-0e79-6eec-87e37a0f900c', '2a5e49fd-41f7-5e5d-b4e3-3e618a718c75', '498c58fd-0d9a-b8d2-c729-3ee3ca4d074b', '6787fa5b-fc97-cd63-1bf1-24bf410bb7a4', '68b5b5e6-60b4-d1a1-4e9f-2c406d1498f6', '730f1ea6-686c-1c86-ad95-7a0a17f1c890', 'b27ca86b-0cba-889e-9687-c34104f58c4c', 'b5f0ca74-3bc5-1270-2e50-027acbca33bc', 'bae2850c-c060-ed1c-4d59-981f4b51d0a2', 'f227e4d3-36cd-e5c2-5180-73e8a9629cd9', '04d778e7-2cae-0444-0022-9c1cb5c371ca', '15f9ea0e-c681-01c2-d078-4ec9e467f564', '26fa9059-fe55-408b-6683-f720ce295b73', '2f7f4a7c-3af8-cc88-c712-f2e96fdef976', '40d9ada3-68c2-760e-7304-2587644ec02f', '539c720b-2603-5883-f8c7-33a9b08b9564', '6414d968-06f0-d33b-747b-2750cbbf4e28', '6966a348-0b48-2761-5d6e-f5ce8d9d70ed', '837e7bcb-5a3f-d6d0-217c-d215b4ebb31a', '90a6af0d-8b63-8fce-6f45-c606a62c2369', 'b6c80c2d-9082-df67-fa04-c4978af39414', 'bf495821-29e1-0c0c-579f-80563a0d1b80', 'dfcf4bf0-3780-1dd3-dcef-7fe8c2631f38', 'f6fd599c-3f86-7958-7ba6-d7db7fac51a6', '03084b96-ccc9-5b5c-a06c-337f1c221597', '3f9b165c-d3bc-481c-2f9b-bae47945f3b2', '4f9c27bb-4983-2326-a430-6f2684d7d4b8', '66c3fe5c-fc92-0efb-3d7b-cf1df6361e8c', '76786c2e-e78b-e511-bf28-44492946909d', '7f7d2595-310f-eed5-43f1-e59f64e28099', '8074bbf1-6487-a96b-c232-6b8ee8efaecf', '85ddaa45-76e4-61b3-7941-92d0f1ccfd0d', '8a851c5e-5925-011d-18ba-49187c64d6b3', 'a0fc439f-92dc-4020-f3a0-f30101e54e0e', 'a2a76f9d-8691-61cb-97c9-b203d9a1ef80', 'a92681ba-e8e9-52f8-9101-a57403abfa8d', 'abb1e5c9-5d6c-f6b2-fa66-2e7e6a68fbaa', 'd8946cd3-77a3-4f74-a236-70a2d22e8061', '05515647-1504-cfa1-706a-22e7f629397a', '2470e9d2-12bb-338f-c43f-eb30dd4640fd', '5d308671-919e-d047-ac53-8259cd685c2c', '5fa662b0-b6f0-19f9-a344-f8cbca1b0601', '60e48332-34b0-bc47-5d1a-fbe5fcaee7c7', '70a2ad42-6fa3-ec3a-c89b-f408efb7d8a3', '7496c994-ccc7-9e93-9a1d-4579c35ae136', '7df53261-0c6a-d079-714e-4954d745338d', '9614d5ef-ee79-f5ed-002a-de7d6ca43939', 'c1413574-158a-6d3b-a6c1-d032c1a6fea0', 'ce879d4d-ba37-7e02-4612-ab2d677aa0f9', 'd3a1742b-9e9d-4108-dcef-11fc6f6d9bc0', 'eaf88caf-2db7-d6bb-1117-6e34ab39dbf8', '029c16b6-7fa9-3e5f-40d9-4dd5a2127ac1', '5e3eb845-9d10-e40a-5ff9-f34e7e889923', '6d8bf4b1-ada0-e92c-d343-c87866b5efab', '8bb72bd9-c435-c193-4c04-a77d306284a5', '8d708afb-90c1-e9bc-c4b3-ed7d83a03740', '9f9eea6e-e6f4-fb76-5bbd-12a6dba5df0f', 'a2ad5343-2d40-e65d-ed2f-a73dd322a8c7', 'b644d7ff-ce90-823c-ee3e-2623d44bec34', 'd9ea1973-3583-8d6d-36ef-25f0b0fc7f1b', 'da534823-80d4-74c8-476e-4d50245bd6f7', 'dd70cb01-c4c6-fa7c-9089-86660534fa44', 'de58260c-11b9-3882-3c3a-b7f06e9d69ee', 'fb350b10-c9de-3b24-4e6e-796797cd7652', 'fb7892a4-213d-21d0-5aba-09926486c5d6', '16f93ea3-5440-5f12-bb4b-e1d676502339', '2d9cfba3-f190-fc58-8b90-4e5bf3fcc270', '4d648d26-562f-0b59-6fa1-a3b0b303fc41', '57df6b40-1433-a4a1-566e-10d751391f28', '82fe478c-f34f-2b59-45fc-7053bc8cc0b6', '91b6ad60-f40f-b1a1-6584-bb189a34c47c', '9b0dcff5-9775-0d4f-8643-7dcdb52fe67b', 'bc4a19c6-650f-aa62-3f95-6b00c0121246', 'c5bf2bf9-4cfa-1d60-086a-5b37fcdc34e5', 'd5376063-c1fe-06b6-5645-d853e7ee70ff', 'dfb7e389-ae6c-48e2-3b7f-b50778214eab', 'e52739c3-d582-f88c-21af-16917c5368ed', 'f00a7dfd-4492-3fe4-2284-3485b8879418', 'f61b09b1-fafa-2c9e-ae3e-ffc93dbb06f8', '0b004a46-6110-edbd-2f5d-61b5ed760817', '363354a7-d2f1-49f9-6ed0-91d40fa02a71', '527aeba1-f7c4-0100-c2fb-a153df10316c', '531560c8-24c7-89da-b926-f569c50befcb', '844ba003-c858-5b46-73ed-6e218fa78019', '9a590fba-ad80-c021-ae6b-f80965acbf67', 'a465fc4c-d976-6163-cc2c-ba4d8af4d1a5', 'ca8bbb2f-f50b-e56a-c495-3e285fd57696', 'cbced4f9-5d31-bb6a-ff2a-a21edd32c4be', 'd4350fd5-127d-2a98-505a-5b06a371f23f', 'ec02f842-48fc-d893-be72-5123f6136fab', 'f7cb8675-386e-b4da-f987-1f12c81ee2f2', 'fa70ed1d-0d28-ccdf-55e0-00fdd7492e5c', '1776353e-8a56-f7c2-849d-e9f5d2ba260b', '22a94120-202a-6d2d-64b0-060c465e2685', '27d39bd7-4008-4e14-5ceb-fde79e4b456f', '5e78bf89-8b0c-2d5a-a408-eb563f33f302', '6a4f0bf2-851e-cb38-15d5-6d40b8ca7b26', '87f0c74f-6463-d0aa-7c49-cd151eaa523f', '901f308f-4c4a-2a97-40b6-6cd2f53ac3f1', 'a2a1d5fe-7a93-ce33-cae4-7a5c7b88f7ce', 'b2f980e9-31fe-3df1-3063-a95387a7392d', 'c48c6d77-e22d-4522-596e-7c7f69ca957b', 'cca33c89-4446-8cd3-f643-a22ea3821ccd', 'e95fafa6-82a7-b232-406f-d68c364ef8af', 'efb49a53-e64d-0d35-ce81-e0b55492c8b1', 'f507d3b5-d416-5d86-6ac8-6c99dcd55749', '093dda60-6eb2-016f-9328-5e736259fd7f', '0cee4b48-c428-b156-b6c8-12720a9472f4', '42994153-24dc-455c-4aa6-a6eea9f5c162', '4b63ab6e-056e-b9c4-43e3-05984b6e1a73', '57247234-e698-11f1-94b7-8a60d043515b', '69b36d87-83e8-30ad-3caa-0a9429daefa2', '7ad5519a-109b-f566-14b6-130f79610a66', '8e9b25bb-3ac4-34ec-f172-ffc7bc5e95c3', 'a3fed2fd-c801-8a4a-9b55-b8f5df7d13d0', 'da5dd41d-ae1c-ac2d-d142-a6767b545026', 'e4bef449-956c-591e-ae87-e32407a1403c', 'e83621e6-bbfe-23a2-9399-1080ce41f4f2', 'f592db3f-5c9e-888a-b77f-708e7245f399', 'fd6c61d6-1210-568d-60b2-7942c50116d3', '0740f3bf-3e84-5c44-bc35-6891d4e879b3', '0d87c338-ea79-c41b-b3a3-ea7c3eadff95', '24b18bae-6e89-1b53-aa63-cdbbe21def7f', '33b29a88-282a-c846-e1e2-96cf701c025e', '3755339d-a767-2f54-3c4b-88fdb5a615d5', '7e3e1f63-0efa-5dea-089c-f4fbed175e76', '89780d37-e44b-b90b-c46d-76904194bdec', '9b7cb829-4e66-49b6-2fde-74a80324d116', '9fc03a77-2606-ccac-cbaf-0ee751066957', 'a4d4c67d-7547-15a0-89c3-466bb32640f9', 'a8031fd4-704c-6525-cde1-459841716123', 'a8453abc-8176-d462-1d29-a449201fa40c', 'f8e43a97-000a-2c6e-aa3c-aa84ec37637d', 'fbb1669b-8217-4c58-58e1-77dbe3420146', '0fab4b9e-c02b-ec5b-d9f7-1f9a16c8e93a', '36bc234b-05b7-cae6-2a7e-1a6445035b29', '725e47dd-9234-e5d5-a7e3-32012c7ff13d', '73b17518-2737-5587-8dae-7515a30b4953', '80df85fe-25e1-81d2-c02c-de403eada3b1', '8c968a78-ebe7-78b2-970c-ee7e6e89b189', '918fd3c8-1a45-3709-0a67-91c6a6205544', '97be7e3b-54d6-beff-f7ca-075814eba389', '9976eb89-f130-445a-a350-cb6ac1acd572', 'e20eb447-50d0-cc74-9160-96181f9d4ced', 'f32da6cf-0b18-4013-789e-2343d5ccee60', 'fadee5fd-e046-20c1-980e-ae6cd81d65f6', 'fc0865d9-a551-dc87-e875-560fb0d488ce', '2a8cff98-f629-c7f8-e86f-3d70bbe0cfa8', '3e8856c9-76c1-fe91-bf49-49b3051b8ce1', '598b9e26-e447-fded-85f3-f030d112836e', '5c0d4acf-af7f-8796-c792-49fa523e78d4', '634d3851-2f43-08e3-7c1f-e28759e6f26c', '9bdb56c9-5907-d336-3890-07acb0293762', 'a375e3fa-f993-fdc6-8f0a-ca45fb0c1450', 'a3dd0171-48ca-6d6e-4cc7-491ddb14f32d', 'b5d33ecd-6bff-24b7-be1a-bcbc98e5a8aa', 'c31ddaa6-e23d-d4f6-b33e-376c1f8ee3a8', 'd35f3802-5ecb-f40a-2dce-14d11ce3746a', 'e62c8f3d-f69c-7b50-5efc-240f844c3846', 'f50a9420-831a-21b3-b2df-5c9ab2d5973e', 'fee4f21d-762c-b966-b51b-8dd688ea81ab', '17dde531-c7a3-90de-91cb-b7a898214afa', '3cd686b4-5984-ca29-b60e-50b3af81570f', '4331efd7-9d00-9894-b869-f20d155eaeb0', '44156f0f-1eec-a59b-fe1d-3cd2c1d5249c', '4b61a1cd-7eb7-3e2f-2644-59dd40560fee', '56c3a6ae-05a7-35f1-0ec1-55c67cbe679f', '5bac5be6-87b5-5da7-bbc1-8c172369c831', '6a4c712d-4728-f0a7-f390-3bfbe9fafbb7', '72a80a1b-c22f-c07b-95fa-0535b2b3d4e0', '87af1d89-17a4-cba6-29c1-b100007fed5a', 'b38e2ad9-e9c0-3b1b-803d-50f06022f1d1', 'df2cadb4-7772-5ce9-5d14-8e0277a4fb10', 'ed706f91-eb76-7d20-2141-7dbb96ea8ab1', 'f0d32a55-0581-9e08-91b7-040a68586665', '064e1746-b2a6-fce1-c64c-c7e962391e41', '0f25a692-76ad-8d95-7e8f-84430f438eb3', '15713b1a-6311-d82a-041d-003efecc03ff', '250ac881-8bd1-de0b-320b-6d1f899c08d9', '35134046-4437-81cf-26c4-b14ba53e77e2', '8fa5632a-8d7b-2746-a5dd-12eae252d967', '90334b83-46ea-9386-876e-5fb4251cccc6', '934103ac-91b1-4f66-970e-b753c00a3751', 'acb9b893-ca08-a3cd-949a-f3813699248f', 'bf67b966-25f7-8baf-d5bc-4df5941a8e0b', 'c6cdea33-cc90-fbd1-bb18-6560069f4df2', 'e5f9b496-8201-8094-575f-3210f023fae4', 'f8a8a05a-2e68-325d-a223-3f16b1c07737', '079b5de5-a393-ca49-2d55-dea112baa483', '20b1c409-d539-8c6d-c419-92cb442cec08', '36d8abbf-7142-68e0-5f7e-eda7bd1890a6', '42573ec5-2c5a-1ea8-ca22-d425ce0e466b', '45ded39a-13f8-0d27-65e4-a4a913e1d7bf', '49cc5e45-31a3-bf32-dc88-c09e5f7bc8b0', '58d40bc0-a71d-c162-6f6c-a1a683bddfb4', '60c9da51-5840-fed7-1654-f63019d70daf', '62421b7b-dc25-d116-9df4-c58710f4a1a9', 'a3a61924-0205-746f-ec15-05ee0d51f151', 'a463a775-578a-5ffa-9545-a7bc3c7b3bd8', 'e02174f8-aee4-7d8c-6c52-dd1ba69b3ef6', 'e094f18b-1b5e-5b76-b61c-05554b0c29bb', 'e43435c9-415c-454b-39dc-ff9a83dcd552', '0ce28543-602d-ad8a-8ad1-f389632e5dfd', '21363ca1-f215-5b38-caf4-840aa154b649', '5520c154-052f-c56e-957d-665d764a3529', '75cf6c8f-f193-2593-55e4-d3b2738792f0', '7a5218c6-ff4e-cb1b-9414-72f61a68f337', '9c213fca-6a24-f7a9-5586-18743c66f43c', '9dba386b-6cba-9fa8-3b84-e192b330c844', 'b0ebd78b-0575-b0b2-a582-dbbce3ead1fd', 'b1dfa677-9e36-31a9-1424-7f2e85670397', 'c4c76d21-414c-461b-fae3-4211f5b08377', 'ce222dcb-fd11-ebb8-d90f-2c16daab5560', 'db8733a4-b2b9-9e50-d9ee-4046cb609203', 'dfc982f8-d305-fe3e-d807-3ec0933d4a14', 'e9c2b0f6-dfa9-65c4-80ee-d9ed1faad4e1');"
+        ]
+      },
+      "equivalent": true,
+      "digest": "1a2bb82b72ad41f7db44d46776ef07e28bdda38d423d79c2fdb1e7799d63bc5f",
+      "events": 725,
+      "registrations": 431000,
+      "ratio": 1.6780109689002023
+    }
+  ]
+}
