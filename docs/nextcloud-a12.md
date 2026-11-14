@@ -20,11 +20,13 @@ Abrir **http://localhost:8082**. Las claves se generan en `infra/nextcloud/.env`
 
 | Integrante | Usuario | Clave local |
 |---|---|---|
-| Mauro | mauro-nanda | NC_MAURO_PASSWORD |
-| Gabriel | gabriel-calisaya | NC_GABRIEL_PASSWORD |
-| Juan | juan-carrizo | NC_JUAN_PASSWORD |
-| Delia | delia-cusipuma | NC_DELIA_PASSWORD |
-| Mauro Flores | dumbi34 | NC_DUMBI_PASSWORD |
+| Mauro | usuario1 | NC_USER1_PASSWORD |
+| Gabriel | usuario2 | NC_USER2_PASSWORD |
+| Juan | usuario3 | NC_USER3_PASSWORD |
+| Delia | usuario4 | NC_USER4_PASSWORD |
+| Mauro Flores | usuario5 | NC_USER5_PASSWORD |
+
+Las cuentas personales del laboratorio admiten claves de al menos ocho caracteres. Las cuentas antiguas conservan archivos e historial, pero quedan deshabilitadas. En instalaciones nuevas se generan claves aleatorias; las claves de la instancia compartida se entregan por privado.
 
 `admin-convoca` administra el servidor. `archivo-convoca` conserva las publicaciones y comparte las carpetas. `prueba-ajena` es una cuenta de control sin acceso a las carpetas del grupo. Ninguna cuenta técnica sustituye a los integrantes.
 

@@ -2,12 +2,16 @@
 if (PHP_SAPI !== 'cli') exit(1);
 define('OC_CONSOLE', 1);
 require_once '/var/www/html/lib/base.php';
-$users = array('archivo-convoca'=>'OWNER', 'mauro-nanda'=>'MAURO',
-    'gabriel-calisaya'=>'GABRIEL', 'juan-carrizo'=>'JUAN',
-    'delia-cusipuma'=>'DELIA', 'dumbi34'=>'DUMBI', 'prueba-ajena'=>'OUTSIDER');
+$users = array('archivo-convoca'=>'OWNER', 'usuario1'=>'USER1',
+    'usuario2'=>'USER2', 'usuario3'=>'USER3', 'usuario4'=>'USER4',
+    'usuario5'=>'USER5', 'prueba-ajena'=>'OUTSIDER');
 $manager = \OCP\Server::get(\OCP\IUserManager::class);
 $groups = \OCP\Server::get(\OCP\IGroupManager::class);
 \OCP\Server::get(\OCP\IConfig::class)->setSystemValue('skeletondirectory', '');
+$config = \OCP\Server::get(\OCP\IConfig::class);
+$config->setAppValue('password_policy','minLength','8');
+$config->setAppValue('password_policy','enforceNonCommonPassword','0');
+$config->setAppValue('password_policy','enforceHaveIBeenPwned','0');
 $group = $groups->get('convoca-g02') ?? $groups->createGroup('convoca-g02');
 foreach ($users as $uid=>$key) {
     $user = $manager->get($uid);
@@ -16,7 +20,11 @@ foreach ($users as $uid=>$key) {
     $user->setQuota($uid === 'archivo-convoca' ? '2 GB' : '500 MB');
     if (!in_array($key, array('OWNER','OUTSIDER'))) $group->addUser($user);
 }
-$config = \OCP\Server::get(\OCP\IConfig::class);
+// Conservar historial y archivos de las cuentas anteriores, sin accesos duplicados.
+foreach (array('mauro-nanda','gabriel-calisaya','juan-carrizo','delia-cusipuma','dumbi34') as $oldUid) {
+    $old = $manager->get($oldUid);
+    if ($old) { $group->removeUser($old); $old->setEnabled(false); }
+}
 foreach (array('shareapi_allow_links'=>'no', 'shareapi_allow_public_upload'=>'no',
     'shareapi_allow_resharing'=>'no', 'shareapi_allow_share_dialog_user_enumeration'=>'no') as $key=>$value) {
     $config->setAppValue('core',$key,$value);
