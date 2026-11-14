@@ -44,7 +44,7 @@ async function main(){
   if(command==='restore-test'){await require('./nextcloud-respaldo').run(command,{root,dir,envFile,save,compose,occ,env});return;}
   if(command==='up'&&!fs.existsSync(envFile))fs.writeFileSync(envFile,fs.readFileSync(path.join(dir,'.env.example'),'utf8').replace(/generar-localmente/g,()=>crypto.randomBytes(24).toString('hex')),{mode:0o600,flag:'wx'});
   const cfg=env();if(!/^convoca-nextcloud-a12(?:-[a-z0-9]+)?$/.test(cfg.COMPOSE_PROJECT_NAME))throw new Error('Proyecto no autorizado.');
-  for(const [key,value]of Object.entries(cfg))if(key.endsWith('_PASSWORD')&&!/^[a-f0-9]{32,}$/.test(value))throw new Error('Configurar clave local '+key);
+  for(const [key,value]of Object.entries(cfg))if(key.endsWith('_PASSWORD')&&!/^[A-Za-z0-9!._-]{16,128}$/.test(value))throw new Error('Configurar clave local '+key+' (16 a 128 letras, numeros o ! . _ -).');
   if(command==='stop'){compose(['stop']);return;}
   if(command==='public-url'){
     const url=new globalThis.URL(process.argv[3]);if(url.protocol!=='https:'||!url.hostname.endsWith('.trycloudflare.com')||url.username||url.password||url.pathname!=='/')throw new Error('Indicar URL HTTPS temporal de Cloudflare, sin credenciales ni ruta.');
