@@ -2,6 +2,8 @@
 
 ## Resultado
 
+PR #49 integrado en `develop` el 14/11/2026, merge `4b4df6b`; tarea #35 cerrada. La guía y el informe compartidos reflejan esta entrega. La reproducción humana en otra PC permanece como comprobación del ensayo grupal de A15, sin confundirse con la validación técnica ya realizada desde una base nueva.
+
 Se incorporó una instalación reproducible de **MantisBT 2.28.4 + MariaDB**, separada del PostgreSQL de Convoca. Desde la raíz del backend: `npm run mantis:up` y `npm run mantis:validate`. El procedimiento completo, usuarios y claves locales están en [mantis-a11.md](../../mantis-a11.md).
 
 El proyecto **Convoca - A11 reproducible** contiene diez incidentes con reproducción, categoría, prioridad, responsable, tratamiento, vínculos a cambios, dos notas e historial de asignación → resolución → cierre. El seguimiento figura a cargo de Gabriel y la nota de verificación automatizada/cierre a nombre de Mauro. Es una **importación retrospectiva identificada**, no una recreación de fechas ni una afirmación de ejecución original por Gabriel.
