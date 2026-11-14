@@ -34,7 +34,7 @@ LÍMITES Y ESTADO
 - A11-01/02 están resueltos en la rama `chore/gestion-incidencias`; PR #49 espera revisión de Mauro e integración a develop. No se afirma despliegue productivo.
 - A11-03 es una simulación controlada; A11-04–08 referencian pruebas previas A4/A6 con las limitaciones de sus registros; A11-09/10 referencian mediciones de laboratorio A5. Las notas conservan esas procedencias y no atribuyen a Gabriel ejecuciones originales ajenas.
 - Ningún ticket A11 se cerró. La resolución de Mantis no sustituye revisión/integración del PR ni la validación final.
-- No se obtuvieron capturas nuevas de la interfaz Mantis. Se conserva esta consulta verificable de estado; capturas visuales del listado/detalle siguen pendientes.
+- Se capturó la pantalla de inicio de sesión de Mantis local. No se capturó el listado ni el detalle de tickets; esas capturas del ciclo siguen pendientes. Imagen en Drive: https://drive.google.com/file/d/10DSNJuRXI-HGfktaKpcGKx5USmQqy5bD/view
 - La instancia está solo en localhost y el nodo Tailscale continúa en NeedsLogin; el equipo no accede desde otras PCs hasta autorizar el nodo y configurar Tailscale Serve.
 
 Consulta realizada dentro del contenedor Mantis sobre el proyecto ID 1; se recuperaron ID, resumen, responsable, categoría, prioridad, estado, resolución y cantidad de notas. No se leyeron ni registraron contraseñas, tokens, hashes o datos personales.

@@ -30,7 +30,7 @@ La ejecución directa en Windows no se contabiliza: faltaba el binding nativo de
 MANTIS LOCAL
 La interfaz local http://localhost:8989/login_page.php respondió HTTP 200 después de reconstruir Dockerfile con Apache mod_rewrite habilitado. MariaDB está healthy; Mantis expone solo 127.0.0.1:8989, la base no publica puerto y la API REST permanece deshabilitada.
 La base conserva INC-001–005. Se agregaron INC-006–010 (IDs 6–10, responsables juan-carrizo) y A11-01–10 (IDs 11–20, responsables gabriel-calisaya, con categorías, prioridades y notas). Todos los A11 están Resolved (80), no Closed: #11–12 Fixed (20) en la rama PR #49; #13–18 Not a bug (70) por simulación/comportamiento esperado; #19–20 Fixed (20) como mejoras medidas en A5.
-No se capturaron imágenes nuevas de la interfaz. El estado de IDs/responsables/resoluciones/notas está en actividad11-mantis-verificacion.txt. Tailscale continúa en NeedsLogin; Mantis no está disponible para otras PCs.
+Se capturó únicamente la pantalla de inicio de sesión; no muestra el listado ni el detalle de tickets. Imagen: https://drive.google.com/file/d/10DSNJuRXI-HGfktaKpcGKx5USmQqy5bD/view. El estado de IDs/responsables/resoluciones/notas está en actividad11-mantis-verificacion.txt. Tailscale continúa en NeedsLogin; Mantis no está disponible para otras PCs.
 
 EVIDENCIA REUTILIZADA DE ACTIVIDADES ANTERIORES
 A4 — https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view
