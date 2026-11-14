@@ -15,25 +15,26 @@ ESTADO DE PROYECTO Y TICKETS
 Proyecto Mantis: Convoca - mantenimiento (ID 1).
 Tickets totales del proyecto: 20.
 INC-001–005 (IDs Mantis 1–5): registros anteriores de Gabriel, conservados.
-INC-006–010 (IDs Mantis 6–10): cinco escenarios del reparto de Juan; responsable juan-carrizo. Se cargaron con nota inicial que aclara que la ejecución sigue pendiente.
-A11-01–10 (IDs Mantis 11–20): diez registros específicos del informe A11; responsable gabriel-calisaya; categoría, prioridad y una nota inicial con procedencia, evidencia y limitaciones. Todos están en estado Assigned (código Mantis 50), abiertos para seguimiento.
+INC-006–010 (IDs Mantis 6–10): escenarios del reparto de Juan; responsable juan-carrizo. Sus notas iniciales mantienen las pruebas pendientes.
+A11-01–10 (IDs Mantis 11–20): registros específicos del informe A11; responsable gabriel-calisaya; categoría, prioridad y nota de seguimiento. Todos están en estado Resolved (código 80), no Closed.
 
-ID Mantis | ID A11 | Categoría | Prioridad | Estado | Notas
-11 | A11-01 | Eventos | Normal (30) | Assigned (50) | 1
-12 | A11-02 | Permisos | Alta (40) | Assigned (50) | 1
-13 | A11-03 | Eventos | Normal (30) | Assigned (50) | 1
-14 | A11-04 | Cupos e inscripciones | Alta (40) | Assigned (50) | 1
-15 | A11-05 | Cupos e inscripciones | Normal (30) | Assigned (50) | 1
-16 | A11-06 | Cupos e inscripciones | Normal (30) | Assigned (50) | 1
-17 | A11-07 | Cupos e inscripciones | Alta (40) | Assigned (50) | 1
-18 | A11-08 | Eventos | Alta (40) | Assigned (50) | 1
-19 | A11-09 | Estadisticas | Normal (30) | Assigned (50) | 1
-20 | A11-10 | Estadisticas | Normal (30) | Assigned (50) | 1
+ID Mantis | ID A11 | Categoría | Prioridad | Resolución | Estado | Notas
+11 | A11-01 | Eventos | Normal (30) | Fixed (20), código en PR #49 | Resolved (80) | 2
+12 | A11-02 | Permisos | Alta (40) | Fixed (20), código en PR #49 | Resolved (80) | 2
+13 | A11-03 | Eventos | Normal (30) | Not a bug (70), simulación terminada | Resolved (80) | 2
+14 | A11-04 | Cupos e inscripciones | Alta (40) | Not a bug (70), prueba previa A4 | Resolved (80) | 2
+15 | A11-05 | Cupos e inscripciones | Normal (30) | Not a bug (70), prueba previa A4 | Resolved (80) | 2
+16 | A11-06 | Cupos e inscripciones | Normal (30) | Not a bug (70), recuperación A4 | Resolved (80) | 2
+17 | A11-07 | Cupos e inscripciones | Alta (40) | Not a bug (70), prueba previa A4 | Resolved (80) | 2
+18 | A11-08 | Eventos | Alta (40) | Not a bug (70), recuperación A6 | Resolved (80) | 2
+19 | A11-09 | Estadisticas | Normal (30) | Fixed (20), mejora medida A5 | Resolved (80) | 2
+20 | A11-10 | Estadisticas | Normal (30) | Fixed (20), mejora medida A5 | Resolved (80) | 2
 
 LÍMITES Y ESTADO
-- Los casos A11-04–07 y A11-08–10 enlazan evidencia previa A4/A5/A6 con autoría y límites indicados; el registro de A11 no atribuye a Gabriel la ejecución original de actividades ajenas.
-- A11-01 y A11-02 tienen correcciones en PR #49, pendiente de revisión e integración en develop. No se marcaron como resueltos.
-- No se cerró ningún ticket A11. Mantis no tiene capturas nuevas de la interfaz para el ciclo de estos tickets; este archivo registra la consulta de base verificable. La instancia queda solo en localhost y Tailscale sigue sin autenticarse, así que no está disponible para los compañeros.
-- A11 continúa EN PROGRESO hasta revisión del PR, seguimiento/resolución documentado y acceso/evidencia visual compartidos según la consigna.
+- A11-01/02 están resueltos en la rama `chore/gestion-incidencias`; PR #49 espera revisión de Mauro e integración a develop. No se afirma despliegue productivo.
+- A11-03 es una simulación controlada; A11-04–08 referencian pruebas previas A4/A6 con las limitaciones de sus registros; A11-09/10 referencian mediciones de laboratorio A5. Las notas conservan esas procedencias y no atribuyen a Gabriel ejecuciones originales ajenas.
+- Ningún ticket A11 se cerró. La resolución de Mantis no sustituye revisión/integración del PR ni la validación final.
+- No se obtuvieron capturas nuevas de la interfaz Mantis. Se conserva esta consulta verificable de estado; capturas visuales del listado/detalle siguen pendientes.
+- La instancia está solo en localhost y el nodo Tailscale continúa en NeedsLogin; el equipo no accede desde otras PCs hasta autorizar el nodo y configurar Tailscale Serve.
 
-Consulta realizada dentro del contenedor Mantis sobre el proyecto ID 1; se recuperaron ID, resumen, responsable, categoría, prioridad, estado y cantidad de notas. No se leyeron ni registraron contraseñas, tokens, hashes o datos personales.
+Consulta realizada dentro del contenedor Mantis sobre el proyecto ID 1; se recuperaron ID, resumen, responsable, categoría, prioridad, estado, resolución y cantidad de notas. No se leyeron ni registraron contraseñas, tokens, hashes o datos personales.

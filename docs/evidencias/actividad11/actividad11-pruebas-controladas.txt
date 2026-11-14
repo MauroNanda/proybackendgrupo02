@@ -28,9 +28,9 @@ Resultado: 9 pruebas aprobadas, 0 fallidas. Salida completa: actividad11-tests-n
 La ejecución directa en Windows no se contabiliza: faltaba el binding nativo de bcrypt en node_modules del host.
 
 MANTIS LOCAL
-La interfaz local http://localhost:8989/login_page.php respondió HTTP 200 después de reconstruir la imagen desde Dockerfile y habilitar Apache mod_rewrite. MariaDB está healthy; solo Mantis expone 127.0.0.1:8989 y MariaDB no publica puerto. La API REST permanece deshabilitada.
-La base conserva INC-001–005. Se agregaron INC-006–010 (IDs 6–10, responsables juan-carrizo) y A11-01–10 (IDs 11–20, responsables gabriel-calisaya, con prioridad, categoría y nota de procedencia/evidencia). Los diez tickets A11 permanecen Assigned (50), abiertos.
-Tailscale sigue en NeedsLogin. La instancia no está disponible para el equipo desde otras PCs. No se obtuvieron capturas nuevas de la interfaz; la consulta verificable de tickets quedó en actividad11-mantis-verificacion.txt.
+La interfaz local http://localhost:8989/login_page.php respondió HTTP 200 después de reconstruir Dockerfile con Apache mod_rewrite habilitado. MariaDB está healthy; Mantis expone solo 127.0.0.1:8989, la base no publica puerto y la API REST permanece deshabilitada.
+La base conserva INC-001–005. Se agregaron INC-006–010 (IDs 6–10, responsables juan-carrizo) y A11-01–10 (IDs 11–20, responsables gabriel-calisaya, con categorías, prioridades y notas). Todos los A11 están Resolved (80), no Closed: #11–12 Fixed (20) en la rama PR #49; #13–18 Not a bug (70) por simulación/comportamiento esperado; #19–20 Fixed (20) como mejoras medidas en A5.
+No se capturaron imágenes nuevas de la interfaz. El estado de IDs/responsables/resoluciones/notas está en actividad11-mantis-verificacion.txt. Tailscale continúa en NeedsLogin; Mantis no está disponible para otras PCs.
 
 EVIDENCIA REUTILIZADA DE ACTIVIDADES ANTERIORES
 A4 — https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view
@@ -46,10 +46,10 @@ A6 — https://drive.google.com/file/d/1h1qWxsSofjCCNY0wyCxTQ6iQ8a46unNj/view
 Se detuvo solo la réplica: cero conexiones standby; la API siguió HTTP 200 contra el principal. Tras reanudar el contenedor, ambas filas de prueba estuvieron visibles en la réplica, el estado volvió a `streaming` y los LSN coincidieron. Se limpiaron las filas temporales desde el principal y la limpieza se propagó. Responsable de ejecución original: Gabriel Calisaya.
 
 ESTADO DE A11
-El registro contiene diez casos respaldados por evidencia previa o reproducida. A4/A5/A6 conservan su atribución original; el seguimiento de A11 quedó asignado a Gabriel. Los diez casos A11 ya están cargados en Mantis local con IDs 11–20, responsables/prioridades/notas y en estado abierto. A11 sigue EN PROGRESO: PR #49 espera revisión e integración, faltan transiciones/resolución documentadas y Tailscale no está autenticado para compartir Mantis con el equipo.
+El registro contiene diez casos respaldados por evidencia previa o reproducida. A4/A5/A6 conservan su atribución original; Gabriel realizó el seguimiento A11. Los diez casos A11 están cargados y en estado Resolved (Mantis 11–20), ninguno Closed, con notas de resolución y límites. A11 sigue EN PROGRESO: PR #49 espera revisión/integración, faltan capturas de interfaz y Tailscale no está autorizado/configurado para compartir la instancia.
 
 ACTUALIZACIÓN DE MANTIS LOCAL — 2026-11-14
 
-Se dejó Oracle de lado según la decisión del equipo. Docker Compose local se reconstruyó y recreó conservando el volumen. GET /login_page.php devuelve HTTP 200; la API REST queda deshabilitada (sin autenticación devuelve HTTP 401). A11-01–10 fueron cargados en Mantis como IDs 11–20 y verificados por consulta al proyecto 1: responsable gabriel-calisaya, categoría, prioridad, estado Assigned (50) y una nota cada uno. INC-006–010 son los IDs 6–10, asignados a juan-carrizo.
+Se dejó Oracle de lado y se continuó en Docker Compose local; la imagen se reconstruyó desde Dockerfile y el contenedor se recreó conservando el volumen. GET /login_page.php responde HTTP 200; la API REST está deshabilitada. En el proyecto Convoca, los tickets A11-01–10 son Mantis #11–20: responsable gabriel-calisaya, categoría/prioridad y dos notas; estado Resolved (80), no Closed. #11–12 tienen resolución Fixed (20) en la rama PR #49, pendiente de revisión/integración; #13–18 Not a bug (70) como simulación o comportamiento esperado según evidencia; #19–20 Fixed (20) como mejora medida en A5. INC-006–010 (IDs 6–10) están asignados a juan-carrizo y las pruebas de esos casos siguen pendientes.
 
-La app solo escucha en localhost:8989 y Tailscale sigue en NeedsLogin. No se capturó nueva imagen de la lista/detalle de tickets; los resultados y límites se registran en actividad11-mantis-verificacion.txt. A11 sigue EN PROGRESO. PR #49 permanece abierto a develop, pendiente de revisión de Mauro y de integración.
+Mantis solo escucha en localhost:8989; Tailscale sigue en NeedsLogin. No se capturó nueva imagen de interfaz. IDs y estado consultados: actividad11-mantis-verificacion.txt. A11 permanece EN PROGRESO hasta revisión del PR, capturas de interfaz y acceso privado compartido.
