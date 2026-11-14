@@ -15,3 +15,6 @@ docs
 infra/mantis/.env*
 infra/mantis/resultados
 infra/mantis/*.log
+infra/nextcloud/.env*
+infra/nextcloud/resultados
+infra/nextcloud/backups

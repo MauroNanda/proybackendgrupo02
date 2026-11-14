@@ -1,0 +1,29 @@
+{
+  "capturedAt": "2026-11-14T18:29:00.835833+00:00",
+  "images": [
+    {
+      "file": "01_carpetas.png",
+      "sha256": "4842b89c05d232c0e43044897394ff476f224a164b7010083a9c60061ce096a4",
+      "method": "Captura real de Chrome con Playwright; sin alterar el contenido de la pagina",
+      "account": "mauro-nanda"
+    },
+    {
+      "file": "02_documentos_trabajo.png",
+      "sha256": "6603056103acc87873ac6a3dd4df8f98c1ee9ca1784252b59a611a87c00e1969",
+      "method": "Captura real de Chrome con Playwright; sin alterar el contenido de la pagina",
+      "account": "mauro-nanda"
+    },
+    {
+      "file": "03_acceso_https.png",
+      "sha256": "a74076f85900a2b0a9584bcfbdd2bfc0f14244bc167093b6ea185be8d8f8257f",
+      "method": "Captura real de Chrome con Playwright; sin alterar el contenido de la pagina",
+      "account": "mauro-nanda"
+    },
+    {
+      "file": "04_versiones.png",
+      "sha256": "bbfc43e79772602d93462938b90892f12b3cac52bf918e304f6adba6113a51db",
+      "method": "Captura real de Chrome con Playwright; sin alterar el contenido de la pagina",
+      "account": "mauro-nanda"
+    }
+  ]
+}

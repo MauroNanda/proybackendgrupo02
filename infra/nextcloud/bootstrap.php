@@ -1,0 +1,29 @@
+<?php
+if (PHP_SAPI !== 'cli') exit(1);
+define('OC_CONSOLE', 1);
+require_once '/var/www/html/lib/base.php';
+$users = array('archivo-convoca'=>'OWNER', 'mauro-nanda'=>'MAURO',
+    'gabriel-calisaya'=>'GABRIEL', 'juan-carrizo'=>'JUAN',
+    'delia-cusipuma'=>'DELIA', 'dumbi34'=>'DUMBI', 'prueba-ajena'=>'OUTSIDER');
+$manager = \OCP\Server::get(\OCP\IUserManager::class);
+$groups = \OCP\Server::get(\OCP\IGroupManager::class);
+\OCP\Server::get(\OCP\IConfig::class)->setSystemValue('skeletondirectory', '');
+$group = $groups->get('convoca-g02') ?? $groups->createGroup('convoca-g02');
+foreach ($users as $uid=>$key) {
+    $user = $manager->get($uid);
+    if (!$user) $user = $manager->createUser($uid, getenv('NC_'.$key.'_PASSWORD'));
+    if (!$user) throw new RuntimeException('No se pudo crear '.$uid);
+    $user->setQuota($uid === 'archivo-convoca' ? '2 GB' : '500 MB');
+    if (!in_array($key, array('OWNER','OUTSIDER'))) $group->addUser($user);
+}
+$config = \OCP\Server::get(\OCP\IConfig::class);
+foreach (array('shareapi_allow_links'=>'no', 'shareapi_allow_public_upload'=>'no',
+    'shareapi_allow_resharing'=>'no', 'shareapi_allow_share_dialog_user_enumeration'=>'no') as $key=>$value) {
+    $config->setAppValue('core',$key,$value);
+}
+$config->setAppValue('core','backgroundjobs_mode','cron');
+$config->setAppValue('firstrunwizard','skip','1');
+$config->setSystemValue('default_phone_region','AR');
+$config->setSystemValue('maintenance_window_start',3);
+$config->setSystemValue('versions_retention_obligation','30, auto');
+echo json_encode(array('users'=>array_keys($users),'group'=>$group->getGID(),'publicLinks'=>false,'resharing'=>false))."\n";

@@ -242,6 +242,18 @@ Abrir **http://localhost:8989**. La [guía de Mantis](mantis-a11.md) indica usua
 
 **Comprobación de esta guía (13/11/2026):** setup ensayado en un proyecto Docker separado, con una base nueva y puertos de base/pgAdmin alternativos. Pasaron migraciones, carga y validación del piloto; API saludable; login real desde Angular con ambos roles; creación, inscripción, QR generado, asistencia manual, dashboard y rechazo del asistente; backup y restauración. Base: backend `b7e2ba7`, frontend `2c0de57`; Node del host 24.15.0 y API en Node 22.22.3. Los apartados opcionales de réplica y monitoreo describen lo integrado, pero no se repitieron en este ensayo.
 
+### Gestión documental (actividad 12, independiente de Convoca)
+
+Con Docker Desktop abierto, en la terminal del backend:
+
+```powershell
+node scripts/nextcloud.js up
+node scripts/nextcloud.js sync
+node scripts/nextcloud.js validate
+```
+
+Abrir **http://localhost:8082** con la cuenta individual indicada en [Nextcloud A12](nextcloud-a12.md). Mostrar Trabajo (edición), Entregas (lectura), documentos reales y versiones. El instructivo también explica cómo respaldar/restaurar y habilitar la instancia compartida por HTTPS. No necesita la API, el frontend ni la base de Convoca.
+
 ## 9. Detener el proyecto
 
 En la **Terminal 2 del frontend**: pulsar **Ctrl+C**. Después, en la **Terminal 1, dentro del backend**, detener API, base y pgAdmin conservando datos:
@@ -257,6 +269,8 @@ docker compose --env-file infra/hia/.env -f infra/hia/docker-compose.yml --profi
 ```
 
 El recolector de métricas es un proceso Node local; para detenerlo seguir el apartado final de [monitoreo.md](monitoreo.md). No usar `down -v`: borra los datos persistentes.
+
+Si se inició Nextcloud: `node scripts/nextcloud.js stop`. Conserva los documentos y usuarios.
 
 Para volver a usarlo, seguir el **recorrido A**. Réplica y monitoreo se vuelven a iniciar con sus bloques respectivos del apartado 8.
 

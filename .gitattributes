@@ -7,3 +7,8 @@ docs/evidencias/actividad11/manifest.json text eol=lf
 docs/evidencias/actividad11/pruebas/*.json text eol=lf
 docs/evidencias/actividad11/pruebas/*.txt text eol=lf
 docs/evidencias/actividad11/capturas/*.png binary
+infra/nextcloud/*.php text eol=lf
+infra/nextcloud/*.yaml text eol=lf
+scripts/nextcloud*.js text eol=lf
+docs/evidencias/actividad12/*.json text eol=lf
+docs/evidencias/actividad12/capturas/*.png binary
