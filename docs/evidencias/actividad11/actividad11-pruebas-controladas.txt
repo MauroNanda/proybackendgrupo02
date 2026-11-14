@@ -27,10 +27,10 @@ Entorno: Node v22.22.3 en contenedor efímero; red Docker deshabilitada; DATABAS
 Resultado: 9 pruebas aprobadas, 0 fallidas. Salida completa: actividad11-tests-node.txt.
 La ejecución directa en Windows no se contabiliza: faltaba el binding nativo de bcrypt en node_modules del host.
 
-MANTIS
-La interfaz local http://127.0.0.1:8989/login_page.php respondió HTTP 200.
-Se restauró el respaldo 2026-10-18 únicamente sobre una base recién comprobada vacía; contiene cinco tickets históricos (IDs Mantis 1–5), no diez.
-El estado de Tailscale es NeedsLogin; la URL privada compartida no está disponible/verificada todavía. No se afirma que los compañeros puedan acceder.
+MANTIS LOCAL
+La interfaz local http://localhost:8989/login_page.php respondió HTTP 200 después de reconstruir la imagen desde Dockerfile y habilitar Apache mod_rewrite. MariaDB está healthy; solo Mantis expone 127.0.0.1:8989 y MariaDB no publica puerto. La API REST permanece deshabilitada.
+La base conserva INC-001–005. Se agregaron INC-006–010 (IDs 6–10, responsables juan-carrizo) y A11-01–10 (IDs 11–20, responsables gabriel-calisaya, con prioridad, categoría y nota de procedencia/evidencia). Los diez tickets A11 permanecen Assigned (50), abiertos.
+Tailscale sigue en NeedsLogin. La instancia no está disponible para el equipo desde otras PCs. No se obtuvieron capturas nuevas de la interfaz; la consulta verificable de tickets quedó en actividad11-mantis-verificacion.txt.
 
 EVIDENCIA REUTILIZADA DE ACTIVIDADES ANTERIORES
 A4 — https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view
@@ -46,4 +46,10 @@ A6 — https://drive.google.com/file/d/1h1qWxsSofjCCNY0wyCxTQ6iQ8a46unNj/view
 Se detuvo solo la réplica: cero conexiones standby; la API siguió HTTP 200 contra el principal. Tras reanudar el contenedor, ambas filas de prueba estuvieron visibles en la réplica, el estado volvió a `streaming` y los LSN coincidieron. Se limpiaron las filas temporales desde el principal y la limpieza se propagó. Responsable de ejecución original: Gabriel Calisaya.
 
 ESTADO DE A11
-El registro contiene 10 casos con evidencia previa o reproducida en el laboratorio, incluyendo seguridad y rendimiento. A4/A5 se citan como evidencia preexistente de las actividades correspondientes, no como ejecución original de Gabriel. Los diez casos todavía no están cargados y seguidos en el Mantis compartido. La instancia local solo tiene cinco tickets históricos y Tailscale sigue en NeedsLogin; por eso A11 permanece EN PROGRESO, sin afirmar que ya se cerró.
+El registro contiene diez casos respaldados por evidencia previa o reproducida. A4/A5/A6 conservan su atribución original; el seguimiento de A11 quedó asignado a Gabriel. Los diez casos A11 ya están cargados en Mantis local con IDs 11–20, responsables/prioridades/notas y en estado abierto. A11 sigue EN PROGRESO: PR #49 espera revisión e integración, faltan transiciones/resolución documentadas y Tailscale no está autenticado para compartir Mantis con el equipo.
+
+ACTUALIZACIÓN DE MANTIS LOCAL — 2026-11-14
+
+Se dejó Oracle de lado según la decisión del equipo. Docker Compose local se reconstruyó y recreó conservando el volumen. GET /login_page.php devuelve HTTP 200; la API REST queda deshabilitada (sin autenticación devuelve HTTP 401). A11-01–10 fueron cargados en Mantis como IDs 11–20 y verificados por consulta al proyecto 1: responsable gabriel-calisaya, categoría, prioridad, estado Assigned (50) y una nota cada uno. INC-006–010 son los IDs 6–10, asignados a juan-carrizo.
+
+La app solo escucha en localhost:8989 y Tailscale sigue en NeedsLogin. No se capturó nueva imagen de la lista/detalle de tickets; los resultados y límites se registran en actividad11-mantis-verificacion.txt. A11 sigue EN PROGRESO. PR #49 permanece abierto a develop, pendiente de revisión de Mauro y de integración.

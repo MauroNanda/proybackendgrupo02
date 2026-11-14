@@ -30,15 +30,21 @@ El archivo anterior enumeraba doce filas, pero diez eran controles con resultado
 
 **Fuentes enlazadas:** A4 [JSON de reanudación y ensayos](https://drive.google.com/file/d/1YeBTRC1Nn6781k_TPdcSAtLB-FrUUHtP/view) y [README de evidencias](https://drive.google.com/file/d/1eijeESFGBi5RS71SikBryXZ7aybuiH-A/view); A5 [resultados de ocho consultas](https://docs.google.com/document/d/1jPQREhVNm1DDiVr3olxqZM8qjWb4M7RLZgHVlikqWrg/edit); A6 [salida de corte y recuperación de réplica](https://drive.google.com/file/d/1h1qWxsSofjCCNY0wyCxTQ6iQ8a46unNj/view); A11 [pruebas controladas](https://drive.google.com/file/d/1HGSn6WC2LlZVqDhKS5qL3BWucXohc0It/view).
 
-**A11 aún no está cerrada.** El mínimo documental queda respaldado, pero faltan cargar y seguir los diez casos en Mantis compartido, adjuntar las capturas del ciclo de tickets y completar autenticación de Tailscale. La base local solo contiene cinco tickets históricos y no se presenta como los diez tickets requeridos.
+**A11 aún no está cerrada.** Los diez casos A11-01–10 ya están cargados en Mantis local (IDs 11–20), con categoría, prioridad, responsable Gabriel Calisaya, nota de procedencia y estado abierto. No se cuentan como cerrados: A11-01/02 dependen de revisión e integración del PR #49; los demás requieren validar el tratamiento documentado y completar el recorrido de seguimiento/resolución con evidencia visual. El nodo Tailscale sigue sin autenticarse, por lo que la instancia local no está compartida con el equipo.
 
 ## Controles superados que no se cuentan
 
 El registro previo observó respuestas HTTP 200/401/403, coherencia de KPI en una muestra, cupos/lista de espera y rechazo de asistencia duplicada. En el alcance ensayado se comportaron como se esperaba; son controles funcionales/de seguridad, no incidencias.
 
-## Mantis: estado comprobado
+## Mantis local: estado comprobado
 
-El Compose de Mantis se levantó localmente. Se restauró `mantis-precompartir-20261018-120121.sql` únicamente después de comprobar que la base objetivo estaba vacía. El respaldo contiene cinco tickets históricos (INC-001–INC-005 / IDs 1–5), no diez. La interfaz de login respondió HTTP 200 en `http://127.0.0.1:8989/login_page.php`. La URL compartida no se declara disponible: el nodo Tailscale informa `NeedsLogin` y requiere autenticación interactiva.
+La instancia local MantisBT 2.28.4 se reconstruyó desde Dockerfile con Apache `mod_rewrite` habilitado. Docker publica Mantis solo en `127.0.0.1:8989`; MariaDB está healthy y sin puerto publicado. `GET /login_page.php` devuelve HTTP 200. La API REST permanece deshabilitada (`/api/rest/` sin autenticación devuelve 401). Los contenedores del resto de Compose se conservaron.
+
+El proyecto `Convoca - mantenimiento` (ID 1) contiene veinte tickets: INC-001–010 (IDs Mantis 1–10, catálogo funcional previo) y A11-01–10 (IDs Mantis 11–20). Los tickets A11 se registraron por el flujo CLI autenticado de Mantis con Gabriel Calisaya como responsable de registro y seguimiento, prioridad, categoría y una nota inicial con evidencia/procedencia y límites. Todos están `Assigned` (50), abiertos; no se simuló cierre. INC-006–010 quedaron a cargo de `juan-carrizo` por el reparto documentado.
+
+La correspondencia A11→Mantis es: A11-01→11, A11-02→12, A11-03→13, A11-04→14, A11-05→15, A11-06→16, A11-07→17, A11-08→18, A11-09→19 y A11-10→20. La consulta de ID/resumen/responsable/categoría/prioridad/estado/notas quedó guardada en [actividad11-mantis-verificacion.txt](actividad11-mantis-verificacion.txt). A4/A5/A6 son evidencia previa y mantienen su atribución original; los tickets A11 no afirman que Gabriel haya ejecutado esos ensayos por primera vez.
+
+**A11 sigue en progreso.** A11-01/02 están corregidos en la rama del PR #49, que espera revisión e integración a `develop`; por eso permanecen abiertos. Los otros ocho tickets también siguen abiertos hasta completar el seguimiento y documentar su resolución conforme a la consigna. No se capturó una nueva pantalla de la lista de tickets. Tailscale continúa en `NeedsLogin`; la aplicación solo escucha en localhost y el equipo no tiene acceso compartido desde esta PC.
 
 ## Verificación automatizada
 
@@ -55,9 +61,9 @@ La salida completa está en `actividad11-tests-node.txt`. Las pruebas controlada
 
 ## Pendiente para cerrar A11
 
-1. Cargar y seguir los diez casos en Mantis compartido, con categoría, prioridad, responsable, historial y evidencia antes/después; incluir rendimiento y seguridad.
-2. Completar la autenticación interactiva de Tailscale y verificar la URL compartida desde otro dispositivo/red.
-3. Adjuntar capturas reales de Mantis y la evolución de los tickets; revisar las transiciones antes de cerrar cada caso.
-4. Mantener el PR #49 con base `develop`; esperar revisión de Mauro antes de integrar. El PR por sí solo no cierra A11.
+1. Esperar la revisión de Mauro e integración a `develop` del PR #49 antes de marcar A11-01/02 como resueltos.
+2. Completar para A11-03–10 el seguimiento y la resolución con la evidencia enlazada; mantener clara la diferencia entre ensayos previos A4/A5/A6 y pruebas de A11.
+3. Capturar la lista y el detalle de tickets desde la interfaz Mantis, con datos sensibles ocultos, y añadir esas capturas al Drive.
+4. Si el equipo necesita acceso durante la actividad, volver a autenticar el nodo Tailscale y comprobarlo desde otro dispositivo. Hoy Mantis es solo local.
 
 **Estado de la actividad 11: EN PROGRESO.**
