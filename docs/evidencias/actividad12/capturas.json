@@ -15,9 +15,10 @@
     },
     {
       "file": "03_acceso_https.png",
-      "sha256": "a74076f85900a2b0a9584bcfbdd2bfc0f14244bc167093b6ea185be8d8f8257f",
+      "sha256": "d146e5475d91ab0cb97adbbaf4b719540e43e4800cbbd1c1f44fb19b34165cfa",
       "method": "Captura real de Chrome con Playwright; sin alterar el contenido de la pagina",
-      "account": "mauro-nanda"
+      "account": "mauro-nanda",
+      "updatedAt": "2026-11-14T19:28:30.860606+00:00"
     },
     {
       "file": "04_versiones.png",

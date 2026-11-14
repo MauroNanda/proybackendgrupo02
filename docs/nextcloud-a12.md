@@ -84,10 +84,12 @@ El servidor del responsable es el espacio común del grupo. Una instalación en 
 Con `cloudflared` instalado, el responsable abre otra terminal y mantiene este proceso activo:
 
 ```powershell
-cloudflared tunnel --url http://localhost:8082 --no-autoupdate
+cloudflared tunnel --url http://127.0.0.1:8082 --no-autoupdate
 ```
 
 Copiar la URL `https://...trycloudflare.com` que imprime y autorizar ese dominio en otra terminal del backend:
+
+Se usa `127.0.0.1` explícitamente: Docker publica este servicio solo en IPv4. Usar `localhost` puede resolver a `::1` y provocar un 502 en Cloudflare.
 
 ```powershell
 node scripts/nextcloud.js public-url https://DOMINIO-IMPRESO.trycloudflare.com
