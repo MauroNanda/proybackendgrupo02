@@ -1,3 +1,9 @@
 *.sh text eol=lf
 Dockerfile text eol=lf
 *.conf text eol=lf
+# Checksums reproducibles también al clonar en Windows con core.autocrlf=true.
+infra/mantis/casos.json text eol=lf
+docs/evidencias/actividad11/manifest.json text eol=lf
+docs/evidencias/actividad11/pruebas/*.json text eol=lf
+docs/evidencias/actividad11/pruebas/*.txt text eol=lf
+docs/evidencias/actividad11/capturas/*.png binary

@@ -1,0 +1,176 @@
+{
+  "version": "a11-2",
+  "alcance": "Registro retrospectivo de defectos y fallas reproducidas. No importa ni suplanta la base histórica de Gabriel. No se cuentan controles correctos como incidencias.",
+  "casos": [
+    {
+      "id": "A11-01",
+      "titulo": "Alta de evento sin descripción devuelve error",
+      "tipo": "defecto funcional",
+      "categoria": "Eventos",
+      "prioridad": 30,
+      "problema": "El formulario permite omitir descripcion, pero Evento.descripcion NOT NULL provoca HTTP 400.",
+      "reproduccion": "En el backend anterior a c5a4813, crear un evento con titulo, ubicacion, fecha futura y cupo_maximo, omitiendo descripcion.",
+      "tratamiento": "Normalizar descripcion ausente a cadena vacía en evento.service.js; prueba de regresión.",
+      "origen": "Defecto informado por Gabriel; corrección en PR #49. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "La prueba de regresión del servicio pasa con el código de la rama; no necesita conexión a datos reales.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/regresiones.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/pull/49"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-02",
+      "titulo": "El error HTTP filtra el stack en desarrollo",
+      "tipo": "defecto de seguridad en laboratorio",
+      "categoria": "Seguridad",
+      "prioridad": 40,
+      "problema": "El middleware anterior enviaba err.stack con rutas internas al cliente en NODE_ENV=development.",
+      "reproduccion": "Ejecutar la regresión del error handler en desarrollo sobre el middleware anterior; consultar una ruta protegida sin autenticación.",
+      "tratamiento": "Quitar stack de todas las respuestas JSON; conservar el error completo en logs del servidor.",
+      "origen": "Hallazgo local y corrección de Gabriel en PR #49. No se afirma exposición en producción. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "La regresión comprueba HTTP 401, mensaje funcional y ausencia de stack.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/regresiones.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/pull/49"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-03",
+      "titulo": "Bloqueo exclusivo retrasa el catálogo",
+      "tipo": "incidente de rendimiento provocado",
+      "categoria": "Rendimiento",
+      "prioridad": 30,
+      "problema": "Un bloqueo ACCESS EXCLUSIVE de Eventos impide atender la lectura del catálogo mientras dura la transacción.",
+      "reproduccion": "En el piloto aislado: BEGIN; LOCK TABLE \"Eventos\" IN ACCESS EXCLUSIVE MODE; mantener la transacción y solicitar GET /api/eventos; después COMMIT.",
+      "tratamiento": "Liberar la transacción que retiene el bloqueo y repetir la petición. No requiere modificar el código.",
+      "origen": "Simulación de contención de base; se registra como incidente operativo, no como defecto espontáneo. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "La solicitud espera durante el bloqueo y responde al liberarlo; se compara con una solicitud posterior sin bloqueo.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/operacion.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/issues/35"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-04",
+      "titulo": "Health devolvía 200 con PostgreSQL caído",
+      "tipo": "defecto de monitoreo",
+      "categoria": "Disponibilidad",
+      "prioridad": 40,
+      "problema": "La versión anterior de health mantenía HTTP 200 y status ok aunque authenticate fallaba, produciendo una señal de salud falsa.",
+      "reproduccion": "Revisar routes/health.routes.js en bbfdefa; provocar una excepción de conexión. En la versión actual detener el principal y consultar /api/health.",
+      "tratamiento": "health-check.js responde HTTP 503, status degraded y database down; recuperar PostgreSQL y comprobar 200/up.",
+      "origen": "Defecto corregido y probado en A10, PR #48; se conserva la evidencia histórica y se repite la regresión actual. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "La prueba health con base caída exige HTTP 503; A10 contiene además muestras de la caída real y recuperación.",
+      "evidencia": "docs/evidencias/monitoreo/03_validacion_integrada.json y docs/evidencias/actividad11/pruebas/operacion.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/pull/48"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-05",
+      "titulo": "Nginx conserva la IP antigua de una API recreada",
+      "tipo": "defecto de despliegue",
+      "categoria": "Publicacion",
+      "prioridad": 40,
+      "problema": "El proxy estático resolvía api al arrancar y podía devolver 502/504 al recrearse el contenedor con otra IP.",
+      "reproduccion": "Con el proxy anterior, arrancar API y Nginx; recrear API con otra dirección manteniendo Nginx; solicitar /api/health.",
+      "tratamiento": "Resolver Docker DNS 127.0.0.11 con valid=5s y upstream variable, integrado en frontend PR #25.",
+      "origen": "Defecto de publicación corregido durante A10. El ensayo de regresión compara proxy estático anterior y proxy dinámico actual en una red aislada. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "Ensayo aislado: proxy anterior devuelve 504 tras el cambio de IP; el corregido mantiene HTTP 200 sin reiniciar Nginx.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/proxy.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proyfrontendgrupo02/pull/25"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-06",
+      "titulo": "Interrupción de sesión detiene una carga parcial",
+      "tipo": "incidente operativo provocado",
+      "categoria": "Carga",
+      "prioridad": 30,
+      "problema": "La terminación de la sesión de carga deja el trabajo sin completar; se requiere retomar desde el avance confirmado.",
+      "reproduccion": "En un piloto nuevo y vacío ejecutar node test/lab/integration.js; termina realmente la sesión del generador después de confirmar un lote.",
+      "tratamiento": "Repetir el generador; reanuda desde el checkpoint transaccional y completa los lotes faltantes sin duplicados.",
+      "origen": "Ensayo A4; se repite en un laboratorio nuevo y separado para A11. Los rechazos correctos de datos ajenos, concurrencia y versión incompatible NO se cuentan como otros incidentes. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "El proceso interrumpido termina con error; avance y filas coinciden; reanuda, completa y conserva pares únicos.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/integracion-piloto.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/issues/35"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-07",
+      "titulo": "API detenida deja indisponible la aplicación",
+      "tipo": "incidente de disponibilidad provocado",
+      "categoria": "Disponibilidad",
+      "prioridad": 40,
+      "problema": "Con el contenedor API detenido, las solicitudes no llegan al backend aunque PostgreSQL siga disponible.",
+      "reproduccion": "En el entorno aislado detener solo la API y consultar /api/health; comprobar que PostgreSQL sigue ejecutándose.",
+      "tratamiento": "Volver a iniciar API y esperar HTTP 200/database up. No se modifica la base ni se presenta como fallo espontáneo.",
+      "origen": "Prueba operativa de interrupción y recuperación, independiente de la falsa señal health de A11-04. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "Se observa petición fallida durante la detención y petición saludable tras reiniciar API.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/operacion.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/issues/35"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-08",
+      "titulo": "Réplica detenida pierde temporalmente el seguimiento WAL",
+      "tipo": "incidente de replicación provocado",
+      "categoria": "Replicacion",
+      "prioridad": 40,
+      "problema": "Al detener db-replica, el principal queda sin standby conectado; la réplica deja de recibir nuevos cambios hasta recuperarse.",
+      "reproduccion": "A6: detener solo el standby, verificar cero filas en pg_stat_replication y escribir filas de prueba en el principal; reiniciar standby.",
+      "tratamiento": "Iniciar la réplica persistente y esperar streaming y recepción de los cambios; limpiar solo las filas temporales.",
+      "origen": "Ensayo de réplica de Gabriel en A6. La validación A10 conserva estado streaming y lag, sin afirmar failover automático. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "Evidencia A6 de recuperación y muestras A10 de réplica streaming; repetición A11 con un registro de prueba, limpieza propagada y verificación directa del standby.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/replica.json",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/pull/44"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-09",
+      "titulo": "JOIN de inscripciones penaliza el catálogo masivo",
+      "tipo": "hallazgo de rendimiento",
+      "categoria": "Rendimiento",
+      "prioridad": 30,
+      "problema": "En A5 el catálogo con el JOIN de inscripciones tomó 5330.062 ms sobre el conjunto masivo.",
+      "reproduccion": "Comparar el mismo catálogo y parámetros sobre el dataset A5: 100000 usuarios, 10000 eventos y 6000000 inscripciones; caso 07.",
+      "tratamiento": "Cargar inscripciones mediante separate:true en Sequelize. El ensayo midió 3176.417 ms con 725 eventos y 431000 inscripciones equivalentes.",
+      "origen": "Mediciones históricas de A5 realizadas por el equipo. No se repite la carga masiva para instalar Mantis ni se afirma una latencia de producción. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "Resultado equivalente antes/después en el archivo original de los ocho ensayos; medir no equivale a garantizar rendimiento futuro.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/ocho-probados.json (caso 07)",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/pull/42"
+      ],
+      "verificado": true
+    },
+    {
+      "id": "A11-10",
+      "titulo": "Agregación mensual requiere más trabajo del necesario",
+      "tipo": "hallazgo de rendimiento",
+      "categoria": "Rendimiento",
+      "prioridad": 30,
+      "problema": "La consulta mensual original de A5 tomó 276.302 ms en el conjunto masivo.",
+      "reproduccion": "Sobre el mismo dataset A5 comparar caso 05 con idénticos meses, filtro y protocolo de medición.",
+      "tratamiento": "COUNT(*) y acceso por índice de fecha en el ensayo: 154.735 ms, manteniendo siete meses y totales equivalentes.",
+      "origen": "Optimización demostrada en el laboratorio A5; el cierre es del ensayo y no acredita integración del cambio en el dashboard de producción. Registro retrospectivo importado; la fecha de importación no es la fecha del hallazgo.",
+      "verificacion": "El registro original de los ocho casos conserva planes, parámetros y equivalencia de resultados antes/después.",
+      "evidencia": "docs/evidencias/actividad11/pruebas/ocho-probados.json (caso 05)",
+      "vinculos": [
+        "https://github.com/MauroNanda/proybackendgrupo02/issues/35"
+      ],
+      "verificado": true
+    }
+  ]
+}

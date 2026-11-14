@@ -1,0 +1,104 @@
+{
+  "fecha": "2026-11-14T13:50:44.855Z",
+  "proyecto": "convoca-lab-v2-a11audit",
+  "casos": {
+    "A11-03": {
+      "waiting": 1,
+      "bloqueada": {
+        "status": 200,
+        "ms": 2031,
+        "bytes": 24449
+      },
+      "recuperada": {
+        "status": 200,
+        "ms": 16,
+        "bytes": 24449
+      },
+      "ok": true
+    },
+    "A11-04": {
+      "durante": {
+        "status": 503,
+        "ms": 2794,
+        "body": {
+          "status": "degraded",
+          "database": "down",
+          "environment": "development",
+          "commit": null,
+          "version": null,
+          "timestamp": "2026-11-14T13:50:50.309Z"
+        }
+      },
+      "recuperada": {
+        "status": 200,
+        "ms": 18,
+        "body": {
+          "status": "ok",
+          "database": "up",
+          "environment": "development",
+          "commit": null,
+          "version": null,
+          "timestamp": "2026-11-14T13:50:51.691Z"
+        }
+      },
+      "ok": true
+    },
+    "A11-07": {
+      "durante": {
+        "status": 0,
+        "ms": 5
+      },
+      "postgresDisponible": true,
+      "recuperada": {
+        "status": 200,
+        "ms": 14,
+        "body": {
+          "status": "ok",
+          "database": "up",
+          "environment": "development",
+          "commit": null,
+          "version": null,
+          "timestamp": "2026-11-14T13:50:53.986Z"
+        }
+      },
+      "ok": true
+    },
+    "A11-08": {
+      "standbysDuranteCorte": 0,
+      "lecturaDirectaStandby": "t|11",
+      "estado": [
+        {
+          "state": "streaming",
+          "sync_state": "async"
+        }
+      ],
+      "limpiezaPropagada": true,
+      "ok": true
+    }
+  },
+  "inicio": {
+    "status": 200,
+    "ms": 34,
+    "body": {
+      "status": "ok",
+      "database": "up",
+      "environment": "development",
+      "commit": null,
+      "version": null,
+      "timestamp": "2026-11-14T13:50:44.906Z"
+    }
+  },
+  "fin": {
+    "status": 200,
+    "ms": 7,
+    "body": {
+      "status": "ok",
+      "database": "up",
+      "environment": "development",
+      "commit": null,
+      "version": null,
+      "timestamp": "2026-11-14T13:51:04.137Z"
+    }
+  },
+  "ok": true
+}

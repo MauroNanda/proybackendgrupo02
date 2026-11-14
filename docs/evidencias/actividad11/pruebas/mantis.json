@@ -1,0 +1,726 @@
+{
+    "ok": true,
+    "project": 1,
+    "tickets": [
+        {
+            "id": 1,
+            "summary": "[A11-01] Alta de evento sin descripción devuelve error",
+            "status": 90,
+            "resolution": 20,
+            "priority": 30,
+            "category": "Eventos",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Normalizar descripcion ausente a cadena vacía en evento.service.js; prueba de regresión.\nDefecto informado por Gabriel; corrección en PR #49.",
+                "Verificación y cierre retrospectivo del ensayo: La prueba de regresión del servicio pasa con el código de la rama; no necesita conexión a datos reales.\nEvidencia: docs/evidencias/actividad11/pruebas/regresiones.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000001",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "administrator"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "administrator"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000011",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 2,
+            "summary": "[A11-02] El error HTTP filtra el stack en desarrollo",
+            "status": 90,
+            "resolution": 20,
+            "priority": 40,
+            "category": "Seguridad",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Quitar stack de todas las respuestas JSON; conservar el error completo en logs del servidor.\nHallazgo local y corrección de Gabriel en PR #49. No se afirma exposición en producción.",
+                "Verificación y cierre retrospectivo del ensayo: La regresión comprueba HTTP 401, mensaje funcional y ausencia de stack.\nEvidencia: docs/evidencias/actividad11/pruebas/regresiones.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000002",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000012",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 3,
+            "summary": "[A11-03] Bloqueo exclusivo retrasa el catálogo",
+            "status": 90,
+            "resolution": 20,
+            "priority": 30,
+            "category": "Rendimiento",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Liberar la transacción que retiene el bloqueo y repetir la petición. No requiere modificar el código.\nSimulación de contención de base; se registra como incidente operativo, no como defecto espontáneo.",
+                "Verificación y cierre retrospectivo del ensayo: La solicitud espera durante el bloqueo y responde al liberarlo; se compara con una solicitud posterior sin bloqueo.\nEvidencia: docs/evidencias/actividad11/pruebas/operacion.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000003",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000013",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 4,
+            "summary": "[A11-04] Health devolvía 200 con PostgreSQL caído",
+            "status": 90,
+            "resolution": 20,
+            "priority": 40,
+            "category": "Disponibilidad",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: health-check.js responde HTTP 503, status degraded y database down; recuperar PostgreSQL y comprobar 200/up.\nDefecto corregido y probado en A10, PR #48; se conserva la evidencia histórica y se repite la regresión actual.",
+                "Verificación y cierre retrospectivo del ensayo: La prueba health con base caída exige HTTP 503; A10 contiene además muestras de la caída real y recuperación.\nEvidencia: docs/evidencias/monitoreo/03_validacion_integrada.json y docs/evidencias/actividad11/pruebas/operacion.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000004",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000014",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 5,
+            "summary": "[A11-05] Nginx conserva la IP antigua de una API recreada",
+            "status": 90,
+            "resolution": 20,
+            "priority": 40,
+            "category": "Publicacion",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Resolver Docker DNS 127.0.0.11 con valid=5s y upstream variable, integrado en frontend PR #25.\nDefecto de publicación corregido durante A10. El ensayo de regresión compara proxy estático anterior y proxy dinámico actual en una red aislada.",
+                "Verificación y cierre retrospectivo del ensayo: Ensayo aislado: proxy anterior devuelve 504 tras el cambio de IP; el corregido mantiene HTTP 200 sin reiniciar Nginx.\nEvidencia: docs/evidencias/actividad11/pruebas/proxy.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000005",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000015",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 6,
+            "summary": "[A11-06] Interrupción de sesión detiene una carga parcial",
+            "status": 90,
+            "resolution": 20,
+            "priority": 30,
+            "category": "Carga",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Repetir el generador; reanuda desde el checkpoint transaccional y completa los lotes faltantes sin duplicados.\nEnsayo A4; se repite en un laboratorio nuevo y separado para A11. Los rechazos correctos de datos ajenos, concurrencia y versión incompatible NO se cuentan como otros incidentes.",
+                "Verificación y cierre retrospectivo del ensayo: El proceso interrumpido termina con error; avance y filas coinciden; reanuda, completa y conserva pares únicos.\nEvidencia: docs/evidencias/actividad11/pruebas/integracion-piloto.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000006",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000016",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 7,
+            "summary": "[A11-07] API detenida deja indisponible la aplicación",
+            "status": 90,
+            "resolution": 20,
+            "priority": 40,
+            "category": "Disponibilidad",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Volver a iniciar API y esperar HTTP 200/database up. No se modifica la base ni se presenta como fallo espontáneo.\nPrueba operativa de interrupción y recuperación, independiente de la falsa señal health de A11-04.",
+                "Verificación y cierre retrospectivo del ensayo: Se observa petición fallida durante la detención y petición saludable tras reiniciar API.\nEvidencia: docs/evidencias/actividad11/pruebas/operacion.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000007",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000017",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 8,
+            "summary": "[A11-08] Réplica detenida pierde temporalmente el seguimiento WAL",
+            "status": 90,
+            "resolution": 20,
+            "priority": 40,
+            "category": "Replicacion",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Iniciar la réplica persistente y esperar streaming y recepción de los cambios; limpiar solo las filas temporales.\nEnsayo de réplica de Gabriel en A6. La validación A10 conserva estado streaming y lag, sin afirmar failover automático.",
+                "Verificación y cierre retrospectivo del ensayo: Evidencia A6 de recuperación y muestras A10 de réplica streaming; repetición A11 con un registro de prueba, limpieza propagada y verificación directa del standby.\nEvidencia: docs/evidencias/actividad11/pruebas/replica.json\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000008",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000018",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 9,
+            "summary": "[A11-09] JOIN de inscripciones penaliza el catálogo masivo",
+            "status": 90,
+            "resolution": 20,
+            "priority": 30,
+            "category": "Rendimiento",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: Cargar inscripciones mediante separate:true en Sequelize. El ensayo midió 3176.417 ms con 725 eventos y 431000 inscripciones equivalentes.\nMediciones históricas de A5 realizadas por el equipo. No se repite la carga masiva para instalar Mantis ni se afirma una latencia de producción.",
+                "Verificación y cierre retrospectivo del ensayo: Resultado equivalente antes/después en el archivo original de los ocho ensayos; medir no equivale a garantizar rendimiento futuro.\nEvidencia: docs/evidencias/actividad11/pruebas/ocho-probados.json (caso 07)\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000009",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000019",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        },
+        {
+            "id": 10,
+            "summary": "[A11-10] Agregación mensual requiere más trabajo del necesario",
+            "status": 90,
+            "resolution": 20,
+            "priority": 30,
+            "category": "Rendimiento",
+            "handler": "gabriel-calisaya",
+            "notes": [
+                "Tratamiento documentado: COUNT(*) y acceso por índice de fecha en el ensayo: 154.735 ms, manteniendo siete meses y totales equivalentes.\nOptimización demostrada en el laboratorio A5; el cierre es del ensayo y no acredita integración del cambio en el dashboard de producción.",
+                "Verificación y cierre retrospectivo del ensayo: El registro original de los ocho casos conserva planes, parámetros y equivalencia de resultados antes/después.\nEvidencia: docs/evidencias/actividad11/pruebas/ocho-probados.json (caso 05)\nLa importación no ejecuta estas pruebas ni afirma despliegue productivo. Corregido en rama no equivale a integrado en develop."
+            ],
+            "history": [
+                {
+                    "field_name": "",
+                    "old_value": "",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "handler_id",
+                    "old_value": "0",
+                    "new_value": "2",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "10",
+                    "new_value": "50",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000010",
+                    "new_value": "",
+                    "date_modified": 1794664285,
+                    "actor": "gabriel-calisaya"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "50",
+                    "new_value": "80",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "resolution",
+                    "old_value": "10",
+                    "new_value": "20",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "",
+                    "old_value": "0000020",
+                    "new_value": "",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                },
+                {
+                    "field_name": "status",
+                    "old_value": "80",
+                    "new_value": "90",
+                    "date_modified": 1794664502,
+                    "actor": "mauro-nanda"
+                }
+            ],
+            "verified": true
+        }
+    ]
+}

@@ -1,4 +1,6 @@
-# Actividad 11 — Incidencias reproducidas y estado
+# Actividad 11 — Registro histórico de Gabriel (anterior a la corrección final)
+
+**Este registro se conserva como antecedente, no como estado actual.** Los IDs Mantis 11–20, los controles de A4 y los pendientes de Tailscale que aparecen abajo corresponden a la instancia histórica del compañero. La entrega revisada, con diez incidentes, nuevas pruebas, cierres y capturas, está en [README.md](README.md). El catálogo vigente es [infra/mantis/casos.json](../../../infra/mantis/casos.json).
 
 **Fecha:** 12/11/2026
 **Responsable de registro y seguimiento A11:** Gabriel Calisaya

@@ -1,0 +1,34 @@
+name: ${COMPOSE_PROJECT_NAME:-convoca-mantis-a11}
+services:
+  mariadb:
+    image: mariadb:11.8.9@sha256:d36f18d65a0459510b8b0f643b226a6d299e3206486e2b64ff20754a6d291707
+    environment:
+      MARIADB_DATABASE: mantis
+      MARIADB_USER: mantis
+      MARIADB_PASSWORD: ${MANTIS_DB_PASSWORD:?Preparar .env con npm run mantis:up}
+      MARIADB_ROOT_PASSWORD: ${MANTIS_DB_ROOT_PASSWORD:?Configurar clave local}
+    volumes: [mantis_db:/var/lib/mysql]
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+  mantis:
+    build: .
+    environment:
+      MANTIS_DB_PASSWORD: ${MANTIS_DB_PASSWORD:?Configurar clave local}
+      MANTIS_CRYPTO_SALT: ${MANTIS_CRYPTO_SALT:?Configurar salt local}
+      MANTIS_ADMIN_PASSWORD: ${MANTIS_ADMIN_PASSWORD:?Configurar clave local}
+      MANTIS_GABRIEL_PASSWORD: ${MANTIS_GABRIEL_PASSWORD:?Configurar clave local}
+      MANTIS_MAURO_PASSWORD: ${MANTIS_MAURO_PASSWORD:?Configurar clave local}
+      MANTIS_JUAN_PASSWORD: ${MANTIS_JUAN_PASSWORD:?Configurar clave local}
+      MANTIS_DELIA_PASSWORD: ${MANTIS_DELIA_PASSWORD:?Configurar clave local}
+      MANTIS_DUMBI_PASSWORD: ${MANTIS_DUMBI_PASSWORD:?Configurar clave local}
+      MANTIS_URL: http://localhost:${MANTIS_PORT:-8989}/
+    ports: ["127.0.0.1:${MANTIS_PORT:-8989}:80"]
+    depends_on:
+      mariadb: {condition: service_healthy}
+    restart: unless-stopped
+volumes:
+  mantis_db:

@@ -1,0 +1,8 @@
+{
+  "login_mauro": true,
+  "diez_tickets_visibles": true,
+  "css": 200,
+  "detalle_y_notas": true,
+  "/admin/install.php": 403,
+  "/api/rest/issues": 403
+}

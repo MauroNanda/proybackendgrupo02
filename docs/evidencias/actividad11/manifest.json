@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-11-14",
+  "alcance": "Laboratorio A11; A5 conserva su evidencia original. Importar el registro no vuelve a ejecutar fallas.",
+  "sha256": {
+    "docs/evidencias/actividad11/pruebas/integracion-piloto.json": "8e516e97095ac91f506130171dc7500487444343eeb2ebcd02d172f8dd2dddaf",
+    "docs/evidencias/actividad11/pruebas/interfaz.json": "c3a1ff1ab80ef0cb85eed9b387c38706af9221d55ec47af5db2e04cba55fe537",
+    "docs/evidencias/actividad11/pruebas/mantis.json": "b6eeb22405f15d5c1b1af358d523a7baa4c2c4a0bb0bdde3b899573330de3189",
+    "docs/evidencias/actividad11/pruebas/ocho-probados.json": "e0a3b6bb2a6cf1d5e71e3b553dbd53d342b29f1307720410d0f324d002a04c4b",
+    "docs/evidencias/actividad11/pruebas/operacion.json": "7cadc9f4a453fa43f7a962eff686cac281745107c9a1975f6e8949d26bffdb52",
+    "docs/evidencias/actividad11/pruebas/proxy.json": "52906592636a78340fb4f5c42b9e4634cb0c54343e259d2a283720992ac892e0",
+    "docs/evidencias/actividad11/pruebas/regresiones.json": "5a871843af4c75423b1391634fa261167c3df61e8bdd8b15d5a13ed625e5dd09",
+    "docs/evidencias/actividad11/pruebas/replica.json": "478ccc2f6b6ef1267b8c09719014448b07d22a47062e90075364f6fe46c26fb9",
+    "docs/evidencias/actividad11/pruebas/suite-node.txt": "6ee213b61d644cc9f473e662e445f42dbed7dd836df1d49cfc1ffbb062621e87",
+    "docs/evidencias/actividad11/capturas/01_listado_mantis.png": "1abbe6100dad3dc6f7b876a4c212fcadd48e9465b71f0eb02536141ba384fc8c",
+    "docs/evidencias/actividad11/capturas/02_detalle_seguridad.png": "3e57bafe2d8639a115aa1415145f773bb6decdc89beab72f3291fe8e567e65a3",
+    "infra/mantis/casos.json": "0d4a90fab92be5d9b28c2f3709d7bd232c9b07481c551984bcdd698f623bf41f"
+  }
+}

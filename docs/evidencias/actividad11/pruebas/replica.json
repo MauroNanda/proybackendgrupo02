@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-14T13:50:44.855Z",
+  "proyecto": "convoca-lab-v2-a11audit",
+  "A11-08": {
+    "standbysDuranteCorte": 0,
+    "lecturaDirectaStandby": "t|11",
+    "estado": [
+      {
+        "state": "streaming",
+        "sync_state": "async"
+      }
+    ],
+    "limpiezaPropagada": true,
+    "ok": true
+  },
+  "ok": true
+}

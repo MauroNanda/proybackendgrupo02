@@ -81,6 +81,8 @@ La configuración y recuperación manual del PostgreSQL principal/réplica de la
 
 ## Documentación
 
+**HIA A11:** [levantar Mantis y revisar los diez incidentes](docs/mantis-a11.md). Incluye Docker, acceso de cada integrante, tickets, historial y evidencias; funciona independientemente de la base PostgreSQL de Convoca.
+
 Laboratorio local para HIA: seguir **[docs/base-datos.md](./docs/base-datos.md)**. Incluye Docker, piloto, carga masiva reanudable, pgAdmin, validación y backup/restauración; usa bases separadas de Neon.
 
 Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs) de este repositorio:

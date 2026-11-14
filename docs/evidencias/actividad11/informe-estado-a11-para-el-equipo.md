@@ -1,4 +1,6 @@
-# Informe de estado de la Actividad 11 — Convoca
+# Informe histórico de estado de la Actividad 11 — Convoca
+
+**Actualización posterior:** este informe de Gabriel se conserva con su contenido original y describe la instancia histórica. La corrección posterior agregó Docker reproducible, un catálogo revisado de diez incidentes, nuevas pruebas, cierres y capturas. Consultar el [estado vigente y evidencias](README.md) y la [guía de instalación](../../mantis-a11.md). El PR sigue pendiente de integración; un cierre de ensayo local no afirma un despliegue productivo.
 
 **Fecha:** 14/11/2026  
 **Responsable del seguimiento:** Gabriel Calisaya  
