@@ -1,17 +1,17 @@
 # Guía de Instalación y Setup (Convoca — Grupo G02)
 
-Este documento contiene las instrucciones paso a paso para que cualquier miembro del equipo (o agente de IA) pueda levantar el proyecto localmente desde cero.
+Para el laboratorio y la presentación de HIA, usar [la guía central](GUIA_DEMOSTRACION.md): separa instalación completa e inicio rápido, conserva los datos y no requiere Neon. Este documento conserva la alternativa original de API en el host con una base ya disponible.
 
-> **Importante:** El proyecto está dividido en **dos repositorios independientes** (exigencia de la cátedra).
+> El proyecto usa dos repositorios independientes, backend y frontend. No mezclar las configuraciones de esta alternativa con las de `infra/hia/.env`.
 
 ## Repositorios
 *   **Backend:** https://github.com/MauroNanda/proybackendgrupo02
 *   **Frontend:** https://github.com/MauroNanda/proyfrontendgrupo02
 
 ## Requisitos Previos
-*   **Node.js** (v18 o superior recomendado).
+*   **Node.js 22.22.3 o superior**, según los requisitos actuales del frontend.
 *   **Git** instalado.
-*   **NO es necesario instalar PostgreSQL localmente.** Usamos una base de datos compartida en la nube (Neon.tech).
+*   **PostgreSQL accesible** y configurado en el `.env` de la API. Puede ser el destino original en Neon; el recorrido HIA utiliza PostgreSQL en Docker.
 
 ---
 

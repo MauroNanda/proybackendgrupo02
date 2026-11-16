@@ -9,6 +9,7 @@ $manager = \OCP\Server::get(\OCP\IUserManager::class);
 $groups = \OCP\Server::get(\OCP\IGroupManager::class);
 \OCP\Server::get(\OCP\IConfig::class)->setSystemValue('skeletondirectory', '');
 $config = \OCP\Server::get(\OCP\IConfig::class);
+// Política del laboratorio para accesos de práctica; las claves se reciben del entorno local.
 $config->setAppValue('password_policy','minLength','8');
 $config->setAppValue('password_policy','enforceNonCommonPassword','0');
 $config->setAppValue('password_policy','enforceHaveIBeenPwned','0');

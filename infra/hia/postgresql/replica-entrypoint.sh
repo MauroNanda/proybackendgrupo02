@@ -10,6 +10,7 @@ printf 'db-principal:5432:replication:%s:%s\n' "$REPLICATION_USER" "$REPLICATION
 chown postgres:postgres "$PGPASSFILE"
 chmod 0600 "$PGPASSFILE"
 
+# Solo toma la copia inicial con un volumen vacío; luego continúa el WAL del principal.
 if [ ! -s "$PGDATA/PG_VERSION" ]; then
   mkdir -p "$PGDATA"
   chown postgres:postgres "$PGDATA"

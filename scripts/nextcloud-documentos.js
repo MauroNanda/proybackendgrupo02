@@ -8,6 +8,7 @@ async function put(c,user,file,bytes,headers={}){const r=await c.dav(user,'PUT',
 const directories=new Set();
 async function tree(c,base){let p='';for(const part of base.split('/')){p+=(p?'/':'')+part;if(!directories.has(p)){await c.mk(owner,p);directories.add(p);}}}
 exports.sync=async c=>{
+  // La lista explícita evita publicar archivos de entorno, claves o respaldos.
   const sources=[['docs/ARQUITECTURA.md','Manuales/Arquitectura.md'],['docs/base-datos.md','Manuales/Base-datos.md'],
     ['docs/GUIA_DEMOSTRACION.md','Manuales/Demostracion.md'],['docs/mantis-a11.md','Manuales/Incidencias.md'],
     ['docs/nextcloud-a12.md','Manuales/Nextcloud.md'],['infra/nextcloud/compose.yaml','Configuraciones/nextcloud-compose.yaml'],
@@ -37,6 +38,7 @@ exports.sync=async c=>{
     for(const base of [work,release+'/'+version]){
       const target=base+'/'+x.dest;await tree(c,path.posix.dirname(target));const old=await c.dav(owner,'GET',target);
       if(old.status===200){if(hash(old.bytes)!==x.sha256){
+        // Actualiza solo copias administradas intactas y conserva las ediciones del equipo.
         const prior=previous.files.find(p=>p.path===x.dest);
         if(base===work&&prior&&prior.sha256===hash(old.bytes))await put(c,owner,target,x.bytes,{'If-Match':old.headers.get('etag')});
         else {conflicts.push(target);continue;}

@@ -1,3 +1,4 @@
+# Reutiliza la base y los volúmenes del laboratorio; no crea otra arquitectura.
 include:
   - path: ./hia/docker-compose.yml
     env_file: ./hia/.env
@@ -11,12 +12,14 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
+      # Entre contenedores se usa el nombre del servicio, no localhost.
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${API_DB_HOST:-db-principal}:5432/convoca_lab_piloto_v2
       DB_SSL: "false"
       JWT_SECRET: ${API_JWT_SECRET:?Configurar API_JWT_SECRET en infra/hia/.env}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:4200}
     ports:
       - "127.0.0.1:${API_PORT:-3000}:3000"
+    # Espera a PostgreSQL antes de iniciar la API; las migraciones se aplican aparte.
     depends_on:
       db-principal:
         condition: service_healthy

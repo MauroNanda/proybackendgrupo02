@@ -6,8 +6,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?Configurar infra/hia/.env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configurar infra/hia/.env}
       POSTGRES_DB: postgres
+    # El cliente de Windows usa este puerto; no se publica en otras interfaces.
     ports: ["127.0.0.1:${LAB_DB_PORT:-5435}:5432"]
     volumes:
+      # Los datos pertenecen al volumen y sobreviven al reemplazo del contenedor.
       - principal_v2:/var/lib/postgresql/data
       - ./postgresql/logging.conf:/etc/postgresql/lab.conf:ro
       - ./postgresql/pg_hba.conf:/etc/postgresql/lab_hba.conf:ro
@@ -117,6 +119,7 @@ services:
       - ./resultados:/resultados
     network_mode: none
 
+  # El perfil monitoreo es optativo y no se inicia con el arranque básico de Convoca.
   prometheus:
     profiles: [monitoreo]
     image: prom/prometheus:v2.53.1

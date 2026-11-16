@@ -1,5 +1,6 @@
 name: Backend CI
 
+# Este workflow valida main; no contiene despliegue ni se dispara para PR a develop.
 on:
   push:
     branches: [ main ]

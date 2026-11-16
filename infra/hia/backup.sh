@@ -11,6 +11,7 @@ name="${db}-$(date -u +%Y%m%dT%H%M%S)-$$"
 tmp="/backups/$name.dump.partial"
 if ! mkdir /backups/.lock 2>/dev/null; then echo 'Backup en curso; revisar .lock si el proceso murió' >&2; exit 1; fi
 trap 'rm -f "$tmp"; rmdir /backups/.lock' EXIT HUP INT TERM
+# La copia definitiva se publica después de comprobar su estructura y registrar el hash.
 pg_dump -Fc --no-owner --no-acl -d "$db" -f "$tmp"
 pg_restore --list "$tmp" >/dev/null
 sha256sum "$tmp" | cut -d ' ' -f 1 > "/backups/$name.sha256"

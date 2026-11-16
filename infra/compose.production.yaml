@@ -8,6 +8,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      # Recibe una base ya preparada y accesible; este Compose no levanta PostgreSQL.
       DATABASE_URL: ${DATABASE_URL:?Configurar DATABASE_URL en el entorno de publicación}
       DB_SSL: ${DB_SSL:-true}
       JWT_SECRET: ${JWT_SECRET:?Configurar JWT_SECRET en el entorno de publicación}
@@ -35,4 +36,5 @@ services:
 
 networks:
   convoca-publicacion:
+    # Backend y Nginx comparten esta red, creada antes de publicar.
     external: true

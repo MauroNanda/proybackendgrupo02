@@ -21,8 +21,10 @@ BEGIN
      current_database() NOT IN ('convoca_lab_piloto_v2','convoca_lab_v2') THEN
     RAISE EXCEPTION 'Destino no permitido';
   END IF;
+  -- Evita que dos procesos carguen simultáneamente el mismo conjunto de datos.
   IF NOT pg_try_advisory_lock(42704,6000000) THEN RAISE EXCEPTION 'Otra carga está activa'; END IF;
   CREATE SCHEMA IF NOT EXISTS laboratorio;
+  -- Guarda el último lote confirmado para continuar una carga interrumpida.
   CREATE TABLE IF NOT EXISTS laboratorio.control_carga (
     unico boolean PRIMARY KEY DEFAULT true CHECK (unico),
     version text NOT NULL, perfil text NOT NULL,
