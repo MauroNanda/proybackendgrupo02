@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const manifest = require('./dataset.json');
 const root = path.resolve(__dirname, '../..');
 
+// El manifiesto separa el piloto de demostración del conjunto masivo de A4.
 function profile(name) {
   if (!Object.hasOwn(manifest.perfiles, name)) throw new Error('Perfil permitido: piloto o completo.');
   return { ...manifest.perfiles[name], name };
@@ -58,6 +59,7 @@ async function main() {
   record.codigoSha256=Object.fromEntries(['seeders/seed-masivo.sql','infra/hia/dataset.json','infra/hia/lab.js',
     'infra/hia/validar-dataset.sql','infra/hia/docker-compose.yml','infra/hia/backup.sh'].map(file=>
     [file,crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file))).digest('hex')]));
+  // Todas las operaciones conservan el mismo proyecto y archivo de entorno del laboratorio.
   const composeArgs = ['compose','--env-file',envFile,'-f',path.join(__dirname,'docker-compose.yml')];
   async function run(bin, argv, options={}) {
     return new Promise((resolve,reject)=>{
@@ -158,6 +160,7 @@ async function main() {
         const disk=await compose(['exec','-T','db-principal','df','-Pk','/var/lib/postgresql/data']);
         const freeBytes=Number(disk.trim().split('\n').at(-1).trim().split(/\s+/)[3])*1024;
         if(freeBytes<sourceBytes*1.5+1024**3) throw new Error('Espacio Docker insuficiente para restaurar.');
+        // Restaura en otra base para comparar integridad sin reemplazar la original.
         const temp=p.database+'_restore_'+Date.now();
         record.backup=file; record.destinoRestauracion=temp;
         await sql('postgres',`CREATE DATABASE "${temp}";`);

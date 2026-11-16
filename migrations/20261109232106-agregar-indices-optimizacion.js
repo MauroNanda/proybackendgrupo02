@@ -1,5 +1,6 @@
 'use strict';
 
+// Estos índices corresponden a los casos medidos de A5 y tienen costo de mantenimiento.
 module.exports = {
   async up (queryInterface, Sequelize) {
     // Extensión para los índices GIN de búsqueda por texto (Caso 08)
