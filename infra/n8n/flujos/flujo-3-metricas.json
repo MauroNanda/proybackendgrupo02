@@ -1,0 +1,492 @@
+{
+  "name": "A13 - Flujo 3 - Metricas, informe y Nextcloud",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a13f3-0001",
+      "name": "Disparador: informe",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "a13f3-0002",
+      "name": "Disparador: datos incompletos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "a13f3-0003",
+      "name": "Disparador: fallo de almacenamiento",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "simular",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "carpeta",
+              "value": "Convoca - Trabajo/Informe",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a13f3-0004",
+      "name": "Parametros normales",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "simular",
+              "value": "incompleto",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "carpeta",
+              "value": "Convoca - Trabajo/Informe",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a13f3-0005",
+      "name": "Parametros datos incompletos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "simular",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "carpeta",
+              "value": "Convoca - Trabajo/NoExiste",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a13f3-0006",
+      "name": "Parametros carpeta inexistente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5679/informe",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ simular: $json.simular, carpeta: $json.carpeta }) }}",
+        "options": {
+          "timeout": 150000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "a13f3-0007",
+      "name": "Generar informe (Python)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        220
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0",
+          "name": "Puente local"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-Info",
+              "leftValue": "={{ $json.ok === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a13f3-0008",
+      "name": "Informe generado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        700,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "resource": "message",
+        "operation": "sendLegacy",
+        "content": "={{ '[ERROR] Informe de metricas no generado: ' + String(($json.error && ($json.error.message || $json.error)) || 'sin detalle').slice(0, 400) }}",
+        "options": {}
+      },
+      "id": "a13f3-0009",
+      "name": "Aviso informe ERROR",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        940,
+        340
+      ],
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "0",
+          "name": "Aviso Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'http://host.docker.internal:8082/remote.php/dav/files/usuario4/' + $json.carpeta.split('/').map(encodeURIComponent).join('/') + '/' + $json.archivo }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Host",
+              "value": "localhost:8082"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/markdown",
+        "body": "={{ $json.contenido }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "a13f3-0010",
+      "name": "Subir a Nextcloud",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        940,
+        100
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "0",
+          "name": "Nextcloud usuario4"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-Guar",
+              "leftValue": "={{ $json.statusCode === 201 || $json.statusCode === 204 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a13f3-0011",
+      "name": "Guardado en Nextcloud?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "resource": "message",
+        "operation": "sendLegacy",
+        "content": "={{ '[OK] Informe guardado en Nextcloud (' + $('Generar informe (Python)').item.json.carpeta + '/' + $('Generar informe (Python)').item.json.archivo + ') | estado: ' + $('Generar informe (Python)').item.json.estado + ' | destinos: ' + $('Generar informe (Python)').item.json.destinos }}",
+        "options": {}
+      },
+      "id": "a13f3-0012",
+      "name": "Aviso informe OK",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        20
+      ],
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "0",
+          "name": "Aviso Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "resource": "message",
+        "operation": "sendLegacy",
+        "content": "={{ '[ERROR] No se pudo guardar el informe en Nextcloud (HTTP ' + ($json.statusCode || 'sin respuesta') + '). Carpeta: ' + $('Generar informe (Python)').item.json.carpeta }}",
+        "options": {}
+      },
+      "id": "a13f3-0013",
+      "name": "Aviso almacenamiento ERROR",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        180
+      ],
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "0",
+          "name": "Aviso Discord"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Disparador: informe": {
+      "main": [
+        [
+          {
+            "node": "Parametros normales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador: datos incompletos": {
+      "main": [
+        [
+          {
+            "node": "Parametros datos incompletos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador: fallo de almacenamiento": {
+      "main": [
+        [
+          {
+            "node": "Parametros carpeta inexistente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros normales": {
+      "main": [
+        [
+          {
+            "node": "Generar informe (Python)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros datos incompletos": {
+      "main": [
+        [
+          {
+            "node": "Generar informe (Python)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parametros carpeta inexistente": {
+      "main": [
+        [
+          {
+            "node": "Generar informe (Python)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar informe (Python)": {
+      "main": [
+        [
+          {
+            "node": "Informe generado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informe generado?": {
+      "main": [
+        [
+          {
+            "node": "Subir a Nextcloud",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso informe ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir a Nextcloud": {
+      "main": [
+        [
+          {
+            "node": "Guardado en Nextcloud?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardado en Nextcloud?": {
+      "main": [
+        [
+          {
+            "node": "Aviso informe OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso almacenamiento ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

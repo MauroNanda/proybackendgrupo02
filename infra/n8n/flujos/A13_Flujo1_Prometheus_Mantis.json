@@ -1,0 +1,546 @@
+{
+  "name": "A13 - Flujo 1 - Prometheus a Mantis y aviso",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a13-flujo1-prometheus",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "3b525983-b700-46f8-98e8-91d3e8c8ffe5",
+      "name": "Webhook Alertmanager",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "795d730c-4769-4f67-8a40-5aa0c4af5fb8"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst body = $json.body ?? $json;\nconst alerts = Array.isArray(body.alerts) ? body.alerts : [];\nif (!alerts.length) {\n  throw new Error('El webhook no contiene body.alerts. Enviar el payload de Alertmanager.');\n}\nreturn alerts.map((a) => {\n  const labels = a.labels ?? {};\n  const ann = a.annotations ?? {};\n  const name = labels.alertname ?? 'AlertaPrometheus';\n  const fingerprint = a.fingerprint ?? `${name}:${labels.instance ?? labels.job ?? 'general'}`;\n  const status = (a.status ?? body.status ?? 'firing').toLowerCase();\n  const sev = (labels.severity ?? 'warning').toLowerCase();\n\n  let category = labels.mantis_category ?? labels.category ?? '';\n  if (!category) {\n    if (/cpu|memoria|memory|disco|disk|rendimiento|latencia/i.test(name)) category = 'Rendimiento';\n    else if (/publicacion|proxy|nginx|http/i.test(name)) category = 'Publicacion';\n    else category = 'Disponibilidad';\n  }\n  const priority = category === 'Rendimiento' ? {id: 30, name: 'normal'} : {id: 40, name: 'high'};\n  const summary = (ann.summary ?? `${name} - ${labels.instance ?? labels.job ?? 'Convoca'}`).slice(0, 200);\n  const description = [\n    'Incidencia generada automáticamente desde una alerta de Prometheus (A13 - Flujo 1).',\n    `Alerta: ${name}`,\n    `Estado recibido: ${status}`,\n    `Fingerprint: ${fingerprint}`,\n    `Instancia: ${labels.instance ?? 'No informada'}`,\n    `Job: ${labels.job ?? 'No informado'}`,\n    `Severidad Prometheus: ${sev}`,\n    `Valor: ${a.value ?? 'No informado'}`,\n    `Inicio: ${a.startsAt ?? 'No informado'}`,\n    `Descripción: ${ann.description ?? 'Sin descripción adicional'}`,\n    '',\n    '[PROMETHEUS_FINGERPRINT:' + fingerprint + ']'\n  ].join('\\n');\n  return {\n    json: {\n      status, fingerprint, alertname: name, summary, description,\n      category, priority, handlerName: labels.handler ?? 'gabriel-calisaya',\n      instance: labels.instance ?? '', severity: sev,\n      startsAt: a.startsAt ?? '', endsAt: a.endsAt ?? '',\n      generatorURL: a.generatorURL ?? '', raw: a\n    }\n  };\n});\n"
+      },
+      "id": "727a313b-e120-4bd6-8778-e0a634c9a137",
+      "name": "Normalizar alertas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "814f1110-d1a6-4214-b021-5df452f2bedb",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "firing",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3f956e4e-ad9f-4cb8-995f-156acda67c08",
+      "name": "¿Alerta activa?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst data = $json;\nconst store = $getWorkflowStaticData('global');\nstore.alerts = store.alerts ?? {};\nconst previous = store.alerts[data.fingerprint];\nif (previous?.issueId) {\n  return {json: {...data, duplicate: true, issueId: previous.issueId}};\n}\nconst issue = {\n  summary: `[PROM] ${data.summary}`,\n  description: data.description,\n  project: {id: 1, name: 'Convoca - A11 reproducible'},\n  category: {name: data.category},\n  priority: data.priority,\n  severity: {id: 70, name: 'failure'},\n  reproducibility: {id: 100, name: 'unknown'},\n  handler: {name: data.handlerName},\n  view_state: {id: 50, name: 'private'}\n};\nreturn {json: {...data, duplicate: false, issue}};\n"
+      },
+      "id": "597281e0-7980-440b-b226-a9f56baf851b",
+      "name": "Preparar incidencia y evitar duplicados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "67713e74-a657-47a7-8f63-74cc870811cb",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f896297b-dba0-4f0d-ad8f-a68180a0496e",
+      "name": "¿Ya existe esta incidencia?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mantis/api/rest/issues",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.MANTIS_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.issue }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "a865abcc-268a-4723-819b-cec642772d6c",
+      "name": "Crear incidencia en Mantis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        420
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst source = $('Preparar incidencia y evitar duplicados').item.json;\nconst response = $json;\nconst issue = response.issue ?? response;\nconst issueId = issue.id ?? response.id;\nif (!issueId) {\n  throw new Error('Mantis respondió, pero no se pudo leer el ID de la incidencia.');\n}\nconst store = $getWorkflowStaticData('global');\nstore.alerts = store.alerts ?? {};\nstore.alerts[source.fingerprint] = {issueId, createdAt: new Date().toISOString(), summary: source.summary};\nreturn {json: {...source, issueId, action: 'created'}};\n"
+      },
+      "id": "6d1a4c0b-b1ea-41b4-8c25-a6922e9f333b",
+      "name": "Guardar fingerprint e ID de Mantis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nreturn {json: {...$json, action: 'duplicate'}};\n"
+      },
+      "id": "e01b54ca-374b-4af0-8c6a-0f99ba4cb032",
+      "name": "Preparar aviso de duplicado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst data = $json;\nconst store = $getWorkflowStaticData('global');\nstore.alerts = store.alerts ?? {};\nconst record = store.alerts[data.fingerprint];\nif (!record?.issueId) {\n  return {json: {...data, found: false, action: 'recovery_without_open_issue'}};\n}\nreturn {json: {...data, found: true, issueId: record.issueId, action: 'resolved'}};\n"
+      },
+      "id": "db23b690-f6dd-4f4d-838a-df093e61f63f",
+      "name": "Buscar incidencia para recuperación",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "65bc1892-d772-4ba4-a43a-5a1781c9aba9",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "893e6a8a-3759-4cb2-950c-82177c4c5425",
+      "name": "¿Hay incidencia abierta?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'http://mantis/api/rest/issues/' + $json.issueId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.MANTIS_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {status: {id: 80, name: 'resolved'}, resolution: {id: 20, name: 'fixed'}} }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "379ba02e-a868-4da5-b9b5-d0c3838bf843",
+      "name": "Resolver incidencia en Mantis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        700
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {content: '🚨 **Convoca | Alerta Prometheus**\\n' + $json.action + ' | ' + $json.alertname + '\\nMantis: #' + ($json.issueId ?? 'verificar') + '\\nResponsable: ' + $json.handlerName + '\\nFingerprint: ' + $json.fingerprint} }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "c390cdb6-c577-4abd-abdf-f6f22d9e1453",
+      "name": "Avisar alerta o duplicado en Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {content: '✅ **Convoca | Recuperación Prometheus**\\n' + $json.alertname + '\\nIncidencia Mantis: #' + $json.issueId + ' marcada como resuelta.\\nFingerprint: ' + $json.fingerprint} }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "8f26b441-ba83-48c3-8215-d8a359c2a303",
+      "name": "Avisar recuperación en Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        700
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {content: '⚠️ **Convoca | Fallo del Flujo 1**\\nNo se pudo completar una operación con Mantis. Revisar la ejecución de n8n.\\nAlerta: ' + ($json.alertname ?? 'sin identificar') + '\\nFingerprint: ' + ($json.fingerprint ?? 'sin fingerprint')} }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "382044b3-2ff4-4b9f-ad3c-1a969148aad0",
+      "name": "Avisar fallo de integración en Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        980
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst original = $('Buscar incidencia para recuperación').item.json;\nreturn {json: {...original, action: 'resolved'}};\n"
+      },
+      "id": "33ee45c8-a8ee-415f-b54e-48228057e39b",
+      "name": "Recuperar contexto de la alerta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        700
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Alertmanager": {
+      "main": [
+        [
+          {
+            "node": "Normalizar alertas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar alertas": {
+      "main": [
+        [
+          {
+            "node": "¿Alerta activa?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Alerta activa?": {
+      "main": [
+        [
+          {
+            "node": "Preparar incidencia y evitar duplicados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar incidencia para recuperación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar incidencia y evitar duplicados": {
+      "main": [
+        [
+          {
+            "node": "¿Ya existe esta incidencia?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Ya existe esta incidencia?": {
+      "main": [
+        [
+          {
+            "node": "Preparar aviso de duplicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear incidencia en Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear incidencia en Mantis": {
+      "main": [
+        [
+          {
+            "node": "Guardar fingerprint e ID de Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar fallo de integración en Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar fingerprint e ID de Mantis": {
+      "main": [
+        [
+          {
+            "node": "Avisar alerta o duplicado en Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar aviso de duplicado": {
+      "main": [
+        [
+          {
+            "node": "Avisar alerta o duplicado en Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar incidencia para recuperación": {
+      "main": [
+        [
+          {
+            "node": "¿Hay incidencia abierta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay incidencia abierta?": {
+      "main": [
+        [
+          {
+            "node": "Resolver incidencia en Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar recuperación en Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolver incidencia en Mantis": {
+      "main": [
+        [
+          {
+            "node": "Recuperar contexto de la alerta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar fallo de integración en Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperar contexto de la alerta": {
+      "main": [
+        [
+          {
+            "node": "Avisar recuperación en Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "timezone": "America/Argentina/Jujuy"
+  },
+  "versionId": "25558934-ce71-470d-b236-fae081278dc2",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

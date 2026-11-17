@@ -1,0 +1,406 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e97b04fb-e1ed-4d10-9426-0aa96db5d04c",
+      "name": "Disparador: backup",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "perfil",
+              "value": "invalido",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "280a281f-e2d7-4653-97b4-6fe3084189c4",
+      "name": "Forzar perfil invalido",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5679/backup",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ perfil: $json.perfil || 'piloto' }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 600000
+        }
+      },
+      "id": "82c2f44e-4eee-4648-9b3d-054415809000",
+      "name": "Ejecutar backup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        80
+      ],
+      "retryOnFail": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2isjoQ1vl0p1PFgF",
+          "name": "Puente local"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-Bac",
+              "leftValue": "={{ $json.ok === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d0123b71-5f05-4063-abd3-1ffeeea0310e",
+      "name": "Backup verificado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        688,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ '[OK] Backup verificado: ' + $json.copia.archivo + ' | SHA-256 ' + $json.copia.sha256.slice(0, 12) + '... | ' + $json.copia.inscripciones + ' inscripciones | ' + $json.segundos + ' s' }}",
+        "options": {}
+      },
+      "id": "3d4754cf-fc12-4169-b3e3-cecef7069e23",
+      "name": "Aviso backup OK",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        0
+      ],
+      "webhookId": "ff8cb9e9-9552-4016-9e58-ae495621c8f4",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "pKd4SuAB4HccIm76",
+          "name": "Aviso Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ '[ERROR] Backup fallido: ' + String(($json.error && ($json.error.message || $json.error)) || $json.salida || 'sin detalle').slice(0, 500) }}",
+        "options": {}
+      },
+      "id": "e247bef8-d0b6-47d2-a161-c212c85b0787",
+      "name": "Aviso backup ERROR",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        176
+      ],
+      "webhookId": "9ffa2a3c-47f0-4fef-9558-63dd8afe8176",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "pKd4SuAB4HccIm76",
+          "name": "Aviso Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5679/restore-test",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ perfil: 'piloto', aprobado: true }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 600000
+        }
+      },
+      "id": "c9b6a950-df11-489b-b3a6-cb0b0de83456",
+      "name": "Restaurar en base temporal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        480
+      ],
+      "retryOnFail": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2isjoQ1vl0p1PFgF",
+          "name": "Puente local"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-Res",
+              "leftValue": "={{ $json.ok === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "187d73cf-8fc2-4f80-8c1d-6babf6a7cebe",
+      "name": "Restauracion OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        688,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ '[OK] Restauracion verificada en base temporal. Copia: ' + $json.restauracion.copia + ' | SHA-256 ' + $json.restauracion.sha256.slice(0, 12) + '... | ' + $json.restauracion.fecha }}",
+        "options": {}
+      },
+      "id": "acdb8271-0e4b-4e23-841e-d1f2f5d00742",
+      "name": "Aviso restauracion OK",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        400
+      ],
+      "webhookId": "2a53c74f-fe10-4876-a7ef-ad2d5e9f48d4",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "pKd4SuAB4HccIm76",
+          "name": "Aviso Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ '[ERROR] Restauracion fallida: ' + String(($json.error && ($json.error.message || $json.error)) || $json.salida || 'sin detalle').slice(0, 500) }}",
+        "options": {}
+      },
+      "id": "bb227cd7-cecf-402f-a439-44a1aa87abaf",
+      "name": "Aviso restauracion ERROR",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        576
+      ],
+      "webhookId": "a49a3e17-f17a-44a8-a196-f7394b43f566",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "pKd4SuAB4HccIm76",
+          "name": "Aviso Discord"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "6a51c01b-b502-4a6b-8595-867715ca2f28",
+      "name": "Disparador: fallo controlado"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        144,
+        480
+      ],
+      "id": "6aa22d73-bdb4-4804-b40c-8f843a3188eb",
+      "name": "Disparador: restaurar"
+    }
+  ],
+  "connections": {
+    "Disparador: backup": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Forzar perfil invalido": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar backup": {
+      "main": [
+        [
+          {
+            "node": "Backup verificado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup verificado?": {
+      "main": [
+        [
+          {
+            "node": "Aviso backup OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso backup ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restaurar en base temporal": {
+      "main": [
+        [
+          {
+            "node": "Restauracion OK?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restauracion OK?": {
+      "main": [
+        [
+          {
+            "node": "Aviso restauracion OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso restauracion ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador: fallo controlado": {
+      "main": [
+        [
+          {
+            "node": "Forzar perfil invalido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador: restaurar": {
+      "main": [
+        [
+          {
+            "node": "Restaurar en base temporal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "a4296d2dff3621e2dc05b7c52776e8105ad08c9d663ac7027084cafe79e1a7f4"
+  }
+}
