@@ -8,7 +8,7 @@ Convoca es una plataforma web para la gestión de eventos universitarios (charla
 
 ## Stack
 
-*   **Backend (este repositorio):** Node.js + Express, con Sequelize (ORM) sobre PostgreSQL alojado en Neon.
+*   **Backend (este repositorio):** Node.js + Express y Sequelize sobre PostgreSQL; laboratorio local en Docker o destino remoto según la configuración. Neon pertenece al entorno original.
 *   **Frontend:** Angular + Bootstrap — [proyfrontendgrupo02](https://github.com/MauroNanda/proyfrontendgrupo02).
 
 ## Funcionalidades principales
@@ -21,6 +21,10 @@ Convoca es una plataforma web para la gestión de eventos universitarios (charla
 *   Dashboard administrativo con estadísticas y exportación de datos.
 
 ## Cómo levantarlo
+
+Para HIA hay dos recorridos en [la guía central](docs/GUIA_DEMOSTRACION.md): **A, inicio rápido** si se conservaron configuración, imágenes y datos; **B, setup completo** para una instalación limpia. Abrir Docker Desktop antes de ambos. La guía indica desde qué carpeta ejecutar cada comando y cómo detener sin perder datos.
+
+El [estado técnico de HIA](docs/ESTADO_HIA.md) distingue implementación, evidencia disponible y pendientes; enlaza la guía de defensa de Drive. El procedimiento manual siguiente es una alternativa para ejecutar la API fuera de Docker y requiere configurar su propia base.
 
 **Gestión documental (HIA A12):** [Nextcloud: arranque, cuentas, permisos y respaldo](docs/nextcloud-a12.md). Es un laboratorio Docker independiente; no requiere iniciar la API ni el frontend.
 

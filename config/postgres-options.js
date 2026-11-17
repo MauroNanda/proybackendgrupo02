@@ -7,6 +7,7 @@ function postgresOptions(env = process.env) {
   let url;
   try { url = new URL(env.DATABASE_URL); } catch { throw new Error('DATABASE_URL no es válida.'); }
   if (!['postgres:', 'postgresql:'].includes(url.protocol)) throw new Error('Se requiere PostgreSQL.');
+  // Permite tráfico local sin TLS y exige certificados válidos en destinos remotos.
   const local = ['localhost', '127.0.0.1', '[::1]', 'db-principal', 'db-replica'].includes(url.hostname);
   if (env.DB_SSL !== undefined && !['true', 'false'].includes(env.DB_SSL)) throw new Error('DB_SSL debe ser true o false.');
   const enabled = env.DB_SSL === undefined ? !local : env.DB_SSL === 'true';

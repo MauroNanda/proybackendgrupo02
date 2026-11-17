@@ -21,6 +21,7 @@ Seguir este orden, sin saltear el backend:
 | Ya tiene `infra/hia/.env`, migraciones y datos del piloto cargados | **A: entorno ya preparado**. |
 | No tiene la base local o todavía no ejecutó las migraciones | **B: preparar desde cero**. |
 | Tiene las migraciones, pero todavía no cargó los datos | **B**, conservando su `.env`. El comando de migración solo aplica las pendientes; luego cargar el piloto. |
+| Eliminó los volúmenes o cambió de computadora sin restaurarlos | **B** para crear un piloto nuevo, o seguir el procedimiento de restauración del respaldo. El inicio rápido no recupera datos eliminados. |
 
 Tener las migraciones **como archivos en Git** no significa haberlas ejecutado. La base debe existir en Docker en este equipo. Esta guía usa `convoca_lab_piloto_v2`; una base migrada en Neon o la base `convoca_lab_v2` del perfil completo no sustituye ese piloto.
 
@@ -44,17 +45,17 @@ Si ya los tienen, conservar los cambios propios y actualizar `develop` en **cada
 
 ## A. Ya tengo las migraciones y los datos cargados
 
-Usar este recorrido si el piloto ya funcionó en este equipo y se conservaron su archivo `infra/hia/.env` y los volúmenes Docker. **No volver a generar claves, migrar ni cargar datos para un arranque normal.**
+Usar este recorrido si el piloto ya funcionó en este equipo y se conservaron su archivo `infra/hia/.env`, la imagen de la API, los volúmenes Docker y las dependencias del frontend. **No volver a generar claves, migrar ni cargar datos para un arranque normal.**
 
 ### A1. Levantar base y backend
 
 Con Docker Desktop abierto, abrir **Terminal 1 en `proybackendgrupo02`** y ejecutar:
 
 ```powershell
-docker compose --env-file infra/hia/.env -f infra/compose.yaml up -d --build --wait
+docker compose --env-file infra/hia/.env -f infra/compose.yaml up -d --wait
 ```
 
-Esperar a que termine. Este comando inicia **PostgreSQL, pgAdmin y el backend** conservando la base existente. `--build` incorpora el código actualizado del backend. Después comprobarlo:
+Esperar a que termine. Este comando inicia **PostgreSQL, pgAdmin y el backend** reutilizando la imagen y conservando la base existente. Si actualizaron código del backend, dependencias o Dockerfile, usar en su lugar `docker compose --env-file infra/hia/.env -f infra/compose.yaml up -d --build --wait`: la imagen incluye una copia del código y necesita reconstruirse. Después comprobarlo:
 
 ```powershell
 Invoke-RestMethod http://localhost:3000/api/health
@@ -170,7 +171,7 @@ Usar una ventana normal para el organizador y una de incógnito para el asistent
 | Paso | Qué hacer | Qué debería verse |
 |---|---|---|
 | 1. Catálogo | Entrar sin sesión y buscar un evento por su título. Abrir su tarjeta. | Catálogo público y detalle con fecha, lugar y cupo. |
-| 2. Organizador | Iniciar sesión con `lab.1@convoca.test`; abrir `/admin/eventos` y crear un evento. Usar título `Demo avances`, **descripción completa**, lugar `Laboratorio`, fecha futura, cupo `10` y estado `PUBLICADO`. | Evento creado y visible en el catálogo. Completar descripción mientras su corrección de A11 no esté integrada. |
+| 2. Organizador | Iniciar sesión con `lab.1@convoca.test`; abrir `/admin/eventos` y crear un evento. Usar título `Demo avances`, descripción, lugar `Laboratorio`, fecha futura, cupo `10` y estado `PUBLICADO`. | Evento creado y visible en el catálogo. A11 ya permite omitir la descripción; no omitir los campos obligatorios del formulario. |
 | 3. Asistente | En incógnito, iniciar sesión con `lab.2@convoca.test`, buscar `Demo avances` y pulsar inscribirse. | Inscripción confirmada; aparece en **Mis inscripciones** (`/mis-inscripciones`) y permite ver el pase QR. |
 | 4. Administración | Volver al organizador, abrir los inscriptos del evento y registrar la asistencia manualmente. | El asistente pasa a `ASISTIO`. Es una alternativa al escaneo QR para mostrar el circuito sin cámara. |
 | 5. Dashboard | Como organizador, entrar a `/admin/dashboard`. | Estadísticas y gráficos obtenidos de la base local. |
@@ -182,7 +183,7 @@ Estos pasos agregan datos al piloto. Para recuperar los totales originales, el o
 
 ## 8. Qué mostrar: avances de infraestructura
 
-Estos apartados son opcionales y se ejecutan desde **Terminal 1, raíz del backend**, con la API y la base funcionando.
+Estos servicios son opcionales para el arranque básico de la aplicación; las actividades de la consigna siguen requiriendo sus demostraciones. Ejecutar desde **Terminal 1, raíz del backend**, con la API y la base funcionando.
 
 ### A4: base, respaldo y restauración
 
@@ -228,6 +229,8 @@ npm run monitor:validate -- --falla-controlada
 Las alertas se ven en Prometheus, no se envían por correo en esta etapa. El detalle está en [monitoreo.md](monitoreo.md).
 
 ### Alcance de la demostración
+
+El recorrido A/B ejecuta la API y PostgreSQL en Docker y Angular en Node para facilitar el desarrollo. Para acreditar **A7 con ambos componentes contenerizados**, mostrar también la imagen del frontend y su Compose del repositorio frontend; el recorrido A/B por sí solo no demuestra ese punto. La variante de publicación usa `infra/compose.production.yaml` en cada repositorio y requiere la red externa `convoca-publicacion`, una base accesible y variables de producción propias. El Compose de producción del backend no crea ni migra la base.
 
 El circuito local permite mostrar aplicación, base, réplica y monitoreo. HTTPS público requiere el despliegue/túnel de A9; `localhost:4200` solo demuestra ejecución local. Google, correo real, Telegram, Discord y push requieren sus credenciales específicas y no quedan habilitados por este setup.
 

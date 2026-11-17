@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: nextcloud
       POSTGRES_PASSWORD: ${NC_DB_PASSWORD:?Generar configuracion local}
       POSTGRES_INITDB_ARGS: --locale=C --encoding=UTF8
+    # Esta base es exclusiva de Nextcloud y no contiene los datos de Convoca.
     volumes: [db:/var/lib/postgresql/data]
     healthcheck:
       test: [CMD-SHELL, pg_isready -U nextcloud -d nextcloud]
@@ -51,6 +52,7 @@ services:
       start_period: 120s
       retries: 60
     restart: unless-stopped
+  # Procesa tareas de Nextcloud en segundo plano usando su mismo volumen persistente.
   cron:
     image: nextcloud:34.0.6-apache@sha256:25d07d3091844c87c5f812037f5281b5d61fbb47f2c3f125274baabfe6f3ed1b
     entrypoint: /cron.sh

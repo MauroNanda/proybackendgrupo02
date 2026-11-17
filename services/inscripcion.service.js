@@ -23,6 +23,7 @@ class InscripcionService {
    * Registra un usuario a un evento con validación de cupo y lista de espera.
    */
   async inscribirse(usuarioId, eventoId) {
+    // La transacción y el bloqueo del evento mantienen coherente el cupo ante solicitudes simultáneas.
     const { inscripcionFinal, estadoFinal, evento } = await sequelize.transaction(async (t) => {
       const evento = await Evento.findByPk(eventoId, {
         transaction: t,
