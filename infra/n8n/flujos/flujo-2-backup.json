@@ -1,0 +1,550 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a13-backup",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "e97b04fb-e1ed-4d10-9426-0aa96db5d04c",
+      "name": "Disparador: backup",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "fb0e9f99-ca60-493d-ab68-4fc359722260",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "perfil",
+              "value": "invalido",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "280a281f-e2d7-4653-97b4-6fe3084189c4",
+      "name": "Forzar perfil invalido",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5681/backup",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ perfil: $json.perfil || 'piloto' }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 600000
+        }
+      },
+      "id": "82c2f44e-4eee-4648-9b3d-054415809000",
+      "name": "Ejecutar backup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        80
+      ],
+      "retryOnFail": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Puente",
+          "name": "A13 puente local"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-Bac",
+              "leftValue": "={{ $json.ok === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d0123b71-5f05-4063-abd3-1ffeeea0310e",
+      "name": "Backup verificado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        688,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso backup OK",
+        "emailFormat": "text",
+        "text": "={{ '[OK] Backup verificado: ' + $json.copia.archivo + ' | SHA-256 ' + $json.copia.sha256.slice(0, 12) + '... | ' + $json.copia.inscripciones + ' inscripciones | ' + $json.segundos + ' s' }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "3d4754cf-fc12-4169-b3e3-cecef7069e23",
+      "name": "Aviso backup OK",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        0
+      ],
+      "webhookId": "ff8cb9e9-9552-4016-9e58-ae495621c8f4",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso backup ERROR",
+        "emailFormat": "text",
+        "text": "={{ '[ERROR] Backup fallido: ' + String(($json.error && ($json.error.message || $json.error)) || $json.salida || 'sin detalle').slice(0, 500) }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "e247bef8-d0b6-47d2-a161-c212c85b0787",
+      "name": "Aviso backup ERROR",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        176
+      ],
+      "webhookId": "9ffa2a3c-47f0-4fef-9558-63dd8afe8176",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5681/restore-test",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ perfil: 'piloto', aprobado: $json.body?.aprobado === true }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 600000
+        }
+      },
+      "id": "c9b6a950-df11-489b-b3a6-cb0b0de83456",
+      "name": "Restaurar en base temporal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        480
+      ],
+      "retryOnFail": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Puente",
+          "name": "A13 puente local"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c-Res",
+              "leftValue": "={{ $json.ok === true }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "187d73cf-8fc2-4f80-8c1d-6babf6a7cebe",
+      "name": "Restauracion OK?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        688,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso restauracion OK",
+        "emailFormat": "text",
+        "text": "={{ '[OK] Restauracion verificada en base temporal. Copia: ' + $json.restauracion.copia + ' | SHA-256 ' + $json.restauracion.sha256.slice(0, 12) + '... | ' + $json.restauracion.fecha }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "acdb8271-0e4b-4e23-841e-d1f2f5d00742",
+      "name": "Aviso restauracion OK",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        400
+      ],
+      "webhookId": "2a53c74f-fe10-4876-a7ef-ad2d5e9f48d4",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso restauracion ERROR",
+        "emailFormat": "text",
+        "text": "={{ '[ERROR] Restauracion fallida: ' + String(($json.error && ($json.error.message || $json.error)) || $json.salida || 'sin detalle').slice(0, 500) }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "bb227cd7-cecf-402f-a439-44a1aa87abaf",
+      "name": "Aviso restauracion ERROR",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        928,
+        576
+      ],
+      "webhookId": "a49a3e17-f17a-44a8-a196-f7394b43f566",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a13-backup-error",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "6a51c01b-b502-4a6b-8595-867715ca2f28",
+      "name": "Disparador: fallo controlado",
+      "webhookId": "aa72060e-d886-4a78-a799-6697412888cd",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a13-restaurar",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        144,
+        480
+      ],
+      "id": "6aa22d73-bdb4-4804-b40c-8f843a3188eb",
+      "name": "Disparador: restaurar",
+      "webhookId": "341a7187-78df-4155-9d08-7ba8776d146c",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
+    },
+    {
+      "id": "e6765b5d-c536-4d87-b5bf-c57e58fc9b03",
+      "name": "Registrar fallo de aviso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        800
+      ],
+      "parameters": {
+        "jsCode": "return $input.all().map(i=>({json:{estado:'aviso_pendiente',detalle:i.json.error?.message || i.json.message || 'SMTP no disponible',accion:'Revisar esta ejecucion y reenviar el aviso desde n8n. No repetir la operacion critica.'}}));"
+      }
+    }
+  ],
+  "connections": {
+    "Disparador: backup": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Forzar perfil invalido": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ejecutar backup": {
+      "main": [
+        [
+          {
+            "node": "Backup verificado?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso backup ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backup verificado?": {
+      "main": [
+        [
+          {
+            "node": "Aviso backup OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso backup ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restaurar en base temporal": {
+      "main": [
+        [
+          {
+            "node": "Restauracion OK?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso restauracion ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restauracion OK?": {
+      "main": [
+        [
+          {
+            "node": "Aviso restauracion OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aviso restauracion ERROR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador: fallo controlado": {
+      "main": [
+        [
+          {
+            "node": "Forzar perfil invalido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador: restaurar": {
+      "main": [
+        [
+          {
+            "node": "Restaurar en base temporal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso backup OK": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso backup ERROR": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso restauracion OK": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso restauracion ERROR": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "id": "a13Flujo2",
+  "name": "A13 - Flujo 2 - Backup y restauracion controlada",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Jujuy",
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  }
+}

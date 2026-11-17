@@ -30,6 +30,11 @@ Thumbs.db
 desktop.ini
 
 # Coverage / tests
+infra/n8n/.env*
+!infra/n8n/.env.example
+infra/n8n/privado/
+infra/n8n/resultados/
+infra/n8n/informes/
 coverage/
 .nyc_output/
 

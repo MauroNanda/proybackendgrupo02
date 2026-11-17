@@ -1,0 +1,687 @@
+{
+  "name": "A13 - Flujo 1 - Prometheus a Mantis y aviso",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a13-flujo1-prometheus",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "3b525983-b700-46f8-98e8-91d3e8c8ffe5",
+      "name": "Webhook Alertmanager",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "8c452fb3-b450-4735-9d86-e1887d7ffc31",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const output=[];\nfor(const input of $input.all()) {\nconst body = input.json.body ?? input.json;\nconst alerts = Array.isArray(body.alerts) ? body.alerts : [];\nif (!alerts.length || alerts.length > 20) {\n  throw new Error('El webhook no contiene body.alerts. Enviar el payload de Alertmanager.');\n}\noutput.push(...alerts.map((a) => {\n  if (!['firing','resolved'].includes(a.status ?? body.status)) throw new Error('Estado invalido');\nconst labels = a.labels ?? {};\nif (typeof labels.alertname !== 'string' || labels.alertname.length > 100) throw new Error('Alerta invalida');\n  const ann = a.annotations ?? {};\n  const name = labels.alertname ?? 'AlertaPrometheus';\n  const fingerprint = a.fingerprint ?? `${name}:${labels.instance ?? labels.job ?? 'general'}`;\n  if (typeof fingerprint !== 'string' || fingerprint.length > 2000 || ['__proto__','constructor','prototype'].includes(fingerprint)) throw new Error('Fingerprint invalido');\nconst status = (a.status ?? body.status ?? 'firing').toLowerCase();\n  const sev = (labels.severity ?? 'warning').toLowerCase();\n\n  let category = '';\n  if (!category) {\n    if (/cpu|memoria|memory|disco|disk|rendimiento|latencia/i.test(name)) category = 'Rendimiento';\n    else if (/publicacion|proxy|nginx|http/i.test(name)) category = 'Publicacion';\n    else category = 'Disponibilidad';\n  }\n  const priority = category === 'Rendimiento' ? {id: 30, name: 'normal'} : {id: 40, name: 'high'};\n  const summary = (ann.summary ?? `${name} - ${labels.instance ?? labels.job ?? 'Convoca'}`).slice(0, 200);\n  const description = [\n    'Incidencia generada automáticamente desde una alerta de Prometheus (A13 - Flujo 1).',\n    `Alerta: ${name}`,\n    `Estado recibido: ${status}`,\n    `Fingerprint: ${fingerprint}`,\n    `Instancia: ${labels.instance ?? 'No informada'}`,\n    `Job: ${labels.job ?? 'No informado'}`,\n    `Severidad Prometheus: ${sev}`,\n    `Valor: ${a.value ?? 'No informado'}`,\n    `Inicio: ${a.startsAt ?? 'No informado'}`,\n    `Descripción: ${ann.description ?? 'Sin descripción adicional'}`,\n    '',\n    '[PROMETHEUS_FINGERPRINT:' + fingerprint + ']'\n  ].join('\\n');\n  return {\n    json: {\n      status, fingerprint, alertname: name, summary, description,\n      category, priority, handlerName: 'gabriel-calisaya',\n      instance: labels.instance ?? '', severity: sev,\n      startsAt: a.startsAt ?? '', endsAt: a.endsAt ?? '',\n      generatorURL: a.generatorURL ?? '', raw: a\n    }\n  };\n}));\n}\nreturn output;"
+      },
+      "id": "727a313b-e120-4bd6-8778-e0a634c9a137",
+      "name": "Normalizar alertas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "814f1110-d1a6-4214-b021-5df452f2bedb",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "firing",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3f956e4e-ad9f-4cb8-995f-156acda67c08",
+      "name": "¿Alerta activa?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst data = $json;\nconst store = $getWorkflowStaticData('global');\nstore.alerts = store.alerts ?? {};\nconst previous = store.alerts[data.fingerprint];\nif (previous?.issueId) {\n  previous.raw=data.raw;\n  return {json: {...data, duplicate: true, issueId: previous.issueId}};\n}\nconst issue = {\n  summary: `[PROM] ${data.summary}`,\n  description: data.description,\n  project: {id: 1, name: 'Convoca - A11 reproducible'},\n  category: {name: data.category},\n  priority: data.priority,\n  severity: {id: 70, name: 'failure'},\n  reproducibility: {id: 100, name: 'unknown'},\n  handler: {name: data.handlerName},\n  view_state: {id: 50, name: 'private'}\n};\nreturn {json: {...data, duplicate: false, issue}};\n"
+      },
+      "id": "597281e0-7980-440b-b226-a9f56baf851b",
+      "name": "Preparar incidencia y evitar duplicados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "67713e74-a657-47a7-8f63-74cc870811cb",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f896297b-dba0-4f0d-ad8f-a68180a0496e",
+      "name": "¿Ya existe esta incidencia?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mantis/api/rest/issues",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.issue }}",
+        "options": {
+          "timeout": 15000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "a865abcc-268a-4723-819b-cec642772d6c",
+      "name": "Crear incidencia en Mantis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        420
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Mantis",
+          "name": "A13 Mantis proyecto"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst source = $('Preparar incidencia y evitar duplicados').item.json;\nconst response = $json;\nconst issue = response.issue ?? response;\nconst issueId = issue.id ?? response.id;\nif (!issueId) {\n  throw new Error('Mantis respondió, pero no se pudo leer el ID de la incidencia.');\n}\nconst store = $getWorkflowStaticData('global');\nstore.alerts = store.alerts ?? {};\nstore.alerts[source.fingerprint] = {issueId, createdAt: new Date().toISOString(), summary: source.summary, raw: source.raw};\nreturn {json: {...source, issueId, action: 'created'}};\n"
+      },
+      "id": "6d1a4c0b-b1ea-41b4-8c25-a6922e9f333b",
+      "name": "Guardar fingerprint e ID de Mantis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nreturn {json: {...$json, action: 'duplicate'}};\n"
+      },
+      "id": "e01b54ca-374b-4af0-8c6a-0f99ba4cb032",
+      "name": "Preparar aviso de duplicado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst data = $json;\nconst store = $getWorkflowStaticData('global');\nstore.alerts = store.alerts ?? {};\nconst record = store.alerts[data.fingerprint];\nif (!record?.issueId) {\n  return {json: {...data, found: false, action: 'recovery_without_open_issue'}};\n}\nreturn {json: {...data, found: true, issueId: record.issueId, action: 'resolved'}};\n"
+      },
+      "id": "db23b690-f6dd-4f4d-838a-df093e61f63f",
+      "name": "Buscar incidencia para recuperación",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "65bc1892-d772-4ba4-a43a-5a1781c9aba9",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "893e6a8a-3759-4cb2-950c-82177c4c5425",
+      "name": "¿Hay incidencia abierta?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'http://mantis/api/rest/issues/' + $json.issueId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: {id: 80, name: 'resolved'}, resolution: {id: 20, name: 'fixed'} }) }}",
+        "options": {
+          "timeout": 15000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "379ba02e-a868-4da5-b9b5-d0c3838bf843",
+      "name": "Resolver incidencia en Mantis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        700
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Mantis",
+          "name": "A13 Mantis proyecto"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Avisar alerta o duplicado",
+        "emailFormat": "text",
+        "text": "={{ ({content: '🚨 **Convoca | Alerta Prometheus**\\n' + $json.action + ' | ' + $json.alertname + '\\nMantis: #' + ($json.issueId ?? 'verificar') + '\\nResponsable: ' + $json.handlerName + '\\nFingerprint: ' + $json.fingerprint}).content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c390cdb6-c577-4abd-abdf-f6f22d9e1453",
+      "name": "Avisar alerta o duplicado por correo local",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1640,
+        300
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Avisar recuperación",
+        "emailFormat": "text",
+        "text": "={{ ({content: '✅ **Convoca | Recuperación Prometheus**\\n' + $json.alertname + '\\nIncidencia Mantis: #' + $json.issueId + ' marcada como resuelta.\\nFingerprint: ' + $json.fingerprint}).content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "8f26b441-ba83-48c3-8215-d8a359c2a303",
+      "name": "Avisar recuperación por correo local",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1640,
+        700
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Avisar fallo de integración",
+        "emailFormat": "text",
+        "text": "={{ ({content: '⚠️ **Convoca | Fallo del Flujo 1**\\nNo se pudo completar una operación con Mantis. Revisar la ejecución de n8n.\\nAlerta: ' + ($json.alertname ?? 'sin identificar') + '\\nFingerprint: ' + ($json.fingerprint ?? 'sin fingerprint')}).content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "382044b3-2ff4-4b9f-ad3c-1a969148aad0",
+      "name": "Avisar fallo de integración por correo local",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1400,
+        980
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst original = $('Buscar incidencia para recuperación').item.json;\ndelete $getWorkflowStaticData('global').alerts[original.fingerprint];\nreturn {json: {...original, action: 'resolved'}};\n"
+      },
+      "id": "33ee45c8-a8ee-415f-b54e-48228057e39b",
+      "name": "Recuperar contexto de la alerta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        700
+      ]
+    },
+    {
+      "id": "c5944df9-9a6a-4bbe-abb6-8bc8b9875caa",
+      "name": "Consultar Prometheus cada 30 segundos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1000,
+        -250
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "98b26873-9d78-47b7-8e3c-97af2e9ab31d",
+      "name": "Alertas reales de A10",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -780,
+        -250
+      ],
+      "parameters": {
+        "url": "http://host.docker.internal:9090/api/v1/alerts",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "bab1e3d7-56bf-4709-ada0-e425bd59efea",
+      "name": "Detectar altas y recuperaciones",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -550,
+        -250
+      ],
+      "parameters": {
+        "jsCode": "if ($json.status !== 'success' || !Array.isArray($json.data?.alerts)) throw new Error('Prometheus invalido');\nconst store=$getWorkflowStaticData('global'); const antes=store.poll || {}; const ahora={}; const alerts=[];\nfor (const a of $json.data.alerts.filter(a=>a.state==='firing')) { const key=JSON.stringify(Object.entries(a.labels).sort()); const fp=Buffer.from(key).toString('base64url'); ahora[fp]=a; alerts.push({...a,status:'firing',fingerprint:fp}); }\nfor (const [fp,a] of Object.entries(antes)) if (!ahora[fp]) { alerts.push({...a,status:'resolved',fingerprint:fp}); if(store.alerts?.[fp]) ahora[fp]=a; }\nfor (const [fp,r] of Object.entries(store.alerts || {})) if (!ahora[fp] && !antes[fp] && r.raw) alerts.push({...r.raw,status:'resolved',fingerprint:fp});\nstore.poll=ahora; return alerts.map(a=>({json:{body:{alerts:[a]}}}));"
+      }
+    },
+    {
+      "id": "664789d4-05cb-4d26-a216-139878d5703d",
+      "name": "Registrar fallo de aviso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        800
+      ],
+      "parameters": {
+        "jsCode": "return $input.all().map(i=>({json:{estado:'aviso_pendiente',detalle:i.json.error?.message || i.json.message || 'SMTP no disponible',accion:'Revisar esta ejecucion y reenviar el aviso desde n8n. No repetir la operacion critica.'}}));"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Alertmanager": {
+      "main": [
+        [
+          {
+            "node": "Normalizar alertas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar alertas": {
+      "main": [
+        [
+          {
+            "node": "¿Alerta activa?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Alerta activa?": {
+      "main": [
+        [
+          {
+            "node": "Preparar incidencia y evitar duplicados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar incidencia para recuperación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar incidencia y evitar duplicados": {
+      "main": [
+        [
+          {
+            "node": "¿Ya existe esta incidencia?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Ya existe esta incidencia?": {
+      "main": [
+        [
+          {
+            "node": "Preparar aviso de duplicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear incidencia en Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear incidencia en Mantis": {
+      "main": [
+        [
+          {
+            "node": "Guardar fingerprint e ID de Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar fallo de integración por correo local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar fingerprint e ID de Mantis": {
+      "main": [
+        [
+          {
+            "node": "Avisar alerta o duplicado por correo local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar aviso de duplicado": {
+      "main": [
+        []
+      ]
+    },
+    "Buscar incidencia para recuperación": {
+      "main": [
+        [
+          {
+            "node": "¿Hay incidencia abierta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay incidencia abierta?": {
+      "main": [
+        [
+          {
+            "node": "Resolver incidencia en Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Resolver incidencia en Mantis": {
+      "main": [
+        [
+          {
+            "node": "Recuperar contexto de la alerta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar fallo de integración por correo local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recuperar contexto de la alerta": {
+      "main": [
+        [
+          {
+            "node": "Avisar recuperación por correo local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Prometheus cada 30 segundos": {
+      "main": [
+        [
+          {
+            "node": "Alertas reales de A10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alertas reales de A10": {
+      "main": [
+        [
+          {
+            "node": "Detectar altas y recuperaciones",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar fallo de integración por correo local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detectar altas y recuperaciones": {
+      "main": [
+        [
+          {
+            "node": "Normalizar alertas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avisar alerta o duplicado por correo local": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avisar recuperación por correo local": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avisar fallo de integración por correo local": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Jujuy",
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "versionId": "25558934-ce71-470d-b236-fae081278dc2",
+  "tags": [],
+  "id": "a13Flujo1"
+}

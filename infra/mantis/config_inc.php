@@ -13,7 +13,8 @@ $g_enable_email_notification = OFF;
 $g_allow_signup = OFF;
 $g_send_reset_password = OFF;
 $g_anonymous_login = OFF;
-$g_webservice_rest_api_enabled = OFF;
+// A13: REST autenticada por token; Apache solo admite al contenedor n8n.
+$g_webservice_rest_enabled = ON;
 $g_allow_file_upload = OFF;
 $g_show_detailed_errors = OFF;
 $g_show_realname = ON;
