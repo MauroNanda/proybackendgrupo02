@@ -1,0 +1,19 @@
+{
+  "ruta": "a13-backup-error",
+  "id": "48",
+  "estado": "success",
+  "nodos": [
+    "Disparador: fallo controlado",
+    "Forzar perfil invalido",
+    "Ejecutar backup",
+    "Backup verificado?",
+    "Aviso backup ERROR",
+    "Registrar fallo de aviso"
+  ],
+  "resultados": {
+    "Ejecutar backup": {
+      "ok": false,
+      "error": "Perfil no permitido (solo piloto)"
+    }
+  }
+}

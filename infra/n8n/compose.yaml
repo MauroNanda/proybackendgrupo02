@@ -1,28 +1,53 @@
-name: convoca-n8n
+name: convoca-n8n-a13
 
 services:
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:2.44.7
     restart: unless-stopped
     ports:
-      - "127.0.0.1:5678:5678"
+      - "127.0.0.1:5680:5678"
     environment:
       N8N_HOST: localhost
       N8N_PORT: "5678"
       N8N_PROTOCOL: http
-      WEBHOOK_URL: http://localhost:5678/
+      WEBHOOK_URL: http://localhost:5680/
       N8N_SECURE_COOKIE: "false"
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Falta N8N_ENCRYPTION_KEY en infra/n8n/.env}
       GENERIC_TIMEZONE: America/Argentina/Jujuy
       TZ: America/Argentina/Jujuy
       N8N_DIAGNOSTICS_ENABLED: "false"
       N8N_PERSONALIZATION_ENABLED: "false"
-      MANTIS_API_TOKEN: ${MANTIS_API_TOKEN:?Falta MANTIS_API_TOKEN}
-      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL:?Falta DISCORD_WEBHOOK_URL}
+      N8N_CONCURRENCY_PRODUCTION_LIMIT: "1"
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: all
+      EXECUTIONS_DATA_SAVE_ON_ERROR: all
+      EXECUTIONS_DATA_PRUNE: "true"
+      EXECUTIONS_DATA_MAX_AGE: "336"
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./flujos:/exports:ro
+      - ./privado:/privado:ro
+    networks:
+      default: {}
+      integracion:
+        ipv4_address: 192.168.241.10
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  correo:
+    image: axllent/mailpit:v1.32.0
+    restart: unless-stopped
+    ports: ["127.0.0.1:8028:8025"]
+    environment:
+      MP_DATABASE: /data/mailpit.db
+    volumes: [correo_data:/data]
+
 volumes:
   n8n_data:
+  correo_data:
+
+networks:
+  integracion:
+    name: convoca-a13-interna
+    ipam:
+      config:
+        - subnet: 192.168.241.0/24

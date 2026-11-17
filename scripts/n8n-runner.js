@@ -12,14 +12,15 @@ const dotenv = require('dotenv');
 const root = path.resolve(__dirname, '..');
 const envFile = path.join(root, 'infra', 'n8n', '.env');
 const env = fs.existsSync(envFile) ? dotenv.parse(fs.readFileSync(envFile)) : {};
+const labRoot = path.resolve(process.env.N8N_LAB_ROOT || env.N8N_LAB_ROOT || root);
 const TOKEN = process.env.N8N_RUNNER_TOKEN || env.N8N_RUNNER_TOKEN || '';
-const PORT = Number(process.env.N8N_RUNNER_PORT || 5679);
+const PORT = Number(process.env.N8N_RUNNER_PORT || env.N8N_RUNNER_PORT || 5681);
 const HOST = process.env.N8N_RUNNER_HOST || '127.0.0.1';
 const PERFILES = ['piloto'];
 const OPERACIONES = ['backup', 'restore-test', 'informe'];
 const informes = path.join(root, 'infra', 'n8n', 'informes');
-const PROM_URL = process.env.N8N_PROMETHEUS_URL || 'http://host.docker.internal:9090';
-const backups = path.join(root, 'infra', 'hia', 'backups');
+const PROM_URL = process.env.N8N_PROMETHEUS_URL || env.N8N_PROMETHEUS_URL || 'http://host.docker.internal:9090';
+const backups = path.join(labRoot, 'infra', 'hia', 'backups');
 const registro = path.join(root, 'infra', 'n8n', 'runner.log');
 let ocupado = false;
 
@@ -33,7 +34,7 @@ function responder(res, status, body) {
   res.end(JSON.stringify(body));
 }
 function anotar(entrada) {
-  try { fs.appendFileSync(registro, JSON.stringify({ fecha: new Date().toISOString(), ...entrada }) + '\n'); } catch { /* sin registro */ }
+  fs.appendFileSync(registro, JSON.stringify({ fecha: new Date().toISOString(), ...entrada }) + '\n');
 }
 function autorizado(req) {
   const m = /^Bearer (.+)$/.exec(req.headers.authorization || '');
@@ -57,7 +58,7 @@ function leerJson(req) {
 }
 function ejecutar(operacion, perfil) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, ['infra/hia/lab.js', operacion, '--perfil', perfil], { cwd: root, windowsHide: true });
+    const child = spawn(process.execPath, ['infra/hia/lab.js', operacion, '--perfil', perfil], { cwd: labRoot, windowsHide: true });
     let out = '';
     let err = '';
     const limite = setTimeout(() => child.kill(), 10 * 60 * 1000);
@@ -71,6 +72,7 @@ function ejecutarInforme(simular) {
   // Python corre en un contenedor descartable: sin red de la base, scripts de solo lectura.
   fs.mkdirSync(informes, { recursive: true });
   const args = ['run', '--rm',
+    '--read-only', '--cap-drop=ALL', '--security-opt=no-new-privileges', '--pids-limit=64', '--memory=128m', '--cpus=0.5',
     '--mount', 'type=bind,source=' + path.join(root, 'scripts') + ',target=/app,readonly',
     '--mount', 'type=bind,source=' + informes + ',target=/out',
     'python:3.12-alpine', 'python', '/app/informe_metricas.py', '--prom', PROM_URL, '--out', '/out'];
@@ -94,7 +96,7 @@ function ejecutarInforme(simular) {
 function verificarCopia(salida) {
   const m = /Copia: (infra\/hia\/backups\/[A-Za-z0-9_.-]+\.dump)/.exec(salida);
   if (!m) return { verificada: false, motivo: 'No se encontró la copia en la salida' };
-  const dump = path.join(root, m[1]);
+  const dump = path.join(labRoot, m[1]);
   const base = dump.slice(0, -5);
   const archivo = path.basename(dump);
   if (!fs.existsSync(dump) || !fs.existsSync(base + '.sha256') || !fs.existsSync(base + '.json')) {
@@ -126,6 +128,7 @@ const server = http.createServer(async (req, res) => {
     const operacion = ruta.slice(1);
     if (req.method !== 'POST' || !OPERACIONES.includes(operacion)) return responder(res, 404, { ok: false, error: 'Operación no permitida' });
     const cuerpo = await leerJson(req);
+    if (!cuerpo || typeof cuerpo !== 'object' || Array.isArray(cuerpo)) return responder(res, 400, { ok: false, error: 'Se requiere un objeto JSON' });
     if (operacion === 'informe') {
       const simular = cuerpo.simular || '';
       const carpeta = String(cuerpo.carpeta || '');
@@ -163,7 +166,8 @@ const server = http.createServer(async (req, res) => {
         resultado = { ok: r.code === 0 && copia.verificada, operacion, perfil, codigo: r.code, copia, salida: cola };
       } else {
         const restauracion = ultimaRestauracion();
-        resultado = { ok: r.code === 0 && /Restauración OK/.test(r.out), operacion, perfil, codigo: r.code, restauracion, salida: cola };
+        const reciente = restauracion && Date.parse(restauracion.fecha) >= inicio;
+        resultado = { ok: r.code === 0 && reciente && /Restauración OK/.test(r.out), operacion, perfil, codigo: r.code, restauracion, salida: cola };
       }
       resultado.segundos = (Date.now() - inicio) / 1000;
       anotar({ evento: 'ejecucion', operacion, perfil, ok: resultado.ok, codigo: r.code, segundos: resultado.segundos });

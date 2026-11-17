@@ -2,55 +2,76 @@
   "name": "A13 - Flujo 3 - Metricas, informe y Nextcloud",
   "nodes": [
     {
-      "parameters": {},
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a13-informe",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
       "id": "a13f3-0001",
       "name": "Disparador: informe",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
       "position": [
         0,
         0
-      ]
+      ],
+      "webhookId": "8c8ba885-20d3-4dac-9d17-7e221bfefffb",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
     },
     {
       "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "days",
-              "daysInterval": 1
-            }
-          ]
-        }
+        "httpMethod": "POST",
+        "path": "a13-informe-incompleto",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
       },
       "id": "a13f3-0002",
       "name": "Disparador: datos incompletos",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
       "position": [
         0,
         220
-      ]
+      ],
+      "webhookId": "16ebd364-11c0-42d2-9acb-d18d6da530d1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
     },
     {
       "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "days",
-              "daysInterval": 1
-            }
-          ]
-        }
+        "httpMethod": "POST",
+        "path": "a13-informe-almacenamiento-error",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
       },
       "id": "a13f3-0003",
       "name": "Disparador: fallo de almacenamiento",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
       "position": [
         0,
         440
-      ]
+      ],
+      "webhookId": "b555f349-69e7-4e47-9651-32c61f128ed9",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
     },
     {
       "parameters": {
@@ -142,7 +163,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:5679/informe",
+        "url": "http://host.docker.internal:5681/informe",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -167,11 +188,11 @@
       ],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "0",
-          "name": "Puente local"
+          "id": "a13Puente",
+          "name": "A13 puente local"
         }
       },
-      "onError": "continueRegularOutput",
+      "onError": "continueErrorOutput",
       "retryOnFail": false
     },
     {
@@ -210,26 +231,33 @@
     },
     {
       "parameters": {
-        "authentication": "webhook",
-        "resource": "message",
-        "operation": "sendLegacy",
-        "content": "={{ '[ERROR] Informe de metricas no generado: ' + String(($json.error && ($json.error.message || $json.error)) || 'sin detalle').slice(0, 400) }}",
-        "options": {}
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso informe ERROR",
+        "emailFormat": "text",
+        "text": "={{ '[ERROR] Informe de metricas no generado: ' + String(($json.error && ($json.error.message || $json.error)) || 'sin detalle').slice(0, 400) }}",
+        "options": {
+          "appendAttribution": false
+        }
       },
       "id": "a13f3-0009",
       "name": "Aviso informe ERROR",
-      "type": "n8n-nodes-base.discord",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
         940,
         340
       ],
       "credentials": {
-        "discordWebhookApi": {
-          "id": "0",
-          "name": "Aviso Discord"
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
         }
-      }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
@@ -270,11 +298,11 @@
       ],
       "credentials": {
         "httpBasicAuth": {
-          "id": "0",
-          "name": "Nextcloud usuario4"
+          "id": "a13Nextcloud",
+          "name": "A13 Nextcloud usuario4"
         }
       },
-      "onError": "continueRegularOutput",
+      "onError": "continueErrorOutput",
       "retryOnFail": false
     },
     {
@@ -313,48 +341,75 @@
     },
     {
       "parameters": {
-        "authentication": "webhook",
-        "resource": "message",
-        "operation": "sendLegacy",
-        "content": "={{ '[OK] Informe guardado en Nextcloud (' + $('Generar informe (Python)').item.json.carpeta + '/' + $('Generar informe (Python)').item.json.archivo + ') | estado: ' + $('Generar informe (Python)').item.json.estado + ' | destinos: ' + $('Generar informe (Python)').item.json.destinos }}",
-        "options": {}
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso informe OK",
+        "emailFormat": "text",
+        "text": "={{ '[OK] Informe guardado en Nextcloud (' + $('Generar informe (Python)').item.json.carpeta + '/' + $('Generar informe (Python)').item.json.archivo + ') | estado: ' + $('Generar informe (Python)').item.json.estado + ' | destinos: ' + $('Generar informe (Python)').item.json.destinos }}",
+        "options": {
+          "appendAttribution": false
+        }
       },
       "id": "a13f3-0012",
       "name": "Aviso informe OK",
-      "type": "n8n-nodes-base.discord",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
         1420,
         20
       ],
       "credentials": {
-        "discordWebhookApi": {
-          "id": "0",
-          "name": "Aviso Discord"
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
         }
-      }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
     },
     {
       "parameters": {
-        "authentication": "webhook",
-        "resource": "message",
-        "operation": "sendLegacy",
-        "content": "={{ '[ERROR] No se pudo guardar el informe en Nextcloud (HTTP ' + ($json.statusCode || 'sin respuesta') + '). Carpeta: ' + $('Generar informe (Python)').item.json.carpeta }}",
-        "options": {}
+        "fromEmail": "automatizacion@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A13 - Aviso almacenamiento ERROR",
+        "emailFormat": "text",
+        "text": "={{ '[ERROR] No se pudo guardar el informe en Nextcloud (HTTP ' + ($json.statusCode || 'sin respuesta') + '). Carpeta: ' + $('Generar informe (Python)').item.json.carpeta }}",
+        "options": {
+          "appendAttribution": false
+        }
       },
       "id": "a13f3-0013",
       "name": "Aviso almacenamiento ERROR",
-      "type": "n8n-nodes-base.discord",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
       "position": [
         1420,
         180
       ],
       "credentials": {
-        "discordWebhookApi": {
-          "id": "0",
-          "name": "Aviso Discord"
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
         }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "f06b578c-a208-482f-aebf-43502af82b2f",
+      "name": "Registrar fallo de aviso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        800
+      ],
+      "parameters": {
+        "jsCode": "return $input.all().map(i=>({json:{estado:'aviso_pendiente',detalle:i.json.error?.message || i.json.message || 'SMTP no disponible',accion:'Revisar esta ejecucion y reenviar el aviso desde n8n. No repetir la operacion critica.'}}));"
       }
     }
   ],
@@ -433,6 +488,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Aviso informe ERROR",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -462,6 +524,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Aviso almacenamiento ERROR",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -482,11 +551,51 @@
           }
         ]
       ]
+    },
+    "Aviso informe ERROR": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso informe OK": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aviso almacenamiento ERROR": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar fallo de aviso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "pinData": {},
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Jujuy",
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
   },
-  "active": false
+  "active": false,
+  "id": "a13Flujo3"
 }

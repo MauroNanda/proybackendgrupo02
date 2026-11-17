@@ -1,0 +1,15 @@
+{
+  "ruta": "a13-flujo1-prometheus",
+  "id": "46",
+  "estado": "success",
+  "nodos": [
+    "Webhook Alertmanager",
+    "Normalizar alertas",
+    "¿Alerta activa?",
+    "Preparar incidencia y evitar duplicados",
+    "¿Ya existe esta incidencia?",
+    "Crear incidencia en Mantis",
+    "Avisar fallo de integración por correo local"
+  ],
+  "resultados": {}
+}

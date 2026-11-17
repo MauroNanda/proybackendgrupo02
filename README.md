@@ -28,6 +28,8 @@ El [estado técnico de HIA](docs/ESTADO_HIA.md) distingue implementación, evide
 
 **Gestión documental (HIA A12):** [Nextcloud: arranque, cuentas, permisos y respaldo](docs/nextcloud-a12.md). Es un laboratorio Docker independiente; no requiere iniciar la API ni el frontend.
 
+**Automatizaciones (HIA A13):** [Preparar, ejecutar y comprobar los tres flujos de n8n](docs/AUTOMATIZACIONES_A13.md). Reutiliza A4/A10/A11/A12, con avisos en una bandeja local y restauración temporal aprobada por el operador.
+
 **Para el equipo de HIA:** seguir [Levantar el proyecto y mostrar los avances](docs/GUIA_DEMOSTRACION.md). Centraliza el setup local de ambos repositorios, las cuentas del piloto y el recorrido de demostración de aplicación e infraestructura.
 
 Requisitos: Node.js y una base de datos PostgreSQL (por ejemplo, en Neon).

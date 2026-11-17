@@ -6,6 +6,7 @@ Codigos de salida: 0 informe generado; 2 datos incompletos (no se genera informe
 """
 import argparse
 import json
+import math
 import sys
 import urllib.parse
 import urllib.request
@@ -60,7 +61,10 @@ def main():
         print(json.dumps({"ok": False, "error": "Datos incompletos: sin datos para " + ", ".join(faltantes)}))
         return 2
 
-    destinos = {r["metric"].get("job", "?"): float(r["value"][1]) for r in crudo["destinos_up"]}
+    if any(not math.isfinite(float(r["value"][1])) for values in crudo.values() for r in values):
+        print(json.dumps({"ok": False, "error": "Datos no finitos en Prometheus"}))
+        return 2
+    destinos = {r["metric"].get("job", "?") + " / " + r["metric"].get("instance", "?"): float(r["value"][1]) for r in crudo["destinos_up"]}
     caidos = sorted(j for j, v in destinos.items() if v < 1)
     api = valor(crudo["api_disponible"])
     pg = valor(crudo["postgres_up"])

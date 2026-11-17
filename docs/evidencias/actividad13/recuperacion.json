@@ -1,0 +1,19 @@
+{
+  "id": "45",
+  "status": "success",
+  "nodos": [
+    "Consultar Prometheus cada 30 segundos",
+    "Alertas reales de A10",
+    "Detectar altas y recuperaciones",
+    "Normalizar alertas",
+    "¿Alerta activa?",
+    "Preparar incidencia y evitar duplicados",
+    "¿Ya existe esta incidencia?",
+    "Preparar aviso de duplicado",
+    "Buscar incidencia para recuperación",
+    "¿Hay incidencia abierta?",
+    "Resolver incidencia en Mantis",
+    "Recuperar contexto de la alerta",
+    "Avisar recuperación por correo local"
+  ]
+}

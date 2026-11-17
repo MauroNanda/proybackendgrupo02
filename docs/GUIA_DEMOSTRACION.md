@@ -257,6 +257,10 @@ node scripts/nextcloud.js validate
 
 Abrir **http://localhost:8082** con la cuenta individual indicada en [Nextcloud A12](nextcloud-a12.md). Mostrar Trabajo (edición), Entregas (lectura), documentos reales y versiones. El instructivo también explica cómo respaldar/restaurar y habilitar la instancia compartida por HTTPS. No necesita la API, el frontend ni la base de Convoca.
 
+### Automatizaciones A13
+
+Con A4/A10/A11/A12 disponibles, seguir [Automatizaciones A13](AUTOMATIZACIONES_A13.md). El instructivo distingue la preparación inicial del arranque habitual e incluye los tres flujos, sus pruebas y fallos controlados. n8n abre en **http://localhost:5680** y la bandeja local en **http://localhost:8028**. Se usa el piloto; no repetir la carga masiva.
+
 ## 9. Detener el proyecto
 
 En la **Terminal 2 del frontend**: pulsar **Ctrl+C**. Después, en la **Terminal 1, dentro del backend**, detener API, base y pgAdmin conservando datos:

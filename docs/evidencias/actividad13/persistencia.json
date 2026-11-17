@@ -1,0 +1,36 @@
+{
+  "fecha": "2026-11-17T19:05:00.573Z",
+  "estadoPersistente": true,
+  "entradaAdministrativa": true,
+  "informeTrasReinicio": {
+    "ruta": "a13-informe",
+    "id": "69",
+    "estado": "success",
+    "nodos": [
+      "Disparador: informe",
+      "Parametros normales",
+      "Generar informe (Python)",
+      "Informe generado?",
+      "Subir a Nextcloud",
+      "Guardado en Nextcloud?",
+      "Aviso informe OK"
+    ],
+    "resultados": {
+      "Generar informe (Python)": {
+        "ok": true,
+        "codigo": 0,
+        "archivo": "informe-metricas-20261117-190458.md"
+      },
+      "Subir a Nextcloud": {
+        "statusCode": 201
+      },
+      "Guardado en Nextcloud?": {
+        "statusCode": 201
+      }
+    }
+  },
+  "restExterna": 403,
+  "adminExterno": 403,
+  "restInternaSinToken": 401,
+  "bandejaConservada": true
+}

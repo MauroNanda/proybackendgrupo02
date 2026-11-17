@@ -32,7 +32,7 @@ El recorrido sencillo combina API/base en Docker y frontend en Node. Para acredi
 | 10. Monitoreo | Exportadores, dashboard, alertas y evidencia versionada. | Métricas agregadas no equivalen al registro de cada SQL. |
 | 11. Incidencias | Mantis reproducible y diez casos retrospectivos con evidencias. | Importarlos no vuelve a ejecutar diez fallas; su API externa está bloqueada. |
 | 12. Documentos | Nextcloud, permisos, versiones, respaldo y acceso remoto comprobados previamente. | Cuentas simplificadas/política de laboratorio requieren revisión de seguridad; no incluir claves en documentación pública. |
-| 13. n8n | Propuesta detallada en la guía y tarjeta #37. | Sin despliegue ni flujos de Convoca en los develop revisados; pendiente. |
+| 13. n8n | Tres flujos Docker validados el 17/11: Prometheus/Mantis, backup/restauración e informe Python/Nextcloud. | Avisos en Mailpit local, no correo externo. Instructivo y evidencia en `AUTOMATIZACIONES_A13.md` y `evidencias/actividad13`. |
 | 14. Seguridad | Controles de aplicación/configuración y regresiones parciales. | Faltan matriz, escaneos/correcciones, respuesta y flujo de incidentes integrado. |
 | 15. Entrega | Manuales, informe parcial y esta guía de defensa. | A13–A15 del informe siguen sin desarrollo; falta cierre y ensayo grupal. |
 
@@ -53,7 +53,7 @@ Los checksums y capturas históricos permanecen asociados a sus ensayos original
 ## Prioridades para la presentación
 
 1. Completar o respaldar CD/rollback de A8 y delimitar la interpretación del volumen de A4.
-2. Implementar A13 con A4/A10/A11/A12; preparar acceso interno autenticado a Mantis.
+2. Conservar el entorno A13 y ensayar sus tres flujos con el instructivo de automatizaciones; su validación integrada se documenta aparte de esta revisión histórica.
 3. Completar A14, incluido el riesgo de los accesos de laboratorio y las automatizaciones.
 4. Integrar las dos propuestas restantes de A5 cuando se tome esa tarea; no mezclarlas en este PR documental.
 5. Completar A15: ensayo reproducible en otro equipo, acceso externo vigente y reparto de la defensa de aproximadamente veinte minutos.
