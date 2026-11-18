@@ -1,0 +1,15 @@
+{
+  "origen": "backup y restore-test reales del piloto aislado",
+  "resultado": {
+    "sha256": "568f4d2b8a93deb48038dbb1fc0e9dca4b9383e5a9c524cd501e582ea63d14a7",
+    "fecha": "2026-11-18T04:02:37.856Z",
+    "resultado": "OK",
+    "evidencia": "2026-11-18T04-02-35-031Z-restore-test-piloto"
+  },
+  "conteos": {
+    "Usuarios": 1000,
+    "Eventos": 100,
+    "Inscripciones": 10000
+  },
+  "baseOriginalReemplazada": false
+}

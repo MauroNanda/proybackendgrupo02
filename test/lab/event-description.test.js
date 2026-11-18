@@ -2,6 +2,9 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+// El modelo se importa, pero su persistencia se sustituye debajo: no usar una base real.
+process.env.DATABASE_URL ||= 'postgres://validation:example@127.0.0.1/convoca_ci';
+process.env.DB_SSL = 'false';
 const { Evento } = require('../../models');
 const eventoService = require('../../services/evento.service');
 

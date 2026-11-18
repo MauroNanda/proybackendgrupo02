@@ -1,0 +1,6 @@
+# Solo laboratorio: ventana corta para demostrar 429 y recuperacion sin esperar 5 minutos.
+services:
+  api:
+    environment:
+      API_RATE_MAX: '50'
+      API_RATE_WINDOW_MS: '10000'

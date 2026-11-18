@@ -8,6 +8,10 @@ const sequelize = require('./config/db');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler.middleware');
 const sanitize = require('./middlewares/sanitize.middleware');
+const originGuard = require('./middlewares/origin.middleware');
+const { securityDetector } = require('./middlewares/security-detector.middleware');
+const { apiLimiter } = require('./middlewares/rate-limit.middleware');
+const { trustedProxy, validateSecurityEnv, forwardedHeaders } = require('./config/security');
 const registrarIntegraciones = require('./integrations/register');
 const recordatoriosJob = require('./jobs/recordatorios.job');
 
@@ -15,19 +19,20 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:4200';
 
-// Render (y otros PaaS) terminan TLS y envían X-Forwarded-For; express-rate-limit
-// lo requiere para identificar IPs correctamente.
-app.set('trust proxy', 1);
+app.set('trust proxy', trustedProxy());
 
 // ===== Middlewares base =====
+app.use(forwardedHeaders);
 app.use(helmet());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(originGuard);
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+app.use(securityDetector);
 app.use(sanitize);
 
 // ===== Rutas =====
-app.use('/api', routes);
+app.use('/api', apiLimiter, routes);
 
 // ===== 404 =====
 app.use((_req, res) => {
@@ -39,12 +44,7 @@ app.use(errorHandler);
 
 // ===== Validación de variables de entorno requeridas =====
 function validarEnv() {
-  // DATABASE_URL siempre es obligatoria. JWT_SECRET solo es obligatoria en
-  // producción; en desarrollo hay un secreto de respaldo (ver jwt.util.js).
-  const requeridas = ['DATABASE_URL'];
-  if (process.env.NODE_ENV === 'production') {
-    requeridas.push('JWT_SECRET');
-  }
+  const requeridas = ['DATABASE_URL', 'JWT_SECRET'];
   const faltantes = requeridas.filter((clave) => !process.env[clave]);
   if (faltantes.length > 0) {
     throw new Error(
@@ -52,6 +52,8 @@ function validarEnv() {
       'Definilas en el archivo .env (ver .env.example).'
     );
   }
+
+  validateSecurityEnv();
 }
 
 // ===== Arranque del servidor =====
@@ -60,13 +62,9 @@ async function start() {
     validarEnv();
 
     await sequelize.authenticate();
-    console.log('[DB] Conexión con Neon.tech establecida.');
+    console.log('[DB] Conexión con PostgreSQL establecida.');
 
-    // Conectar integraciones externas a los hooks antes de aceptar tráfico
-    // (Telegram + Discord). Ver integrations/register.js.
     registrarIntegraciones();
-
-    // Job de recordatorios 24h antes de cada evento (requiere DB conectada).
     recordatoriosJob.iniciar();
 
     app.listen(PORT, () => {
@@ -79,6 +77,6 @@ async function start() {
   }
 }
 
-start();
+if (require.main === module) start();
 
 module.exports = app;

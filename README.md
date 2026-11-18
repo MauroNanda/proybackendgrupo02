@@ -116,3 +116,5 @@ Toda la documentación del proyecto vive en la carpeta [`docs/`](./docs) de este
 |---|---|
 | Backend (este) | https://github.com/MauroNanda/proybackendgrupo02 |
 | Frontend | https://github.com/MauroNanda/proyfrontendgrupo02 |
+
+**Seguridad (HIA A14):** [controles, matriz, pruebas y respuesta a incidentes](docs/SEGURIDAD_A14.md). Incluye el flujo autenticado a Mantis/Mailpit y la instalacion verificada de dependencias del frontend.

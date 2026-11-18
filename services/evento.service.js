@@ -4,27 +4,49 @@ const HttpError = require('../utils/http-error');
 const eventosHooks = require('../integrations/eventos.hooks');
 const notificaciones = require('../integrations/notificaciones');
 
+const CAMPOS_EVENTO_PERMITIDOS = [
+  'titulo',
+  'descripcion',
+  'fecha',
+  'ubicacion',
+  'cupo_maximo',
+  'estado',
+];
+
+function escaparLike(texto) {
+  return String(texto).replace(/[\\%_]/g, '\\$&');
+}
+
 class EventoService {
+  _filtrarCamposEvento(datos = {}) {
+    const filtrado = {};
+    for (const campo of CAMPOS_EVENTO_PERMITIDOS) {
+      if (Object.prototype.hasOwnProperty.call(datos, campo) && datos[campo] !== undefined) {
+        filtrado[campo] = datos[campo];
+      }
+    }
+    return filtrado;
+  }
+
   async listar(categoria, todos = false, search = '') {
     const where = {};
-    const { Op } = require('sequelize');
 
     if (!todos) {
       where.estado = {
         [Op.in]: ['PUBLICADO', 'CANCELADO'],
       };
-      // Catálogo público: no listar eventos que ya ocurrieron (no se puede
-      // hacer nada con ellos). Los que aún no pasaron se muestran aunque el
-      // cupo esté lleno, porque el usuario puede sumarse a la lista de espera.
       where.fecha = {
         [Op.gte]: new Date(),
       };
     }
 
     if (search) {
-      where.titulo = {
-        [Op.iLike]: `%${search}%`,
-      };
+      const termino = escaparLike(search.trim());
+      if (termino) {
+        where.titulo = {
+          [Op.iLike]: `%${termino}%`,
+        };
+      }
     }
 
     const include = [
@@ -38,7 +60,7 @@ class EventoService {
         as: 'inscripciones',
         attributes: ['id', 'estado'],
         required: false,
-        separate: true, // <--- OPTIMIZACIÓN CASO 07: Separa la consulta para evitar JOIN masivo
+        separate: true,
       },
     ];
 
@@ -65,148 +87,138 @@ class EventoService {
     });
   }
 
-
-
-
-// Recupera un evento con sus categorías (usado para responder y para notificar).
-async _conCategorias(id) {
-  return await Evento.findByPk(id, {
-    include: [{ model: Categoria, as: 'categorias', through: { attributes: [] } }],
-  });
-}
-
-async crear(datos) {
-  const { categorias, ...datosEvento } = datos;
-  datosEvento.descripcion = datosEvento.descripcion ?? '';
-
-  const evento = await Evento.create(datosEvento);
-
-  if (categorias && categorias.length > 0) {
-    await evento.setCategorias(categorias);
-  }
-
-  const eventoCompleto = await this._conCategorias(evento.id);
-
-  // Si nace publicado, difundirlo (Telegram, etc.). El hook aísla errores.
-  if (eventoCompleto.estado === 'PUBLICADO') {
-    await eventosHooks.alPublicarEvento(eventoCompleto);
-  }
-
-  return eventoCompleto;
-}
-
-async actualizar(id, datos) {
-  const { categorias, ...datosEvento } = datos;
-
-  const evento = await Evento.findByPk(id);
-
-  if (!evento) {
-    throw new HttpError('Evento no encontrado', 404);
-  }
-
-  if (datosEvento.cupo_maximo !== undefined) {
-    const countActive = await Inscripcion.count({
-      where: {
-        eventoId: id,
-        estado: { [Op.in]: ['CONFIRMADO', 'ASISTIO'] }
-      }
+  async _conCategorias(id) {
+    return await Evento.findByPk(id, {
+      include: [{ model: Categoria, as: 'categorias', through: { attributes: [] } }],
     });
-    if (datosEvento.cupo_maximo < countActive) {
-      throw new HttpError(`No se puede reducir el cupo a ${datosEvento.cupo_maximo} porque ya existen ${countActive} inscripciones confirmadas/asistidas`, 400);
+  }
+
+  async crear(datos) {
+    const { categorias } = datos;
+    const datosEvento = this._filtrarCamposEvento(datos);
+    datosEvento.descripcion = datosEvento.descripcion ?? '';
+
+    const evento = await Evento.create(datosEvento);
+
+    if (categorias && categorias.length > 0) {
+      await evento.setCategorias(categorias);
     }
-  }
 
-  const estadoAnterior = evento.estado;
-  // Snapshot de campos operativos para detectar cambios que hay que avisar.
-  const fechaAnterior = evento.fecha;
-  const ubicacionAnterior = evento.ubicacion;
+    const eventoCompleto = await this._conCategorias(evento.id);
 
-  await evento.update(datosEvento);
-
-  if (categorias) {
-    await evento.setCategorias(categorias);
-  }
-
-  const seCancela = evento.estado === 'CANCELADO' && estadoAnterior !== 'CANCELADO';
-
-  // Al cancelar: capturar los inscriptos activos ANTES de darlos de baja (después
-  // del bulk update quedan en CANCELADO, indistinguibles) para poder notificarles.
-  let afectadosCancelacion = [];
-  if (seCancela) {
-    afectadosCancelacion = await Inscripcion.findAll({
-      where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] },
-      include: [{ model: Usuario, as: 'usuario', attributes: ['id', 'nombre', 'email'] }],
-    });
-    await Inscripcion.update(
-      { estado: 'CANCELADO' },
-      { where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] } }
-    );
-  }
-
-  // Detectar cambios operativos (fecha/lugar) en un evento que sigue PUBLICADO.
-  // Solo sobre eventos ya publicados: editar un BORRADOR no le importa a nadie,
-  // y una transición de estado se maneja por los hooks/cancelación de arriba.
-  const cambios = {};
-  if (evento.estado === 'PUBLICADO' && estadoAnterior === 'PUBLICADO') {
-    if (fechaAnterior && evento.fecha &&
-        new Date(fechaAnterior).getTime() !== new Date(evento.fecha).getTime()) {
-      cambios.fecha = true;
+    if (eventoCompleto.estado === 'PUBLICADO') {
+      await eventosHooks.alPublicarEvento(eventoCompleto);
     }
-    if (ubicacionAnterior !== evento.ubicacion) {
-      cambios.ubicacion = true;
+
+    return eventoCompleto;
+  }
+
+  async actualizar(id, datos) {
+    const { categorias } = datos;
+    const datosEvento = this._filtrarCamposEvento(datos);
+
+    const evento = await Evento.findByPk(id);
+
+    if (!evento) {
+      throw new HttpError('Evento no encontrado', 404);
     }
-  }
 
-  const eventoCompleto = await this._conCategorias(id);
-
-  // Difusión a nivel grupo (Telegram/Discord) solo en la transición de estado.
-  if (evento.estado === 'PUBLICADO' && estadoAnterior !== 'PUBLICADO') {
-    await eventosHooks.alPublicarEvento(eventoCompleto);
-  } else if (seCancela) {
-    await eventosHooks.alCancelarEvento(eventoCompleto);
-  }
-
-  // Notificaciones personales a los inscriptos (aisladas: un fallo de un canal
-  // o de un usuario no rompe la edición del evento).
-  if (afectadosCancelacion.length > 0) {
-    for (const insc of afectadosCancelacion) {
-      if (!insc.usuario) continue;
-      try {
-        await notificaciones.eventoCancelado(insc.usuario, eventoCompleto);
-      } catch (err) {
-        console.error('[evento] notificar cancelación:', err.message);
+    if (datosEvento.cupo_maximo !== undefined) {
+      const countActive = await Inscripcion.count({
+        where: {
+          eventoId: id,
+          estado: { [Op.in]: ['CONFIRMADO', 'ASISTIO'] },
+        },
+      });
+      if (datosEvento.cupo_maximo < countActive) {
+        throw new HttpError(
+          `No se puede reducir el cupo a ${datosEvento.cupo_maximo} porque ya existen ${countActive} inscripciones confirmadas/asistidas`,
+          400
+        );
       }
     }
-  } else if (Object.keys(cambios).length > 0) {
-    const inscriptos = await Inscripcion.findAll({
-      where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] },
-      include: [{ model: Usuario, as: 'usuario', attributes: ['id', 'nombre', 'email'] }],
-    });
-    for (const insc of inscriptos) {
-      if (!insc.usuario) continue;
-      try {
-        await notificaciones.eventoModificado(insc.usuario, eventoCompleto, cambios);
-      } catch (err) {
-        console.error('[evento] notificar modificación:', err.message);
+
+    const estadoAnterior = evento.estado;
+    const fechaAnterior = evento.fecha;
+    const ubicacionAnterior = evento.ubicacion;
+
+    await evento.update(datosEvento);
+
+    if (categorias) {
+      await evento.setCategorias(categorias);
+    }
+
+    const seCancela = evento.estado === 'CANCELADO' && estadoAnterior !== 'CANCELADO';
+
+    let afectadosCancelacion = [];
+    if (seCancela) {
+      afectadosCancelacion = await Inscripcion.findAll({
+        where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] },
+        include: [{ model: Usuario, as: 'usuario', attributes: ['id', 'nombre', 'email'] }],
+      });
+      await Inscripcion.update(
+        { estado: 'CANCELADO' },
+        { where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] } }
+      );
+    }
+
+    const cambios = {};
+    if (evento.estado === 'PUBLICADO' && estadoAnterior === 'PUBLICADO') {
+      if (
+        fechaAnterior &&
+        evento.fecha &&
+        new Date(fechaAnterior).getTime() !== new Date(evento.fecha).getTime()
+      ) {
+        cambios.fecha = true;
+      }
+      if (ubicacionAnterior !== evento.ubicacion) {
+        cambios.ubicacion = true;
       }
     }
-  }
 
-  return eventoCompleto;
-}
+    const eventoCompleto = await this._conCategorias(id);
+
+    if (evento.estado === 'PUBLICADO' && estadoAnterior !== 'PUBLICADO') {
+      await eventosHooks.alPublicarEvento(eventoCompleto);
+    } else if (seCancela) {
+      await eventosHooks.alCancelarEvento(eventoCompleto);
+    }
+
+    if (afectadosCancelacion.length > 0) {
+      for (const insc of afectadosCancelacion) {
+        if (!insc.usuario) continue;
+        try {
+          await notificaciones.eventoCancelado(insc.usuario, eventoCompleto);
+        } catch (err) {
+          console.error('[evento] notificar cancelación:', err.message);
+        }
+      }
+    } else if (Object.keys(cambios).length > 0) {
+      const inscriptos = await Inscripcion.findAll({
+        where: { eventoId: id, estado: ['CONFIRMADO', 'ESPERA'] },
+        include: [{ model: Usuario, as: 'usuario', attributes: ['id', 'nombre', 'email'] }],
+      });
+      for (const insc of inscriptos) {
+        if (!insc.usuario) continue;
+        try {
+          await notificaciones.eventoModificado(insc.usuario, eventoCompleto, cambios);
+        } catch (err) {
+          console.error('[evento] notificar modificación:', err.message);
+        }
+      }
+    }
+
+    return eventoCompleto;
+  }
 
   async eliminar(id) {
-    // Borrado atómico: si falla algún paso, no queda el evento a medias.
     return await sequelize.transaction(async (t) => {
       const evento = await Evento.findByPk(id, { transaction: t });
       if (!evento) {
         throw new HttpError('Evento no encontrado', 404);
       }
-      // Inscripciones asociadas al evento
       await Inscripcion.destroy({ where: { eventoId: id }, transaction: t });
-      // Relaciones con categorías
       await EventoCategoria.destroy({ where: { eventoId: id }, transaction: t });
-      // El evento
       await evento.destroy({ transaction: t });
       return true;
     });

@@ -1,5 +1,14 @@
 const { Usuario } = require('../models');
 const HttpError = require('../utils/http-error');
+const PUBLIC_FIELDS=['id','nombre','username','email','rol','avatar_url','createdAt','updatedAt'];
+const WRITE_FIELDS=['nombre','username','email','rol'];
+function camposPermitidos(datos) {
+  return Object.fromEntries(WRITE_FIELDS.filter(k=>Object.hasOwn(datos,k)).map(k=>[k,datos[k]]));
+}
+function publico(usuario) {
+  const data=usuario.get?usuario.get({plain:true}):usuario;
+  return Object.fromEntries(PUBLIC_FIELDS.filter(k=>Object.hasOwn(data,k)).map(k=>[k,data[k]]));
+}
 
 /**
  * Servicio para gestionar la lógica de negocio de Usuarios.
@@ -9,14 +18,14 @@ class UsuarioService {
    * Obtiene todos los usuarios.
    */
   async obtenerTodos() {
-    return await Usuario.findAll();
+    return await Usuario.findAll({attributes:PUBLIC_FIELDS});
   }
 
   /**
    * Obtiene un usuario por ID.
    */
   async obtenerPorId(id) {
-    const usuario = await Usuario.findByPk(id);
+    const usuario = await Usuario.findByPk(id,{attributes:PUBLIC_FIELDS});
     if (!usuario) {
       throw new HttpError('Usuario no encontrado', 404);
     }
@@ -32,7 +41,7 @@ class UsuarioService {
     if (existe) {
       throw new HttpError('El correo electrónico ya está registrado', 409);
     }
-    return await Usuario.create(datos);
+    return publico(await Usuario.create(camposPermitidos(datos)));
   }
 
   /**
@@ -48,7 +57,7 @@ class UsuarioService {
       }
     }
 
-    return await usuario.update(datos);
+    return publico(await usuario.update(camposPermitidos(datos)));
   }
 
   /**

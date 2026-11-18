@@ -1,9 +1,6 @@
-// Middleware de sanitización contra XSS / inyección.
-// Fase 0: implementación mínima — recorre body, query y params eliminando
-// tags HTML básicos. La implementación completa con una librería como
-// `xss-clean` o `dompurify` se aborda en la tarea de seguridad de Fase 1.
-
+// Middleware de sanitización contra XSS y Prototype Pollution.
 const HTML_TAG_REGEX = /<\/?[^>]+(>|$)/g;
+const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 function sanitizeValue(value) {
   if (typeof value === 'string') {
@@ -21,6 +18,9 @@ function sanitizeValue(value) {
 function sanitizeObject(obj) {
   const out = {};
   for (const key of Object.keys(obj)) {
+    if (DANGEROUS_KEYS.has(key)) {
+      continue;
+    }
     out[key] = sanitizeValue(obj[key]);
   }
   return out;
