@@ -18,3 +18,11 @@ infra/mantis/*.log
 infra/nextcloud/.env*
 infra/nextcloud/resultados
 infra/nextcloud/backups
+infra/n8n/.env*
+infra/n8n/privado
+infra/n8n/resultados
+infra/n8n/informes
+infra/n8n/*.log
+infra/seguridad/.env*
+infra/seguridad/resultados
+**/*.log

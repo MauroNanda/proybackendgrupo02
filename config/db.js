@@ -10,7 +10,8 @@ if (!process.env.DATABASE_URL) {
 const connection = postgresOptions();
 const sequelize = new Sequelize(connection.url, {
   dialect: 'postgres',
-  logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  // Los valores SQL pueden contener datos privados. Activar solo para ensayos anonimizados.
+  logging: process.env.DB_LOG_SQL === 'true' ? console.log : false,
   dialectOptions: connection.dialectOptions,
   define: {
     underscored: false,

@@ -1,0 +1,13 @@
+{
+  "fecha": "2026-11-18T04:34:24.494Z",
+  "http": 200,
+  "usuario": "node",
+  "raizSoloLectura": true,
+  "capacidades": [
+    "ALL"
+  ],
+  "proteccion": [
+    "no-new-privileges:true"
+  ],
+  "escrituraRechazada": "EROFS"
+}

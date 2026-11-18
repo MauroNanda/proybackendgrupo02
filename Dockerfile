@@ -10,6 +10,7 @@ RUN npm ci
 COPY . .
 
 ENV NODE_ENV=development
+USER node
 EXPOSE 3000
 
 CMD ["npm", "run", "dev"]

@@ -1,0 +1,14 @@
+{
+  "fecha": "2026-11-18T04:33:31.791Z",
+  "caso": "invalido",
+  "origen": "Webhook real con evento sintetico de laboratorio",
+  "primero": {
+    "ejecucion": "239",
+    "estado": "error",
+    "nodos": [
+      "Webhook Incidentes Seguridad",
+      "Normalizar y deduplicar incidente"
+    ],
+    "error": "Evento de seguridad invalido [line 3]"
+  }
+}

@@ -4,8 +4,10 @@ const { body, param } = require('express-validator');
 const usuarioController = require('../controllers/usuario.controller');
 const validate = require('../middlewares/validate.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
+const roleMiddleware = require('../middlewares/role.middleware');
 
 router.use(authMiddleware);
+router.use(roleMiddleware(['ORGANIZADOR']));
 
 // Validaciones
 const validacionId = [

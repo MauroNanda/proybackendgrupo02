@@ -8,8 +8,10 @@ const sequelize = require('./config/db');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/error-handler.middleware');
 const sanitize = require('./middlewares/sanitize.middleware');
+const originGuard = require('./middlewares/origin.middleware');
 const { securityDetector } = require('./middlewares/security-detector.middleware');
 const { apiLimiter } = require('./middlewares/rate-limit.middleware');
+const { trustedProxy, validateSecurityEnv, forwardedHeaders } = require('./config/security');
 const registrarIntegraciones = require('./integrations/register');
 const recordatoriosJob = require('./jobs/recordatorios.job');
 
@@ -17,11 +19,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:4200';
 
-app.set('trust proxy', 1);
+app.set('trust proxy', trustedProxy());
 
 // ===== Middlewares base =====
+app.use(forwardedHeaders);
 app.use(helmet());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.use(originGuard);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(securityDetector);
@@ -49,15 +53,7 @@ function validarEnv() {
     );
   }
 
-  const secretosInseguros = new Set([
-    'cambiame-por-un-secreto-largo-y-aleatorio',
-    'convoca-dev-secret-inseguro-no-usar-en-prod',
-  ]);
-  if (process.env.JWT_SECRET.length < 32 || secretosInseguros.has(process.env.JWT_SECRET)) {
-    throw new Error(
-      'JWT_SECRET es débil o usa un valor por defecto. Generá uno aleatorio de al menos 32 caracteres.'
-    );
-  }
+  validateSecurityEnv();
 }
 
 // ===== Arranque del servidor =====
@@ -81,6 +77,6 @@ async function start() {
   }
 }
 
-start();
+if (require.main === module) start();
 
 module.exports = app;

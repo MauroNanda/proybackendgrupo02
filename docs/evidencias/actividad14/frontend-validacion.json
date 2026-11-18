@@ -1,0 +1,14 @@
+{
+  "fecha": "2026-11-18",
+  "rama": "fix/dependencias-seguridad-a14",
+  "commit": "4601be72cc87b3c1152b46e3577d0f9ed1db38f1",
+  "tests": {
+    "aprobados": 4,
+    "fallidos": 0
+  },
+  "buildProduccion": "OK, advertencias de presupuesto/CommonJS conservadas",
+  "docker": "Dockerfile.production compilado; GET / y /api/health HTTP 200",
+  "navegador": "Login real lab_1, descarga de catalogo XLSX y lectura con SheetJS 0.20.3",
+  "filasExportadas": 100,
+  "smokeTextoFormula": "Texto =2+2 conservado como string; no formula"
+}

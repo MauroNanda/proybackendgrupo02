@@ -1,155 +1,88 @@
+'use strict';
 /* global fetch, AbortSignal */
-// Middleware de detección temprana de anomalías e incidentes de seguridad.
-// Emite logs estructurados y notifica al webhook de respuesta automática (n8n).
-
-const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
-const SUSPICIOUS_PATTERNS = [
-  /<\s*script\b/i,
-  /javascript\s*:/i,
-  /\b(union\s+select|drop\s+table|insert\s+into|delete\s+from)\b/i,
-  /('\s*or\s+'?1'?\s*=\s*'?1)/i,
-  /\.\.\//,
-];
-
-// Ventana en memoria para detectar ráfagas de fallos de autenticación por IP.
-const authFailuresByIp = new Map();
-const AUTH_WINDOW_MS = 2 * 60 * 1000;
-const AUTH_THRESHOLD = 5;
-
-function obtenerIpCliente(req) {
-  return req.ip || req.socket?.remoteAddress || 'desconocida';
-}
-
-function contieneClavePeligrosa(value, depth = 0) {
-  if (!value || typeof value !== 'object' || depth > 6) {
-    return false;
-  }
-  if (Array.isArray(value)) {
-    return value.some((item) => contieneClavePeligrosa(item, depth + 1));
-  }
-  for (const key of Object.keys(value)) {
-    if (DANGEROUS_KEYS.has(key) || contieneClavePeligrosa(value[key], depth + 1)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function contienePatronSospechoso(value, depth = 0) {
-  if (depth > 6 || value === null || value === undefined) {
-    return false;
-  }
-  if (typeof value === 'string') {
-    return SUSPICIOUS_PATTERNS.some((regex) => regex.test(value));
-  }
-  if (Array.isArray(value)) {
-    return value.some((item) => contienePatronSospechoso(item, depth + 1));
-  }
-  if (typeof value === 'object') {
-    return Object.values(value).some((val) => contienePatronSospechoso(val, depth + 1));
-  }
-  return false;
-}
-
-async function notificarIncidente(alerta) {
-  const payload = {
-    servicio: 'convoca-backend',
-    entorno: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString(),
-    ...alerta,
-  };
-
-  console.warn('[SECURITY_ALERT]', JSON.stringify(payload));
-
-  const webhookUrl = process.env.N8N_SECURITY_WEBHOOK_URL;
-  if (!webhookUrl) {
-    return;
-  }
-
-  const headers = { 'Content-Type': 'application/json' };
-  if (process.env.N8N_SECURITY_WEBHOOK_TOKEN) {
-    headers['X-A13-Token'] = process.env.N8N_SECURITY_WEBHOOK_TOKEN;
-  }
-
-  try {
-    await fetch(webhookUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(3000),
-    });
-  } catch (err) {
-    console.error('[SECURITY_ALERT] Error enviando evento a n8n:', err.message);
-  }
-}
-
-function registrarFalloAuth(ip, ruta, statusCode) {
-  const ahora = Date.now();
-  const historial = (authFailuresByIp.get(ip) || []).filter(
-    (ts) => ahora - ts < AUTH_WINDOW_MS
-  );
-  historial.push(ahora);
-  authFailuresByIp.set(ip, historial);
-
-  if (historial.length === AUTH_THRESHOLD) {
-    void notificarIncidente({
-      tipo: 'AUTH_BRUTE_FORCE_BURST',
-      severidad: 'alta',
-      ip,
-      ruta,
-      statusCode,
-      detalle: `Se detectaron ${historial.length} respuestas ${statusCode} en menos de 2 minutos desde la misma IP.`,
-    });
-  }
-}
-
-function securityDetector(req, res, next) {
-  const ip = obtenerIpCliente(req);
-  const ruta = req.originalUrl || req.url;
-
-  if (
-    contieneClavePeligrosa(req.body) ||
-    contieneClavePeligrosa(req.query) ||
-    contieneClavePeligrosa(req.params)
-  ) {
-    void notificarIncidente({
-      tipo: 'PROTOTYPE_POLLUTION_ATTEMPT',
-      severidad: 'alta',
-      ip,
-      metodo: req.method,
-      ruta,
-      detalle: 'Payload rechazado por contener claves reservadas (__proto__, constructor o prototype).',
-    });
-    return res.status(400).json({
-      error: { message: 'Carga útil rechazada por política de seguridad.' },
-    });
-  }
-
-  if (
-    contienePatronSospechoso(req.body) ||
-    contienePatronSospechoso(req.query) ||
-    contienePatronSospechoso(req.params)
-  ) {
-    void notificarIncidente({
-      tipo: 'INJECTION_PROBE_DETECTED',
-      severidad: 'media',
-      ip,
-      metodo: req.method,
-      ruta,
-      detalle: 'Se detectaron patrones sospechosos de XSS, SQLi o Path Traversal en la petición.',
-    });
-  }
-
-  res.on('finish', () => {
-    if (res.statusCode === 401 || res.statusCode === 403) {
-      registrarFalloAuth(ip, ruta, res.statusCode);
-    }
-  });
-
-  return next();
-}
-
-module.exports = {
-  securityDetector,
-  notificarIncidente,
+const { isIP } = require('node:net');
+const dangerousKeys = new Set(['__proto__','constructor','prototype']);
+const patterns = [/<\s*script\b/i,/javascript\s*:/i,/\b(union\s+select|drop\s+table|insert\s+into|delete\s+from)\b/i,/'\s*or\s+'?1'?\s*=\s*'?1/i,/\.\.\//];
+const descriptions = {
+  PROTOTYPE_POLLUTION_ATTEMPT:'Entrada con claves reservadas rechazada.',
+  PAYLOAD_COMPLEXITY_EXCEEDED:'Entrada demasiado profunda o compleja rechazada.',
+  INJECTION_PROBE_DETECTED:'Patron compatible con sondeo de inyeccion; requiere revision humana.',
+  AUTH_BRUTE_FORCE_BURST:'Cinco rechazos de autenticacion/autorizacion en dos minutos.',
+  RATE_LIMIT_EXCEEDED:'Umbral de peticiones superado; respuesta HTTP 429.',
 };
+const failures = new Map();
+const recent = new Map();
+const MAX_KEYS = 1024;
+let inFlight = 0;
+let budgetStart = 0;
+let sentInWindow = 0;
+function boundedSet(map,key,value) {
+  if(!map.has(key) && map.size >= MAX_KEYS) map.delete(map.keys().next().value);
+  map.set(key,value);
+}
+function routeForLog(req) {
+  const raw = String(req.path || req.url || '').split('?')[0];
+  const known = /^(\/api\/(?:auth|eventos|inscripciones|usuarios|categorias|notificaciones|health))(?:\/([^/]+))?/i.exec(raw);
+  if(!known) return '/[ruta-no-reconocida]';
+  const action=known[2];
+  return known[1] + (action ? (['login','registro','perfil','logout','2fa','google'].includes(action) ? '/'+action : '/:id') : '');
+}
+function scan(value,depth=0,budget={nodes:0}) {
+  if(++budget.nodes>2000 || depth>12) return {excessive:true};
+  if(typeof value==='string') return {suspicious:patterns.some(p=>p.test(value))};
+  if(!value || typeof value!=='object') return {};
+  const result={};
+  for(const key of Object.keys(value)) {
+    if(dangerousKeys.has(key)) result.dangerous=true;
+    const nested=scan(value[key],depth+1,budget);
+    for(const flag of ['dangerous','suspicious','excessive']) if(nested[flag]) result[flag]=true;
+    if(result.excessive) break;
+  }
+  return result;
+}
+async function notificarIncidente(alerta) {
+  const tipo=Object.hasOwn(descriptions,alerta.tipo) ? alerta.tipo : 'INJECTION_PROBE_DETECTED';
+  const ip=isIP(alerta.ip||'') ? alerta.ip : 'desconocida';
+  const ruta=routeForLog({path:alerta.ruta});
+  const key=tipo+':'+ip+':'+ruta;
+  const now=Date.now();
+  if(now-(recent.get(key)||0)<60000) return {estado:'suprimido'};
+  boundedSet(recent,key,now);
+  if(now-budgetStart>=60000) {budgetStart=now;sentInWindow=0;}
+  if(inFlight>=4 || sentInWindow>=20) return {estado:'limite-de-avisos'};
+  sentInWindow++;
+  const payload={servicio:'convoca-backend',entorno:process.env.NODE_ENV==='production'?'production':'development',timestamp:new Date(now).toISOString(),tipo,severidad:['alta','critica','media','baja'].includes(alerta.severidad)?alerta.severidad:'media',ip,ruta,metodo:['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'].includes(alerta.metodo)?alerta.metodo:'HTTP',statusCode:Number.isInteger(alerta.statusCode)?alerta.statusCode:400,detalle:descriptions[tipo]};
+  console.warn('[SECURITY_ALERT]',JSON.stringify(payload));
+  const url=process.env.N8N_SECURITY_WEBHOOK_URL;
+  const token=process.env.N8N_SECURITY_WEBHOOK_TOKEN;
+  if(!url || !token) return {estado:'solo-log-local'};
+  inFlight++;
+  try {
+    const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-A14-Token':token},body:JSON.stringify(payload),signal:AbortSignal.timeout(3000),redirect:'error'});
+    if(!response.ok) {console.error('[SECURITY_DELIVERY]',JSON.stringify({tipo,estado:'pendiente',http:response.status}));return {estado:'pendiente'};}
+    return {estado:'aceptado-por-webhook'};
+  } catch {
+    console.error('[SECURITY_DELIVERY]',JSON.stringify({tipo,estado:'pendiente',motivo:'conexion-o-timeout'}));
+    return {estado:'pendiente'};
+  } finally {inFlight--;}
+}
+function registrarFallo(req,res) {
+  const ip=req.ip || req.socket?.remoteAddress || '';
+  const now=Date.now();
+  const previous=failures.get(ip);
+  const record=previous && now-previous.start<120000 ? previous : {start:now,count:0};
+  record.count++; boundedSet(failures,ip,record);
+  if(record.count===5) void notificarIncidente({tipo:'AUTH_BRUTE_FORCE_BURST',severidad:'alta',ip,ruta:routeForLog(req),metodo:req.method,statusCode:res.statusCode});
+}
+function securityDetector(req,res,next) {
+  const result=scan([req.body,req.query]);
+  const info={ip:req.ip || req.socket?.remoteAddress || '',ruta:routeForLog(req),metodo:req.method};
+  if(result.dangerous || result.excessive) {
+    void notificarIncidente({...info,tipo:result.dangerous?'PROTOTYPE_POLLUTION_ATTEMPT':'PAYLOAD_COMPLEXITY_EXCEEDED',severidad:'alta',statusCode:400});
+    return res.status(400).json({error:{message:'Carga util rechazada por politica de seguridad.'}});
+  }
+  if(result.suspicious) void notificarIncidente({...info,tipo:'INJECTION_PROBE_DETECTED',severidad:'media',statusCode:400});
+  res.on('finish',()=>{if([401,403].includes(res.statusCode)) registrarFallo(req,res);});
+  next();
+}
+module.exports={securityDetector,notificarIncidente,routeForLog,scan};

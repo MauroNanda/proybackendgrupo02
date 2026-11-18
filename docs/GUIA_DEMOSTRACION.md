@@ -71,7 +71,7 @@ Abrir **Terminal 2 en `proyfrontendgrupo02`** y ejecutar:
 npm start
 ```
 
-Si faltan las dependencias o cambió `package-lock.json` al actualizar el repositorio, ejecutar primero `npm ci` en esa misma carpeta. Esperar la compilación y **dejar esta terminal abierta**.
+Si faltan las dependencias o cambió `package-lock.json` al actualizar el repositorio, ejecutar primero `node scripts/verificar-origen-dependencias.cjs` y luego `npm ci --allow-remote=root` en esa misma carpeta. Esperar la compilación y **dejar esta terminal abierta**.
 
 ### A3. Abrir y mostrar
 
@@ -140,7 +140,8 @@ Invoke-RestMethod http://localhost:3000/api/health
 Abrir **una segunda terminal PowerShell** y entrar en la carpeta **`proyfrontendgrupo02`**. Comprobar que sea la del frontend, no la del backend. Allí ejecutar:
 
 ```powershell
-npm ci
+node scripts/verificar-origen-dependencias.cjs
+npm ci --allow-remote=root
 npm start
 ```
 

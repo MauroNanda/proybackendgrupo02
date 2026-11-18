@@ -1,0 +1,11 @@
+{
+  "fecha": "2026-11-18T04:33:32.969Z",
+  "backend": {
+    "comando": "npm test con entorno exclusivo de CI",
+    "aprobados": 25,
+    "fallidos": 0,
+    "lintErrores": 0,
+    "lintAdvertenciasPrevias": 2
+  },
+  "frontendPR": "https://github.com/MauroNanda/proyfrontendgrupo02/pull/26"
+}

@@ -20,15 +20,15 @@
       "webhookId": "a14-webhook-convoca-sec-01",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "a13Webhook",
-          "name": "A13 entrada protegida"
+          "id": "a14Webhook",
+          "name": "A14 entrada protegida"
         }
       }
     },
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const body = $json.body ?? $json;\nconst tipo = String(body.tipo ?? 'SECURITY_ANOMALY').slice(0, 80);\nconst severidad = String(body.severidad ?? 'media').toLowerCase();\nconst ip = String(body.ip ?? 'desconocida').slice(0, 80);\nconst ruta = String(body.ruta ?? '/api').slice(0, 150);\nconst metodo = String(body.metodo ?? 'HTTP').slice(0, 16);\nconst detalle = String(body.detalle ?? 'Evento de seguridad detectado por middleware').slice(0, 1000);\nconst timestamp = String(body.timestamp ?? new Date().toISOString());\nconst servicio = String(body.servicio ?? 'convoca-backend');\n\nconst fingerprint = `${tipo}:${ip}:${ruta}`;\nconst store = $getWorkflowStaticData('global');\nstore.incidents = store.incidents ?? {};\nconst prev = store.incidents[fingerprint];\n\nif (prev?.issueId) {\n  return {\n    json: {\n      duplicate: true,\n      issueId: prev.issueId,\n      tipo,\n      severidad,\n      ip,\n      ruta,\n      fingerprint\n    }\n  };\n}\n\nconst esAlta = severidad === 'alta' || severidad === 'critica';\nconst summary = `[INC-SEC] ${tipo} desde ${ip} (${metodo} ${ruta})`.slice(0, 200);\nconst description = [\n  'Incidencia de seguridad generada automáticamente por el flujo de respuesta ante incidentes (Actividad 14).',\n  `Servicio: ${servicio}`,\n  `Tipo de evento: ${tipo}`,\n  `Severidad detectada: ${severidad}`,\n  `IP origen: ${ip}`,\n  `Petición: ${metodo} ${ruta}`,\n  `Timestamp: ${timestamp}`,\n  `Detalle: ${detalle}`,\n  '',\n  `[SEC_FINGERPRINT:${fingerprint}]`\n].join('\\n');\n\nconst issue = {\n  summary,\n  description,\n  project: { id: 1, name: 'Convoca - A11 reproducible' },\n  category: { name: 'Seguridad' },\n  priority: esAlta ? { id: 40, name: 'high' } : { id: 30, name: 'normal' },\n  severity: esAlta ? { id: 60, name: 'major' } : { id: 50, name: 'minor' },\n  reproducibility: { id: 10, name: 'always' },\n  handler: { name: 'juan-carrizo' },\n  view_state: { id: 10, name: 'public' }\n};\n\nreturn {\n  json: {\n    duplicate: false,\n    tipo,\n    severidad,\n    ip,\n    metodo,\n    ruta,\n    detalle,\n    timestamp,\n    fingerprint,\n    issue\n  }\n};"
+        "jsCode": "const body = $json.body ?? $json;\nconst allowedTypes=['PROTOTYPE_POLLUTION_ATTEMPT','PAYLOAD_COMPLEXITY_EXCEEDED','INJECTION_PROBE_DETECTED','AUTH_BRUTE_FORCE_BURST','RATE_LIMIT_EXCEEDED'];\nif (!body || typeof body!=='object' || Array.isArray(body) || body.servicio!=='convoca-backend' || !allowedTypes.includes(body.tipo)) throw new Error('Evento de seguridad invalido');\nif (!['alta','critica','media','baja'].includes(body.severidad) || typeof body.ruta!=='string' || body.ruta.length>150 || /[?#\\r\\n]/.test(body.ruta) || !body.ruta.startsWith('/')) throw new Error('Severidad o ruta invalida');\nif(typeof body.ip!=='string' || body.ip.length>80 || !/^[a-f0-9:.]+$|^desconocida$/i.test(body.ip)) throw new Error('Origen invalido');\nif(!Number.isFinite(Date.parse(body.timestamp)) || Math.abs(Date.now()-Date.parse(body.timestamp))>600000) throw new Error('Timestamp ausente o fuera de ventana');\n\nconst tipo = String(body.tipo ?? 'SECURITY_ANOMALY').slice(0, 80);\nconst severidad = String(body.severidad ?? 'media').toLowerCase();\nconst ip = String(body.ip ?? 'desconocida').slice(0, 80);\nconst ruta = String(body.ruta ?? '/api').slice(0, 150);\nconst metodo = String(body.metodo ?? 'HTTP').slice(0, 16);\nconst detalle = String(body.detalle ?? 'Evento de seguridad detectado por middleware').slice(0, 1000);\nconst timestamp = String(body.timestamp ?? new Date().toISOString());\nconst servicio = String(body.servicio ?? 'convoca-backend');\n\nconst fingerprint = `${tipo}:${ip}:${ruta}`;\nconst store = $getWorkflowStaticData('global');\nstore.incidents = store.incidents ?? {};\nconst prev = store.incidents[fingerprint];\n\nconst now=Date.now();\nfor(const [k,v] of Object.entries(store.incidents)) if(now-Date.parse(v.createdAt)>900000) delete store.incidents[k];\nif(Object.keys(store.incidents).length>=1000) delete store.incidents[Object.keys(store.incidents)[0]];\nif (prev?.issueId && now-Date.parse(prev.createdAt)<900000) {\n  return {\n    json: {\n      duplicate: true,\n      retryNotice: Boolean(prev.avisoPendiente && prev.correo),\n      issueId: prev.issueId,\n      tipo,\n      severidad,\n      ip,\n      ruta,\n      fingerprint\n    }\n  };\n}\n\nconst esAlta = severidad === 'alta' || severidad === 'critica';\nconst summary = `[INC-SEC] ${tipo} desde ${ip} (${metodo} ${ruta})`.slice(0, 200);\nconst description = [\n  'Incidencia de seguridad generada automáticamente por el flujo de respuesta ante incidentes (Actividad 14).',\n  `Servicio: ${servicio}`,\n  `Tipo de evento: ${tipo}`,\n  `Severidad detectada: ${severidad}`,\n  `IP origen: ${ip}`,\n  `Petición: ${metodo} ${ruta}`,\n  `Timestamp: ${timestamp}`,\n  `Detalle: ${detalle}`,\n  '',\n  `[SEC_FINGERPRINT:${fingerprint}]`\n].join('\\n');\n\nconst issue = {\n  summary,\n  description,\n  project: { id: 1, name: 'Convoca - A11 reproducible' },\n  category: { name: 'Seguridad' },\n  priority: esAlta ? { id: 40, name: 'high' } : { id: 30, name: 'normal' },\n  severity: esAlta ? { id: 60, name: 'major' } : { id: 50, name: 'minor' },\n  reproducibility: { id: 10, name: 'always' },\n  handler: { name: 'juan-carrizo' },\n  view_state: { id: 50, name: 'private' }\n};\n\nreturn {\n  json: {\n    duplicate: false,\n    tipo,\n    severidad,\n    ip,\n    metodo,\n    ruta,\n    detalle,\n    timestamp,\n    fingerprint,\n    issue\n  }\n};"
       },
       "id": "a14-node-code-0002",
       "name": "Normalizar y deduplicar incidente",
@@ -114,7 +114,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const origen = $('Normalizar y deduplicar incidente').item.json;\nconst issue = $json.issue ?? $json;\nconst issueId = issue.id ?? $json.id;\nif (!issueId) {\n  throw new Error('Mantis no devolvió el ID de la incidencia de seguridad.');\n}\nconst store = $getWorkflowStaticData('global');\nstore.incidents = store.incidents ?? {};\nstore.incidents[origen.fingerprint] = {\n  issueId,\n  createdAt: new Date().toISOString()\n};\n\nconst emailBody = [\n  '🚨 ALERTA DE SEGURIDAD — CONVOCA BACKEND (ACT. 14)',\n  '--------------------------------------------------',\n  `Ticket Mantis: #${issueId} (Categoría: Seguridad)`,\n  `Tipo: ${origen.tipo}`,\n  `Severidad: ${origen.severidad.toUpperCase()}`,\n  `IP Origen: ${origen.ip}`,\n  `Endpoint: ${origen.metodo} ${origen.ruta}`,\n  `Fecha/Hora: ${origen.timestamp}`,\n  `Detalle: ${origen.detalle}`,\n  '',\n  'Revisar evidencia en http://localhost:8089/view.php?id=' + issueId\n].join('\\n');\n\nreturn {\n  json: {\n    ...origen,\n    issueId,\n    emailBody\n  }\n};"
+        "jsCode": "const origen = $('Normalizar y deduplicar incidente').item.json;\nconst issue = $json.issue ?? $json.issues?.[0] ?? $json;\nconst issueId = issue.id ?? $json.id;\nif (!issueId) {\n  throw new Error('Mantis no devolvió el ID de la incidencia de seguridad.');\n}\nconst store = $getWorkflowStaticData('global');\nstore.incidents = store.incidents ?? {};\nstore.incidents[origen.fingerprint] = {\n  issueId,\n  createdAt: new Date().toISOString()\n};\n\nconst emailBody = [\n  '🚨 ALERTA DE SEGURIDAD — CONVOCA BACKEND (ACT. 14)',\n  '--------------------------------------------------',\n  `Ticket Mantis: #${issueId} (Categoría: Seguridad)`,\n  `Tipo: ${origen.tipo}`,\n  `Severidad: ${origen.severidad.toUpperCase()}`,\n  `IP Origen: ${origen.ip}`,\n  `Endpoint: ${origen.metodo} ${origen.ruta}`,\n  `Fecha/Hora: ${origen.timestamp}`,\n  `Detalle: ${origen.detalle}`,\n  '',\n  'Revisar evidencia en http://localhost:8989/view.php?id=' + issueId\n].join('\\n');\n\nstore.incidents[origen.fingerprint].avisoPendiente=true;\nstore.incidents[origen.fingerprint].correo={...origen,issueId,emailBody};\nreturn {\n  json: {\n    ...origen,\n    issueId,\n    emailBody\n  }\n};"
       },
       "id": "a14-node-code-0005",
       "name": "Registrar ID y armar correo",
@@ -179,6 +179,82 @@
           "id": "a13Correo",
           "name": "A13 correo local"
         }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "dabb0578-9e3e-4813-8d6e-a0f34d26a5de",
+      "name": "Registrar aviso pendiente",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const source=$('Normalizar y deduplicar incidente').item.json; const store=$getWorkflowStaticData('global'); const entry=store.incidents?.[source.fingerprint]; if(entry) entry.avisoPendiente=true; return [{json:{estado:'aviso_pendiente',ticket:entry?.issueId,detalle:'Tras recuperar SMTP, repetir el evento autenticado dentro de 15 minutos: solo se reenvia el aviso, sin duplicar el ticket.'}}];"
+      }
+    },
+    {
+      "id": "b6fec523-c776-4307-af4d-7d803cce5516",
+      "name": "Reintentar aviso pendiente?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        650,
+        500
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "pendiente",
+              "leftValue": "={{ $json.retryNotice === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "defaa300-a3ea-403c-8ac4-eb1cacd771e2",
+      "name": "Preparar solo reenvio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        500
+      ],
+      "parameters": {
+        "jsCode": "const entry=$getWorkflowStaticData('global').incidents[$json.fingerprint]; if(!entry?.correo) throw new Error('No hay aviso pendiente recuperable'); return {json:entry.correo};",
+        "mode": "runOnceForEachItem"
+      }
+    },
+    {
+      "id": "777d9b09-13d7-433b-9ac9-2a57c260685f",
+      "name": "Confirmar aviso de seguridad",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        100
+      ],
+      "parameters": {
+        "jsCode": "const source=$('Normalizar y deduplicar incidente').item.json; const store=$getWorkflowStaticData('global'); const entry=store.incidents?.[source.fingerprint]; if(entry) entry.avisoPendiente=false; return [{json:{estado:'aviso_enviado',ticket:entry?.issueId}}];"
       }
     }
   ],
@@ -214,7 +290,13 @@
             "index": 0
           }
         ],
-        []
+        [
+          {
+            "node": "Reintentar aviso pendiente?",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Crear ticket de seguridad en Mantis": {
@@ -236,6 +318,59 @@
       ]
     },
     "Registrar ID y armar correo": {
+      "main": [
+        [
+          {
+            "node": "Notificar incidente por Mailpit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notificar incidente por Mailpit": {
+      "main": [
+        [
+          {
+            "node": "Confirmar aviso de seguridad",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar aviso pendiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Avisar fallo de integración": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Registrar aviso pendiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reintentar aviso pendiente?": {
+      "main": [
+        [
+          {
+            "node": "Preparar solo reenvio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Preparar solo reenvio": {
       "main": [
         [
           {

@@ -1,0 +1,32 @@
+{
+  "fecha": "2026-11-18T04:33:28.306Z",
+  "caso": "duplicado",
+  "origen": "Webhook real con evento sintetico de laboratorio",
+  "primero": {
+    "ejecucion": "236",
+    "estado": "success",
+    "nodos": [
+      "Webhook Incidentes Seguridad",
+      "Normalizar y deduplicar incidente",
+      "¿Es incidente nuevo?",
+      "Crear ticket de seguridad en Mantis",
+      "Registrar ID y armar correo",
+      "Notificar incidente por Mailpit",
+      "Confirmar aviso de seguridad"
+    ],
+    "ticket": 27,
+    "duplicado": false
+  },
+  "repetido": {
+    "ejecucion": "238",
+    "estado": "success",
+    "nodos": [
+      "Webhook Incidentes Seguridad",
+      "Normalizar y deduplicar incidente",
+      "¿Es incidente nuevo?",
+      "Reintentar aviso pendiente?"
+    ],
+    "ticket": 27,
+    "duplicado": true
+  }
+}

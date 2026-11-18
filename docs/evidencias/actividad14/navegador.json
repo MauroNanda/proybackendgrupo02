@@ -1,0 +1,6 @@
+{
+  "login": "ORGANIZADOR lab_1",
+  "url": "http://localhost:8086/admin/test-export",
+  "descarga": "reporte_eventos_general.xlsx",
+  "resultado": "Descarga real mediante interfaz Angular y API Docker"
+}

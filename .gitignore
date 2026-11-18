@@ -30,6 +30,9 @@ Thumbs.db
 desktop.ini
 
 # Coverage / tests
+infra/seguridad/.env*
+!infra/seguridad/.env.example
+infra/seguridad/resultados/
 infra/n8n/.env*
 !infra/n8n/.env.example
 infra/n8n/privado/

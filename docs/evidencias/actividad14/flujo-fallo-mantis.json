@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-18T04:13:57.023Z",
+  "caso": "fallo-mantis",
+  "origen": "Webhook real con evento sintetico de laboratorio",
+  "primero": {
+    "ejecucion": "189",
+    "estado": "success",
+    "nodos": [
+      "Webhook Incidentes Seguridad",
+      "Normalizar y deduplicar incidente",
+      "¿Es incidente nuevo?",
+      "Crear ticket de seguridad en Mantis",
+      "Avisar fallo de integración"
+    ],
+    "duplicado": false
+  }
+}

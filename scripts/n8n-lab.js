@@ -23,7 +23,7 @@ async function main() {
   if (!['preparar','up','stop','importar'].includes(command)) throw new Error('Usar preparar, up, importar o stop.');
   const env = read(envPath);
   if (command === 'preparar') {
-    for (const key of ['N8N_ENCRYPTION_KEY','N8N_RUNNER_TOKEN','N8N_WEBHOOK_TOKEN','N8N_ADMIN_PASSWORD']) {
+    for (const key of ['N8N_ENCRYPTION_KEY','N8N_RUNNER_TOKEN','N8N_WEBHOOK_TOKEN','N8N_ADMIN_PASSWORD','N8N_SECURITY_WEBHOOK_TOKEN']) {
       if (!env[key] || env[key] === 'generar-localmente') env[key] = (key === 'N8N_ADMIN_PASSWORD' ? 'A13!' : '') + crypto.randomBytes(24).toString('hex');
     }
     const nc = read(path.join(root,'infra/nextcloud/.env'));
@@ -78,6 +78,7 @@ async function main() {
   }
   const credentials = [
     {id:'a13Webhook',name:'A13 entrada protegida',type:'httpHeaderAuth',data:{name:'X-A13-Token',value:env.N8N_WEBHOOK_TOKEN}},
+    {id:'a14Webhook',name:'A14 entrada protegida',type:'httpHeaderAuth',data:{name:'X-A14-Token',value:env.N8N_SECURITY_WEBHOOK_TOKEN}},
     {id:'a13Puente',name:'A13 puente local',type:'httpHeaderAuth',data:{name:'Authorization',value:'Bearer '+env.N8N_RUNNER_TOKEN}},
     {id:'a13Mantis',name:'A13 Mantis proyecto',type:'httpHeaderAuth',data:{name:'Authorization',value:env.MANTIS_API_TOKEN}},
     {id:'a13Nextcloud',name:'A13 Nextcloud usuario4',type:'httpBasicAuth',data:{user:env.NEXTCLOUD_USER,password:env.NEXTCLOUD_PASSWORD}},

@@ -1,0 +1,411 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@angular/common": {
+      "name": "@angular/common",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@angular/core",
+        {
+          "source": 1204773,
+          "name": "@angular/common",
+          "dependency": "@angular/common",
+          "title": "Angular: Information Leak via `HttpTransferCache` Bypass When Using `withRequestsMadeViaParent`",
+          "url": "https://github.com/advisories/GHSA-p297-fm68-3q8c",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-200",
+            "CWE-524"
+          ],
+          "cvss": {
+            "score": 4,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:L/I:N/A:N"
+          },
+          "range": ">=22.0.0 <22.1.1"
+        }
+      ],
+      "effects": [
+        "@angular/forms",
+        "@angular/platform-browser",
+        "@angular/router"
+      ],
+      "range": "22.0.0-next.0 - 22.1.0",
+      "nodes": [
+        "node_modules/@angular/common"
+      ],
+      "fixAvailable": true
+    },
+    "@angular/compiler": {
+      "name": "@angular/compiler",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1204780,
+          "name": "@angular/compiler",
+          "dependency": "@angular/compiler",
+          "title": "Angular: Sanitization bypass via directive host bindings on concrete host elements in @angular/core and @angular/compiler",
+          "url": "https://github.com/advisories/GHSA-hh8m-fm6v-7cvg",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=22.0.0 <22.1.0"
+        }
+      ],
+      "effects": [
+        "@angular/core"
+      ],
+      "range": ">=22.0.0 <22.1.0",
+      "nodes": [
+        "node_modules/@angular/compiler"
+      ],
+      "fixAvailable": true
+    },
+    "@angular/core": {
+      "name": "@angular/core",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@angular/compiler",
+        {
+          "source": 1204781,
+          "name": "@angular/core",
+          "dependency": "@angular/core",
+          "title": "Angular: Sanitization bypass via directive host bindings on concrete host elements in @angular/core and @angular/compiler",
+          "url": "https://github.com/advisories/GHSA-hh8m-fm6v-7cvg",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=22.0.0 <22.1.0"
+        }
+      ],
+      "effects": [
+        "@angular/common",
+        "@angular/forms",
+        "@angular/platform-browser",
+        "@angular/router"
+      ],
+      "range": "22.0.0-next.0 - 22.1.0-rc.0",
+      "nodes": [
+        "node_modules/@angular/core"
+      ],
+      "fixAvailable": true
+    },
+    "@angular/forms": {
+      "name": "@angular/forms",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@angular/common",
+        "@angular/core",
+        "@angular/platform-browser"
+      ],
+      "effects": [],
+      "range": "4.4.0-RC.0 - 4.4.0 || 22.0.0-next.0 - 22.1.0",
+      "nodes": [
+        "node_modules/@angular/forms"
+      ],
+      "fixAvailable": true
+    },
+    "@angular/platform-browser": {
+      "name": "@angular/platform-browser",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@angular/common",
+        "@angular/core"
+      ],
+      "effects": [
+        "@angular/forms",
+        "@angular/router"
+      ],
+      "range": "22.0.0-next.0 - 22.1.0",
+      "nodes": [
+        "node_modules/@angular/platform-browser"
+      ],
+      "fixAvailable": true
+    },
+    "@angular/router": {
+      "name": "@angular/router",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "@angular/common",
+        "@angular/core",
+        "@angular/platform-browser",
+        {
+          "source": 1240619,
+          "name": "@angular/router",
+          "dependency": "@angular/router",
+          "title": "Angular Server-Side Rendering (SSR): Denial of Service via Numeric URL Matrix Parameters",
+          "url": "https://github.com/advisories/GHSA-ff3f-86qr-9cv3",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=22.0.0 <22.2.0"
+        },
+        {
+          "source": 1242594,
+          "name": "@angular/router",
+          "dependency": "@angular/router",
+          "title": "@angular/router: Denial of Service via Unmatched Empty-Path Outlet Route Matching in Server-Side Rendering (SSR)",
+          "url": "https://github.com/advisories/GHSA-62vg-58rm-qff7",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-405"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=22.0.0 <22.2.1"
+        },
+        {
+          "source": 1242607,
+          "name": "@angular/router",
+          "dependency": "@angular/router",
+          "title": "@angular/router: Denial of Service via RouterLink Query Parameter Retention in Server-Side Rendering (SSR)",
+          "url": "https://github.com/advisories/GHSA-57xq-rjx2-v5xh",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=22.0.0 <22.2.1"
+        }
+      ],
+      "effects": [],
+      "range": "10.0.0-next.0 - 10.0.0-rc.1 || 22.0.0-next.0 - 22.2.0",
+      "nodes": [
+        "node_modules/@angular/router"
+      ],
+      "fixAvailable": true
+    },
+    "dompurify": {
+      "name": "dompurify",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1138538,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify: IN_PLACE hook removal leaves a detached subtree executable, causing XSS",
+          "url": "https://github.com/advisories/GHSA-55q2-fjhq-7xh7",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.4.12"
+        },
+        {
+          "source": 1240978,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify: `CUSTOM_ELEMENT_HANDLING` bypasses `afterSanitizeElements` for allowed custom elements.",
+          "url": "https://github.com/advisories/GHSA-c2j3-45gr-mqc4",
+          "severity": "low",
+          "cwe": [
+            "CWE-79",
+            "CWE-184",
+            "CWE-693"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.4.11"
+        },
+        {
+          "source": 1241204,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify: IN_PLACE returns a force-removed rawtext root whose text carries attacker markup — pure HTML reparse executes",
+          "url": "https://github.com/advisories/GHSA-6688-9rhm-gjv2",
+          "severity": "low",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.4.15"
+        },
+        {
+          "source": 1242880,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify SAFE_FOR_TEMPLATES bypass: split template expressions survive in attached shadow root content on DOM output modes",
+          "url": "https://github.com/advisories/GHSA-cg2g-xh64-v4q7",
+          "severity": "critical",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=3.4.4 <=3.4.16"
+        },
+        {
+          "source": 1242881,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify IN_PLACE: hook that removes a parent or sibling leaves the detached subtree's event handlers armed (incomplete fix for GHSA-p98j-92pf-mc4p)",
+          "url": "https://github.com/advisories/GHSA-mrv2-3pqr-j5jr",
+          "severity": "high",
+          "cwe": [
+            "CWE-79",
+            "CWE-693"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.4.16"
+        },
+        {
+          "source": 1242882,
+          "name": "dompurify",
+          "dependency": "dompurify",
+          "title": "DOMPurify: SMIL attributeName=href guard is skipped when PARSER_MEDIA_TYPE is application/xhtml+xml",
+          "url": "https://github.com/advisories/GHSA-c6gr-qvv4-5v3f",
+          "severity": "low",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=3.4.16"
+        }
+      ],
+      "effects": [],
+      "range": "<=3.4.16",
+      "nodes": [
+        "node_modules/dompurify"
+      ],
+      "fixAvailable": true
+    },
+    "xlsx": {
+      "name": "xlsx",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1108110,
+          "name": "xlsx",
+          "dependency": "xlsx",
+          "title": "Prototype Pollution in sheetJS",
+          "url": "https://github.com/advisories/GHSA-4r6h-8v6p-xvw6",
+          "severity": "high",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 7.8,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H"
+          },
+          "range": "<0.19.3"
+        },
+        {
+          "source": 1108111,
+          "name": "xlsx",
+          "dependency": "xlsx",
+          "title": "SheetJS Regular Expression Denial of Service (ReDoS)",
+          "url": "https://github.com/advisories/GHSA-5pgg-2g8v-p4x9",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<0.20.2"
+        }
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/xlsx"
+      ],
+      "fixAvailable": false
+    },
+    "zod": {
+      "name": "zod",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1243066,
+          "name": "zod",
+          "dependency": "zod",
+          "title": "Zod can exhaust memory while validating oversized constrained collections",
+          "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+          "severity": "high",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<4.6.6"
+        }
+      ],
+      "effects": [],
+      "range": "<4.6.6",
+      "nodes": [
+        "node_modules/zod"
+      ],
+      "fixAvailable": true
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 5,
+      "high": 3,
+      "critical": 1,
+      "total": 9
+    },
+    "dependencies": {
+      "prod": 66,
+      "dev": 572,
+      "optional": 147,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 648
+    }
+  }
+}

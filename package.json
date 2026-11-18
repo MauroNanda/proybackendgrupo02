@@ -12,7 +12,7 @@
     "seed": "sequelize-cli db:seed:all",
     "seed:undo": "sequelize-cli db:seed:undo:all",
     "lint": "eslint .",
-    "test": "echo \"No tests yet\" && exit 0",
+    "test": "node --test test/lab/*.test.js test/security/*.test.js",
     "prepare": "node -e \"if(process.env.HUSKY==='0'||!require('fs').existsSync('node_modules/husky'))process.exit(0);require('child_process').execSync('husky',{stdio:'inherit'})\"",
     "lab:check": "node infra/hia/lab.js check",
     "lab:up": "node infra/hia/lab.js up",
@@ -46,7 +46,7 @@
   "author": "Grupo G02 — UNJu",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "discord.js": "^14.26.4",
     "dotenv": "^16.4.5",
@@ -74,5 +74,10 @@
   },
   "lint-staged": {
     "*.js": "eslint --fix"
+  },
+  "overrides": {
+    "sequelize": {
+      "uuid": "11.1.1"
+    }
   }
 }

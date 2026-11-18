@@ -1,12 +1,14 @@
 const rateLimit = require('express-rate-limit');
 const { notificarIncidente } = require('./security-detector.middleware');
+const { positiveInt } = require('../config/security');
 
 // Limitadores para endpoints sensibles de autenticación y protección global de /api.
 
-// General /api: 100 peticiones por IP cada 15 minutos.
+// El healthcheck no consume el cupo de usuarios ni se bloquea durante un ensayo.
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: positiveInt(process.env.API_RATE_WINDOW_MS,300000,3600000),
+  max: positiveInt(process.env.API_RATE_MAX,300,10000),
+  skip: req=>req.path==='/health',
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: { message: 'Demasiadas solicitudes desde esta IP. Intentá de nuevo más tarde.' } },
@@ -16,7 +18,7 @@ const apiLimiter = rateLimit({
       severidad: 'media',
       ip: req.ip || req.socket?.remoteAddress || 'desconocida',
       metodo: req.method,
-      ruta: req.originalUrl || req.url,
+      ruta: req.baseUrl + req.path,
       statusCode: options.statusCode,
       detalle: 'Se superó el umbral de peticiones permitido en /api (HTTP 429).',
     });

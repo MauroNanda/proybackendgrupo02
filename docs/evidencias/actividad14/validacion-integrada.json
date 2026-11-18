@@ -1,0 +1,164 @@
+{
+  "fecha": "2026-11-18T04:29:08.107Z",
+  "origen": "HTTP real contra API Docker y PostgreSQL piloto aislado",
+  "base": "http://127.0.0.1:3004",
+  "checks": [
+    {
+      "caso": "webhook sin credencial",
+      "http": 403
+    },
+    {
+      "caso": "login bcrypt6 con hashes anteriores",
+      "roles": [
+        "ORGANIZADOR",
+        "ASISTENTE"
+      ],
+      "ok": true
+    },
+    {
+      "caso": "sin sesion",
+      "http": 401
+    },
+    {
+      "caso": "elevacion de privilegios rechazada",
+      "http": 403,
+      "rolConservado": true
+    },
+    {
+      "caso": "listado autorizado sin campos sensibles",
+      "http": 200,
+      "usuarios": 1000
+    },
+    {
+      "caso": "alta con rol incorrecto",
+      "http": 403
+    },
+    {
+      "caso": "mass assignment de evento impedido",
+      "http": 201,
+      "idImpuestoIgnorado": true,
+      "fechaInternaConservada": true
+    },
+    {
+      "caso": "comodines LIKE tratados literalmente",
+      "coincidencias": 1
+    },
+    {
+      "caso": "sondeo SQLi sin ampliacion de resultados",
+      "http": 200,
+      "coincidencias": 0
+    },
+    {
+      "caso": "prototype pollution",
+      "http": 400
+    },
+    {
+      "caso": "profundidad excesiva",
+      "http": 400
+    },
+    {
+      "caso": "escritura cross-site con cookie",
+      "http": 403
+    },
+    {
+      "caso": "rafaga acotada con IP falsificada",
+      "http": 429,
+      "peticiones": 40,
+      "health": 200
+    },
+    {
+      "caso": "recuperacion al expirar ventana de limite",
+      "http": 200
+    }
+  ],
+  "incidentes": [
+    {
+      "ejecucion": "226",
+      "estado": "success",
+      "tipo": "RATE_LIMIT_EXCEEDED",
+      "ticket": 26,
+      "nodos": [
+        "Webhook Incidentes Seguridad",
+        "Normalizar y deduplicar incidente",
+        "¿Es incidente nuevo?",
+        "Crear ticket de seguridad en Mantis",
+        "Registrar ID y armar correo",
+        "Notificar incidente por Mailpit",
+        "Confirmar aviso de seguridad"
+      ]
+    },
+    {
+      "ejecucion": "225",
+      "estado": "success",
+      "tipo": "AUTH_BRUTE_FORCE_BURST",
+      "ticket": 25,
+      "nodos": [
+        "Webhook Incidentes Seguridad",
+        "Normalizar y deduplicar incidente",
+        "¿Es incidente nuevo?",
+        "Crear ticket de seguridad en Mantis",
+        "Registrar ID y armar correo",
+        "Notificar incidente por Mailpit",
+        "Confirmar aviso de seguridad"
+      ]
+    },
+    {
+      "ejecucion": "224",
+      "estado": "success",
+      "tipo": "PAYLOAD_COMPLEXITY_EXCEEDED",
+      "ticket": 24,
+      "nodos": [
+        "Webhook Incidentes Seguridad",
+        "Normalizar y deduplicar incidente",
+        "¿Es incidente nuevo?",
+        "Crear ticket de seguridad en Mantis",
+        "Registrar ID y armar correo",
+        "Notificar incidente por Mailpit",
+        "Confirmar aviso de seguridad"
+      ]
+    },
+    {
+      "ejecucion": "223",
+      "estado": "success",
+      "tipo": "PROTOTYPE_POLLUTION_ATTEMPT",
+      "ticket": 23,
+      "nodos": [
+        "Webhook Incidentes Seguridad",
+        "Normalizar y deduplicar incidente",
+        "¿Es incidente nuevo?",
+        "Crear ticket de seguridad en Mantis",
+        "Registrar ID y armar correo",
+        "Notificar incidente por Mailpit",
+        "Confirmar aviso de seguridad"
+      ]
+    },
+    {
+      "ejecucion": "222",
+      "estado": "success",
+      "tipo": "INJECTION_PROBE_DETECTED",
+      "ticket": 22,
+      "nodos": [
+        "Webhook Incidentes Seguridad",
+        "Normalizar y deduplicar incidente",
+        "¿Es incidente nuevo?",
+        "Crear ticket de seguridad en Mantis",
+        "Registrar ID y armar correo",
+        "Notificar incidente por Mailpit",
+        "Confirmar aviso de seguridad"
+      ]
+    }
+  ],
+  "canal": "Mailpit local, no correo externo",
+  "contenedor": {
+    "usuario": "node",
+    "capDrop": [
+      "ALL"
+    ],
+    "securityOpt": [
+      "no-new-privileges:true"
+    ],
+    "pids": 128,
+    "memoria": 536870912,
+    "secretosLocalesFueraDeImagen": true
+  }
+}

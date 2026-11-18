@@ -33,7 +33,7 @@ El recorrido sencillo combina API/base en Docker y frontend en Node. Para acredi
 | 11. Incidencias | Mantis reproducible y diez casos retrospectivos con evidencias. | Importarlos no vuelve a ejecutar diez fallas; su API externa está bloqueada. |
 | 12. Documentos | Nextcloud, permisos, versiones, respaldo y acceso remoto comprobados previamente. | Cuentas simplificadas/política de laboratorio requieren revisión de seguridad; no incluir claves en documentación pública. |
 | 13. n8n | Tres flujos Docker validados el 17/11: Prometheus/Mantis, backup/restauración e informe Python/Nextcloud. | Avisos en Mailpit local, no correo externo. Instructivo y evidencia en `AUTOMATIZACIONES_A13.md` y `evidencias/actividad13`. |
-| 14. Seguridad | Controles de aplicación/configuración y regresiones parciales. | Faltan matriz, escaneos/correcciones, respuesta y flujo de incidentes integrado. |
+| 14. Seguridad | Controles, matriz, auditorias antes/despues, pruebas reales y flujo n8n/Mantis/Mailpit. Ver SEGURIDAD_A14.md. | Cambios en revision por PR; persisten avisos dev y limites documentados. Validacion local no equivale a pentest ni ensayo independiente en otro equipo. |
 | 15. Entrega | Manuales, informe parcial y esta guía de defensa. | A13–A15 del informe siguen sin desarrollo; falta cierre y ensayo grupal. |
 
 La consigna exige **al menos 6.000.000 registros por tabla de datos del conjunto de prueba**. El manifiesto actual configura 100.000 usuarios, 10.000 eventos y 6.000.000 inscripciones, no seis millones en cada una. La diferencia debe explicitarse, sin alterar datos durante esta revisión documental.
