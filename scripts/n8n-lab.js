@@ -105,7 +105,7 @@ async function main() {
   } finally {
     for(const name of fs.readdirSync(runtimeExports)) fs.unlinkSync(path.join(runtimeExports,name));
   }
-  for (const id of ['a13Flujo1','a13Flujo2','a13Flujo3']) compose(['exec','-T','n8n','n8n','publish:workflow','--id='+id]);
+  for (const id of ['a13Flujo1','a13Flujo2','a13Flujo3','a14Flujo4']) compose(['exec','-T','n8n','n8n','publish:workflow','--id='+id]);
   compose(['restart','n8n']);
   fs.mkdirSync(path.dirname(marker),{recursive:true});
   fs.writeFileSync(marker,JSON.stringify({sha256:fingerprint,fecha:new Date().toISOString()}));

@@ -1,0 +1,261 @@
+{
+  "name": "A14 - Flujo 4 - Respuesta a Incidentes de Seguridad",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "convoca-security-incident",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "a14-node-webhook-0001",
+      "name": "Webhook Incidentes Seguridad",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "a14-webhook-convoca-sec-01",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Webhook",
+          "name": "A13 entrada protegida"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const body = $json.body ?? $json;\nconst tipo = String(body.tipo ?? 'SECURITY_ANOMALY').slice(0, 80);\nconst severidad = String(body.severidad ?? 'media').toLowerCase();\nconst ip = String(body.ip ?? 'desconocida').slice(0, 80);\nconst ruta = String(body.ruta ?? '/api').slice(0, 150);\nconst metodo = String(body.metodo ?? 'HTTP').slice(0, 16);\nconst detalle = String(body.detalle ?? 'Evento de seguridad detectado por middleware').slice(0, 1000);\nconst timestamp = String(body.timestamp ?? new Date().toISOString());\nconst servicio = String(body.servicio ?? 'convoca-backend');\n\nconst fingerprint = `${tipo}:${ip}:${ruta}`;\nconst store = $getWorkflowStaticData('global');\nstore.incidents = store.incidents ?? {};\nconst prev = store.incidents[fingerprint];\n\nif (prev?.issueId) {\n  return {\n    json: {\n      duplicate: true,\n      issueId: prev.issueId,\n      tipo,\n      severidad,\n      ip,\n      ruta,\n      fingerprint\n    }\n  };\n}\n\nconst esAlta = severidad === 'alta' || severidad === 'critica';\nconst summary = `[INC-SEC] ${tipo} desde ${ip} (${metodo} ${ruta})`.slice(0, 200);\nconst description = [\n  'Incidencia de seguridad generada automáticamente por el flujo de respuesta ante incidentes (Actividad 14).',\n  `Servicio: ${servicio}`,\n  `Tipo de evento: ${tipo}`,\n  `Severidad detectada: ${severidad}`,\n  `IP origen: ${ip}`,\n  `Petición: ${metodo} ${ruta}`,\n  `Timestamp: ${timestamp}`,\n  `Detalle: ${detalle}`,\n  '',\n  `[SEC_FINGERPRINT:${fingerprint}]`\n].join('\\n');\n\nconst issue = {\n  summary,\n  description,\n  project: { id: 1, name: 'Convoca - A11 reproducible' },\n  category: { name: 'Seguridad' },\n  priority: esAlta ? { id: 40, name: 'high' } : { id: 30, name: 'normal' },\n  severity: esAlta ? { id: 60, name: 'major' } : { id: 50, name: 'minor' },\n  reproducibility: { id: 10, name: 'always' },\n  handler: { name: 'juan-carrizo' },\n  view_state: { id: 10, name: 'public' }\n};\n\nreturn {\n  json: {\n    duplicate: false,\n    tipo,\n    severidad,\n    ip,\n    metodo,\n    ruta,\n    detalle,\n    timestamp,\n    fingerprint,\n    issue\n  }\n};"
+      },
+      "id": "a14-node-code-0002",
+      "name": "Normalizar y deduplicar incidente",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a14-cond-0001",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a14-node-if-0003",
+      "name": "¿Es incidente nuevo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mantis/api/rest/issues",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.issue }}",
+        "options": {
+          "timeout": 15000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "a14-node-mantis-0004",
+      "name": "Crear ticket de seguridad en Mantis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        240
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "a13Mantis",
+          "name": "A13 Mantis proyecto"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const origen = $('Normalizar y deduplicar incidente').item.json;\nconst issue = $json.issue ?? $json;\nconst issueId = issue.id ?? $json.id;\nif (!issueId) {\n  throw new Error('Mantis no devolvió el ID de la incidencia de seguridad.');\n}\nconst store = $getWorkflowStaticData('global');\nstore.incidents = store.incidents ?? {};\nstore.incidents[origen.fingerprint] = {\n  issueId,\n  createdAt: new Date().toISOString()\n};\n\nconst emailBody = [\n  '🚨 ALERTA DE SEGURIDAD — CONVOCA BACKEND (ACT. 14)',\n  '--------------------------------------------------',\n  `Ticket Mantis: #${issueId} (Categoría: Seguridad)`,\n  `Tipo: ${origen.tipo}`,\n  `Severidad: ${origen.severidad.toUpperCase()}`,\n  `IP Origen: ${origen.ip}`,\n  `Endpoint: ${origen.metodo} ${origen.ruta}`,\n  `Fecha/Hora: ${origen.timestamp}`,\n  `Detalle: ${origen.detalle}`,\n  '',\n  'Revisar evidencia en http://localhost:8089/view.php?id=' + issueId\n].join('\\n');\n\nreturn {\n  json: {\n    ...origen,\n    issueId,\n    emailBody\n  }\n};"
+      },
+      "id": "a14-node-code-0005",
+      "name": "Registrar ID y armar correo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "seguridad@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "={{ '[Convoca SEC] ' + $json.tipo + ' — Ticket Mantis #' + $json.issueId }}",
+        "emailFormat": "text",
+        "text": "={{ $json.emailBody }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a14-node-email-0006",
+      "name": "Notificar incidente por Mailpit",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1440,
+        240
+      ],
+      "onError": "continueErrorOutput",
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "fromEmail": "seguridad@convoca.local",
+        "toEmail": "equipo-g02@convoca.local",
+        "subject": "A14 - Error al registrar incidente de seguridad en Mantis",
+        "emailFormat": "text",
+        "text": "={{ 'No se pudo crear el ticket en Mantis para el evento: ' + ($json.tipo ?? 'desconocido') + ' | IP: ' + ($json.ip ?? 'desconocida') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a14-node-email-err-0007",
+      "name": "Avisar fallo de integración",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        460
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "a13Correo",
+          "name": "A13 correo local"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Incidentes Seguridad": {
+      "main": [
+        [
+          {
+            "node": "Normalizar y deduplicar incidente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar y deduplicar incidente": {
+      "main": [
+        [
+          {
+            "node": "¿Es incidente nuevo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es incidente nuevo?": {
+      "main": [
+        [
+          {
+            "node": "Crear ticket de seguridad en Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Crear ticket de seguridad en Mantis": {
+      "main": [
+        [
+          {
+            "node": "Registrar ID y armar correo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar fallo de integración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar ID y armar correo": {
+      "main": [
+        [
+          {
+            "node": "Notificar incidente por Mailpit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Argentina/Jujuy",
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "versionId": "a14f4001-0000-4000-8000-000000000004",
+  "tags": [],
+  "id": "a14Flujo4"
+}

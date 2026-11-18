@@ -1,11 +1,10 @@
 name: Backend CI
 
-# Este workflow valida main; no contiene despliegue ni se dispara para PR a develop.
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   build-and-lint:
@@ -26,3 +25,7 @@ jobs:
 
       - name: Run linter
         run: npm run lint
+
+      - name: Security dependency audit
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
