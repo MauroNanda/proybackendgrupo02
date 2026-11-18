@@ -27,6 +27,7 @@ class AuthService {
       }
     }
 
+    // Se guarda un hash con costo de calculo, nunca la contrasena original.
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     // El rol NUNCA se toma del body: el registro público siempre crea ASISTENTE.
@@ -67,6 +68,7 @@ class AuthService {
       throw new HttpError('Credenciales inválidas', 401);
     }
 
+    // bcrypt compara con el hash sin descifrarlo ni exponer su contenido.
     const passwordValida = await bcrypt.compare(password, usuario.password);
     if (!passwordValida) {
       await historialAccesoService.registrar(usuario.id, false, meta);

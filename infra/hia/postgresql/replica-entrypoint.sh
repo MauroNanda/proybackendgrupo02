@@ -15,6 +15,7 @@ if [ ! -s "$PGDATA/PG_VERSION" ]; then
   mkdir -p "$PGDATA"
   chown postgres:postgres "$PGDATA"
   chmod 0700 "$PGDATA"
+  # Copia fisica inicial; --write-recovery-conf deja al nodo siguiendo al principal.
   gosu postgres pg_basebackup \
     --host=db-principal \
     --port=5432 \

@@ -2,6 +2,8 @@
 
 Guía central para el equipo, basada en `develop` de backend y frontend. El recorrido principal usa una base local pequeña: no requiere Neon, cuentas de servicios externos ni cargar seis millones de filas.
 
+Para organizar la presentación y ubicar la documentación obligatoria: [Entrega y defensa A15](ENTREGA_Y_DEFENSA.md). El arranque se sigue aquí, en orden; no empezar directamente por el frontend.
+
 ## Orden de arranque
 
 Seguir este orden, sin saltear el backend:
@@ -261,6 +263,8 @@ Abrir **http://localhost:8082** con la cuenta individual indicada en [Nextcloud 
 ### Automatizaciones A13
 
 Con A4/A10/A11/A12 disponibles, seguir [Automatizaciones A13](AUTOMATIZACIONES_A13.md). El instructivo distingue la preparación inicial del arranque habitual e incluye los tres flujos, sus pruebas y fallos controlados. n8n abre en **http://localhost:5680** y la bandeja local en **http://localhost:8028**. Se usa el piloto; no repetir la carga masiva.
+
+Para demostrar la seguridad integrada, seguir [SEGURIDAD_A14.md](SEGURIDAD_A14.md). Distingue las pruebas acotadas del piloto de la configuración habitual y explica cómo volver a sus límites normales.
 
 ## 9. Detener el proyecto
 

@@ -1,61 +1,35 @@
-# Estado técnico de HIA y defensa
+# Estado técnico de HIA y cierre
 
-Revisión: 16/11/2026. Backend `develop` **787a1d4**; frontend `develop` **2c0de57**. El estado técnico siguiente se contrastó con la consigna del TP integrador, ambos repositorios, Drive, el tablero y GitHub Actions. No modifica el estado de las tarjetas ni reemplaza las evidencias originales.
+Revisión: 18/11/2026. Base integrada: backend `9c206d4`, frontend `75eb62a`. A13 y A14 están integradas. Las comprobaciones nuevas de A15 se identifican aparte de las evidencias históricas.
 
-**[Guía técnica y defensa en Drive](https://docs.google.com/document/d/1L3x7irOQPf3UPhPXYKQznzqA3SrbL3chfSbW9axVdhg)**: fichas por actividad, decisiones, código enlazado a commits concretos, preguntas de defensa y pendientes. No contiene contraseñas ni datos del registro privado.
+**Empezar por [ENTREGA_Y_DEFENSA.md](ENTREGA_Y_DEFENSA.md)**: reúne los 16 puntos de documentación, manual A/B, arquitectura final, recorrido de veinte minutos y código para explicar.
 
-## Cómo iniciar
-
-Usar [GUIA_DEMOSTRACION.md](GUIA_DEMOSTRACION.md). Abrir Docker Desktop primero; ejecutar los comandos en PowerShell dentro del repositorio indicado.
-
-- **A, inicio rápido:** conserva `infra/hia/.env`, imagen de API, dependencias y volúmenes con el piloto ya migrado/cargado. Levantar Compose y Angular; comprobar `/api/health`. Reconstruir la API si cambió su código o Dockerfile.
-- **B, desde cero:** instalar dependencias, generar configuración local, levantar base, aplicar migraciones, cargar y validar piloto, construir API e iniciar frontend.
-- Sin volúmenes/datos anteriores, el inicio rápido no recupera información. Elegir instalación limpia o restauración del respaldo.
-
-El recorrido sencillo combina API/base en Docker y frontend en Node. Para acreditar A7 con ambos componentes en contenedores, mostrar también el Dockerfile y Compose del frontend. La publicación requiere su red externa, base accesible y configuración propia; el Compose de producción de la API no crea la base.
-
-## Estado contrastado
-
-“Evidencia previa” identifica ensayos documentados; no implica que se hayan repetido hoy. El tablero puede estar terminado y conservar pendientes de integración o acreditación.
-
-| Actividad | Implementación y evidencia | Límite o pendiente |
+| Actividad | Material disponible | Límite que debe explicarse |
 |---|---|---|
-| 1. Diagnóstico | Descripción, inventario, arquitectura inicial y funcionalidades en Drive/docs. | Conservar el diagrama inicial separado de la arquitectura Docker final. |
-| 2. Scrum | GitHub Projects, backlog, responsables y sprints. | Los estados no acreditan por sí solos reuniones o pruebas técnicas. |
-| 3. Git | PR obligatorios para main/develop en ambos repositorios. | Aprobaciones obligatorias: 0. Diferenciar pauta de revisión y bloqueo técnico. |
-| 4. Base y backup | PostgreSQL, pgAdmin, piloto, carga reanudable, pgBadger y restauración con evidencia previa. | Solo Inscripciones alcanza 6 M; Usuarios/Eventos son apoyo. Delimitar con la cátedra el alcance de las tablas de prueba. |
-| 5. SQL | Ocho casos medidos; índices y varias optimizaciones integrados. | Dos consultas del dashboard todavía usan COUNT(id). No presentar las ocho propuestas como totalmente integradas. |
-| 6. Réplica | Standby físico asíncrono, propagación y recuperación ensayados. | No hay failover automático; la prueba con la réplica caída no demuestra caída del principal. |
-| 7. Docker | Imágenes de API/frontend y variantes Compose. | Diferenciar desarrollo con Angular en Node de demostración con ambos en Docker. |
-| 8. CI/CD | CI frontend con build/tests/imagen; backend con instalación/lint en main. | No se observa deploy automático ni rollback en los workflows actuales. Hay afirmaciones de Drive que necesitan evidencia o implementación. |
-| 9. Publicación | Proxy Nginx y túnel HTTPS con evidencia previa de acceso externo. | La URL es temporal y debe renovarse/probarse para la defensa. |
-| 10. Monitoreo | Exportadores, dashboard, alertas y evidencia versionada. | Métricas agregadas no equivalen al registro de cada SQL. |
-| 11. Incidencias | Mantis reproducible y diez casos retrospectivos con evidencias. | Importarlos no vuelve a ejecutar diez fallas; su API externa está bloqueada. |
-| 12. Documentos | Nextcloud, permisos, versiones, respaldo y acceso remoto comprobados previamente. | Cuentas simplificadas/política de laboratorio requieren revisión de seguridad; no incluir claves en documentación pública. |
-| 13. n8n | Tres flujos Docker validados el 17/11: Prometheus/Mantis, backup/restauración e informe Python/Nextcloud. | Avisos en Mailpit local, no correo externo. Instructivo y evidencia en `AUTOMATIZACIONES_A13.md` y `evidencias/actividad13`. |
-| 14. Seguridad | Controles, matriz, auditorias antes/despues, pruebas reales y flujo n8n/Mantis/Mailpit. Ver SEGURIDAD_A14.md. | Cambios en revision por PR; persisten avisos dev y limites documentados. Validacion local no equivale a pentest ni ensayo independiente en otro equipo. |
-| 15. Entrega | Manuales, informe parcial y esta guía de defensa. | A13–A15 del informe siguen sin desarrollo; falta cierre y ensayo grupal. |
+| A1–A3 | Diagnóstico/arquitectura inicial, inventario, tablero, ramas y PR | CI aprobado y aprobación humana son cosas distintas; las excepciones se identifican |
+| A4 | Piloto, dataset completo, migraciones, carga, backups y restore-test | Completo: 100.000 usuarios, 10.000 eventos y 6.000.000 inscripciones; no seis millones por tabla |
+| A5 | Ocho casos medidos en el informe; índices y cambios incorporados | No confundir mediciones con ocho reescrituras: el dashboard conserva COUNT(id) |
+| A6 | Réplica física asíncrona y evidencia de propagación | No hay failover automático; réplica no es backup |
+| A7–A9 | Imágenes, Compose, CI, Nginx y HTTPS temporal | Despliegue/rollback manuales; renovar URL temporal y verificarla al presentar |
+| A10 | Prometheus, exportadores y Grafana | Muestras de Docker no describen todo Windows ni registran cada SQL |
+| A11–A12 | Mantis, tickets, Nextcloud con permisos/versiones y respaldo | Incidentes reproducidos no equivalen a fallas productivas; claves solo en registro privado |
+| A13 | Tres flujos de alertas, backup/restauración e informe | Mailpit local; preservar volumen/clave n8n y aprobar acciones críticas |
+| A14 | Matriz, controles, auditorías y respuesta; PR58/PR26 integrados | Avisos dev y límites documentados; no es un pentest |
+| A15 | Guía, arquitectura final, comentarios y ensayo con piloto nuevo | Revisión de PR, ensayo grupal y reproducción independiente se registran cuando ocurran |
 
-La consigna exige **al menos 6.000.000 registros por tabla de datos del conjunto de prueba**. El manifiesto actual configura 100.000 usuarios, 10.000 eventos y 6.000.000 inscripciones, no seis millones en cada una. La diferencia debe explicitarse, sin alterar datos durante esta revisión documental.
+## Comprobación nueva
 
-## Qué se verificó en esta revisión
+Se preparó un piloto con claves y volúmenes distintos. Se verificaron migraciones, carga, navegador con roles, inscripción/QR/asistencia, backup/restauración temporal, réplica y HTTPS. Ver `docs/evidencias/actividad15`: detalla alcance y resultados, sin publicar claves ni dumps.
 
-- Nueve pruebas locales de `test/lab`: 9/9 aprobadas, con variables ficticias y sin acceso a la base real.
-- ESLint sin errores; dos advertencias previas de parámetros Sequelize no usados.
-- Comparación de los 17 archivos ejecutables/configuraciones comentados: mismo AST JavaScript, mismo YAML y mismas instrucciones de SQL, shell, PHP y Dockerfile.
-- Los cinco Compose conservan la misma configuración resuelta antes/después: valores, servicios, redes, puertos, volúmenes y dependencias.
-- Referencias GitHub comprobadas sobre los commits indicados; backend y frontend revisados sin modificar el frontend.
+Se conservaron los finales LF de shell establecidos en `.gitattributes`. Los comentarios se compararon por AST o instrucciones normalizadas, sin cambios de lógica. La lista de publicación a Nextcloud incorpora los manuales A13/A14/A15 y la arquitectura final; conserva el control de ediciones remotas.
 
-No se ejecutaron carga masiva, migraciones, recreación de contenedores, restauraciones ni pruebas externas nuevas. Docker Desktop estaba apagado. `npm test` solo imprime un marcador; no se utilizó como prueba. Se ejecutó `node --test test/lab/*.test.js` con una URL ficticia para los tests que cargan configuración.
+Las evidencias previas conservan sus fechas. El ensayo automatizado desde esta computadora no acredita un ensayo oral grupal, la reproducción por otra persona ni acceso desde otro dispositivo.
 
-Los checksums y capturas históricos permanecen asociados a sus ensayos originales. Los comentarios nuevos cambian bytes del código, no su lógica; no se reescribieron las evidencias para aparentar una ejecución nueva.
+## Cierre por el equipo
 
-## Prioridades para la presentación
+1. Revisar e integrar los PR documentales a develop.
+2. Registrar los SHA finales y exportar informe/guía vigentes a Nextcloud.
+3. Otro integrante sigue el manual A/B y registra su resultado.
+4. Ensayar los veinte minutos y comprobar HTTPS el día de la defensa.
 
-1. Completar o respaldar CD/rollback de A8 y delimitar la interpretación del volumen de A4.
-2. Conservar el entorno A13 y ensayar sus tres flujos con el instructivo de automatizaciones; su validación integrada se documenta aparte de esta revisión histórica.
-3. Completar A14, incluido el riesgo de los accesos de laboratorio y las automatizaciones.
-4. Integrar las dos propuestas restantes de A5 cuando se tome esa tarea; no mezclarlas en este PR documental.
-5. Completar A15: ensayo reproducible en otro equipo, acceso externo vigente y reparto de la defensa de aproximadamente veinte minutos.
-
-Esta rama solo agrega documentación, comentarios e instrucciones. No cambia configuraciones, lógica, dependencias ni credenciales. El PR debe permanecer abierto para revisión.
+No se fusiona a main ni se crea un tag estable automáticamente. Corresponde al cierre coordinado por el equipo.

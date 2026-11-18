@@ -8,6 +8,7 @@ class DashboardService {
    * Se ejecutan en paralelo para minimizar la latencia.
    */
   async obtenerKpis() {
+    // Son consultas independientes: se espera a todas sin ejecutarlas una por una.
     const [totalUsuarios, totalEventos, totalInscripciones, valoracionResult] = await Promise.all([
       Usuario.count(),
 
@@ -55,6 +56,7 @@ class DashboardService {
       Inscripcion.findAll({
         attributes: [
           [literal(`DATE_TRUNC('month', "createdAt")`), 'mes'],
+          // COUNT(id) cuenta valores no nulos; id es clave primaria y no admite NULL.
           [fn('COUNT', col('id')), 'total'],
         ],
         where: { createdAt: { [Op.gte]: seisAtras } },

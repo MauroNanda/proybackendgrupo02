@@ -1,6 +1,7 @@
 'use strict';
 const { isIP } = require('node:net');
 const { URL } = require('node:url');
+// Una clave larga y propia evita que cualquiera firme sesiones con el valor de ejemplo.
 function jwtSecret(value = process.env.JWT_SECRET) {
   const defaults = new Set(['cambiame-por-un-secreto-largo-y-aleatorio','convoca-dev-secret-inseguro-no-usar-en-prod','generar-una-clave-aleatoria-local']);
   if (!value || value.length < 32 || defaults.has(value)) throw new Error('Configurar JWT_SECRET propio, aleatorio y de al menos 32 caracteres.');
@@ -20,6 +21,7 @@ function positiveInt(value, fallback, max) {
   if (!/^\d+$/.test(value) || Number(value)<1 || Number(value)>max) throw new Error('Limite de seguridad fuera de rango.');
   return Number(value);
 }
+// Se descartan cabeceras de IP si el emisor no es un proxy de confianza.
 function forwardedHeaders(req,_res,next) {
   const trust=req.app.get('trust proxy fn');
   if(!trust || !trust(req.socket.remoteAddress,0)) {

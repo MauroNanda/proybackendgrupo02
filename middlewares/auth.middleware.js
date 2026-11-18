@@ -22,7 +22,9 @@ function authMiddleware(req, _res, next) {
   }
 
   try {
+    // Verificar firma y vencimiento; decodificar un JWT por si solo no autentica.
     const payload = verificarToken(token);
+    // Las rutas reciben identidad y rol del token verificado, no del body.
     req.usuario = {
       id: payload.id,
       email: payload.email,

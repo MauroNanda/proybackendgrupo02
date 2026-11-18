@@ -10,6 +10,7 @@ function roleMiddleware(rolesPermitidos) {
       return next(new HttpError('Token de autenticación requerido', 401));
     }
 
+    // 403: la persona esta autenticada, pero su rol no permite esta operacion.
     if (!rolesPermitidos.includes(req.usuario.rol)) {
       return next(new HttpError('No tienes permisos para acceder a este recurso', 403));
     }

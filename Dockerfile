@@ -11,6 +11,7 @@ COPY . .
 
 ENV NODE_ENV=development
 USER node
+# EXPOSE documenta el puerto; quien lo publica en Windows es Compose.
 EXPOSE 3000
 
 CMD ["npm", "run", "dev"]
@@ -21,6 +22,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+# Produccion usa el lockfile e instala solo dependencias necesarias al ejecutar.
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --chown=node:node . .

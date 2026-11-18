@@ -23,6 +23,7 @@ services:
       API_RATE_MAX: ${API_RATE_MAX:-300}
       API_RATE_WINDOW_MS: ${API_RATE_WINDOW_MS:-300000}
     extra_hosts: ["host.docker.internal:host-gateway"]
+    # La API HTTP no necesita capacidades adicionales del kernel.
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     pids_limit: 128
@@ -32,6 +33,7 @@ services:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
     ports:
+      # Izquierda: puerto de Windows; derecha: puerto que escucha Express dentro de Docker.
       - "127.0.0.1:${API_PORT:-3000}:3000"
     # Espera a PostgreSQL antes de iniciar la API; las migraciones se aplican aparte.
     depends_on:

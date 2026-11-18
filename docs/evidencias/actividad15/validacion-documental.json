@@ -1,0 +1,154 @@
+{
+  "fecha": "2026-11-18",
+  "apartadosObligatorios": 16,
+  "matriz": "docs/ENTREGA_Y_DEFENSA.md",
+  "enlacesLocales": [
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "GUIA_DEMOSTRACION.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "PROPUESTA.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "ARQUITECTURA_FINAL_HIA.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "GUIA_DEMOSTRACION.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "base-datos.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "replicacion-postgresql.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "GUIA_DEMOSTRACION.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "monitoreo.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "mantis-a11.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "AUTOMATIZACIONES_A13.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "SEGURIDAD_A14.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "base-datos.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ENTREGA_Y_DEFENSA.md",
+      "destino": "evidencias/actividad15/README.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "ENTREGA_Y_DEFENSA.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "base-datos.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "base-datos.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "replicacion-postgresql.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "monitoreo.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "mantis-a11.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "nextcloud-a12.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "AUTOMATIZACIONES_A13.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "SEGURIDAD_A14.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/GUIA_DEMOSTRACION.md",
+      "destino": "monitoreo.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/ESTADO_HIA.md",
+      "destino": "ENTREGA_Y_DEFENSA.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/SEGURIDAD_A14.md",
+      "destino": "base-datos.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/SEGURIDAD_A14.md",
+      "destino": "mantis-a11.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/SEGURIDAD_A14.md",
+      "destino": "AUTOMATIZACIONES_A13.md",
+      "existe": true
+    },
+    {
+      "origen": "docs/SEGURIDAD_A14.md",
+      "destino": "evidencias/actividad14/README.md",
+      "existe": true
+    }
+  ],
+  "informeDrive": "Actividades 1 a 15; evidencia de cada actividad conserva su fecha",
+  "pendientesHumanos": [
+    "Revision de PR",
+    "Reproduccion por otro integrante",
+    "Ensayo oral grupal"
+  ],
+  "secretos": "Excluidos de los documentos nuevos; credenciales sinteticas de demo identificadas"
+}

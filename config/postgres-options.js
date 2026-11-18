@@ -8,6 +8,7 @@ function postgresOptions(env = process.env) {
   try { url = new URL(env.DATABASE_URL); } catch { throw new Error('DATABASE_URL no es válida.'); }
   if (!['postgres:', 'postgresql:'].includes(url.protocol)) throw new Error('Se requiere PostgreSQL.');
   // Permite tráfico local sin TLS y exige certificados válidos en destinos remotos.
+  // La excepcion sin TLS pertenece al laboratorio; los destinos remotos exigen certificados.
   const local = ['localhost', '127.0.0.1', '[::1]', 'db-principal', 'db-replica'].includes(url.hostname);
   if (env.DB_SSL !== undefined && !['true', 'false'].includes(env.DB_SSL)) throw new Error('DB_SSL debe ser true o false.');
   const enabled = env.DB_SSL === undefined ? !local : env.DB_SSL === 'true';
@@ -18,6 +19,7 @@ function postgresOptions(env = process.env) {
   for (const key of ['sslcert', 'sslkey', 'sslrootcert', 'ssl']) {
     if (url.searchParams.has(key)) throw new Error(`La opción ${key} requiere configuración explícita de certificados.`);
   }
+  // Quitar este parametro evita que pg reemplace la politica SSL ya validada.
   url.searchParams.delete('sslmode');
   return { url: url.toString(), dialectOptions: { ssl: enabled ? { rejectUnauthorized: true } : false } };
 }
