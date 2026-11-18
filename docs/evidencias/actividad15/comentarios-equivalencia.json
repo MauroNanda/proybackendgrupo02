@@ -1,0 +1,275 @@
+{
+  "fecha": "2026-11-18T12:18:38.046Z",
+  "archivos": [
+    {
+      "repositorio": "backend",
+      "archivo": "app.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "7800528292c67407be3714af1723f16619e93b8d89ec30168f8a3af3fd62bbef",
+      "sha256Despues": "a7bad827c24e0098d5b8bb22041c1605527a0a19116d5c615f73a9f834733a8d"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "config/security.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "806f1ff27baf32bed4cb5fcb19551105c809f31d37c349ce5f6d9da65eba4630",
+      "sha256Despues": "d818c8a8d219ca70b1c97d64efe2128de3ee36cb616213e99c0d6a840170451d"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "config/postgres-options.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "0dd5ad491192d804127c75d2e6dcb4759d87fa86bbb55cd18261a6fb3794512e",
+      "sha256Despues": "af2a858c44b139983cf688fd54aad29a8a17a36fe71031a18fb13f6f64680570"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "middlewares/auth.middleware.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "875890a156291d5ed7e089731717a4bf53eb8e2900d5674887ba12881223d8b7",
+      "sha256Despues": "15f2693e31ce6f2f3561d3874083e83e09579be9a7e27f7b528ce36c90c2bd67"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "middlewares/role.middleware.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "809d9a2acb4ff2650bf8be02ae110fb59f11fa645a3dfd584fec7aa7ea6a50ad",
+      "sha256Despues": "5cee235947f146cb5475d66062a12e0838c12f2da156da0aa9d8de49cd198240"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "middlewares/security-detector.middleware.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "44970b75ad9105f27e06b05bf917cb588fec4b535d6f25b6e4d515f128208151",
+      "sha256Despues": "db43c3ff4e467ff58a31c1f7a43ba093e83eb97eb0390bd8b53d9e060e5f64c3"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "middlewares/rate-limit.middleware.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "5b583f7760cab1a8bf21fb1537a07149bb1f8f3f2ad77fe417a8f27f29b9f65c",
+      "sha256Despues": "ef6b79da82720204b64c31f4010b956f160ccde0e71fedc8a23ae66f2f43cfcd"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "services/auth.service.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "df4102b165652d5d34202f143829e626806ff5aaa17abc15f99dedd4f8138659",
+      "sha256Despues": "89d00f65a75d68b75646952304ff1a69fe577378c6ff9422e785d6ca2fe6a17c"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "services/inscripcion.service.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "1818333de321aad61c541eb158586d88c451f2764e97472358a6059ad0c4a138",
+      "sha256Despues": "4acf513b736cc9896e69955c50b2f56040ba0f4e9f32c78cabe6a44ce480805a"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "services/evento.service.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "173e9537bca074eda6290b254f415ac2b3bb6c4448f2b0963db64c4ce00d8867",
+      "sha256Despues": "122b2451a13755b4740c0e978f84e5d53efe8b97123ee89ad0d63182bc05cf7a"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "services/dashboard.service.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "844a9485991055770e60d9336c377ef620311e697e1ec140dd884ef749080e60",
+      "sha256Despues": "1f1ca6b60fae8521b048b503afada7bfcd644e2324c81c1006342d687d78d0c7"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "scripts/n8n-runner.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "dc9ad0917024c2a972f916a66f29b33821a63fb60b6ca2b8b0d0266040620914",
+      "sha256Despues": "f96f70b967b2ec40563ab4a23acfed0e7850c2a461c2743d4749e5da50d1860d"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "scripts/n8n-lab.js",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "26ee57793298eb673aec6150235371b4e4091c664324e1986e3482056d7b268e",
+      "sha256Despues": "831726ba045da3532e2f913960d83977c0ee0c42b803d6f6a51cc8e256203216"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "scripts/informe_metricas.py",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "e5da4e30a5ee49dfe016948fcd8ca4c683d06036d69d54555ab254974dd70bbf",
+      "sha256Despues": "34c5cad06de472b72c22d011db2c8ca42de837286c0c4611dee9be9fb6565efa"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "infra/compose.yaml",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "a66d3e846462a50294aa2f60bca92bf45ec5a7dd3b25ab9bc7643cf8be41111a",
+      "sha256Despues": "c2265657687581b735a4afc883a4633089c81bb16afa257817fe372569ea37df"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "infra/compose.production.yaml",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "3acb114e8e3f7cfa1e5971ad78cecdaadd809d4d30523020eed16d4b5bc9628c",
+      "sha256Despues": "ad08391bb101f06ff6bdd2ee821da1d5ac5163e3daa825a24176fadc5f37dd14"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "infra/hia/backup.sh",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "26730dc182941989c4d3441173131b6d6c454c9531d53fcd5ef3cd5362d56d62",
+      "sha256Despues": "6af5f0fb07bb56e17bef3a178042962ea87d4f4de94e425db5ebbe041bc2870e"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "Dockerfile",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "daac0f78920b9035635f727f8d6f76ba23b03e114c3dd98daeb6cad40584a742",
+      "sha256Despues": "0485776bb853d70c36b14dc6c0a93c1fc57d705d32e59a334e96a0e98b668842"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": ".github/workflows/ci.yml",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "1b66cdc17e3ac5d92b921d4af9d5d465c158951aa773d4f8413a29176411857f",
+      "sha256Despues": "4eb282a081aad9bef9be51dad1ef045a6462fbd8056e9c6214eb4eb16c8ee876"
+    },
+    {
+      "repositorio": "backend",
+      "archivo": "infra/hia/postgresql/replica-entrypoint.sh",
+      "base": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "31eaaf031b167abb59f72c76e8496a4b0a0121e1dd7769ae70d308f45c445eb9",
+      "sha256Despues": "0b5db9f51ef75c0f138fdfb8e80a93bec9b5b4ec5c5b0551e3f3c9521545d77e"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/core/guards/auth.guard.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "b70a4be8c101f86f9a6cbc8772cce4f97da8a5f4f7b1955362d402eafe189b04",
+      "sha256Despues": "18e930c55c1bd669b7d718a6abdacb968656f2956b44a42819a9d380b055be12"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/core/guards/role.guard.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "3bdcc40a5225ed1434f363e5b53049ae3f41096a17b193f8f6dea23516587124",
+      "sha256Despues": "223a875c04219a1dcc539e15c652e8297c2ddd7cb949f4e74252e4bb42ef1acf"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/core/interceptors/credentials.interceptor.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "4f81c19d51a63083cb485ba9925da78a865bd68a7f8a8d0c4140a4f0f36e28d1",
+      "sha256Despues": "866e8dc9d26d341b3eb7cea94d8b7e67a44bb8d9b6f9b88f34e39f6f3da20ac8"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/core/interceptors/error.interceptor.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "430e2462ed8e266dc711442c6b4f40902bf3ee99a1e8c1859bd25fcf825e148d",
+      "sha256Despues": "3877a8906209973f0a03e658d8eae267292ff3a17c5b4eec33b6958a55692a80"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/core/services/auth.service.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "4b83cf138f0f28fc4ec51bbd53eefd55b9377175d19b052a2e7e01bd26d9a086",
+      "sha256Despues": "239238a0ec3955517c8f797a37fc5a6577bb65fe62ada2fa5864a94f76ef1964"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/core/services/export.service.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "9d6cdc0a526722b43f8f6e30756060714d4596765daab410abad94e35582e7e1",
+      "sha256Despues": "dd21df1e8c3332557efc0432baaa0529befbe12293d741fa41c6aa510f912014"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "src/app/app.routes.ts",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "TypeScript printer removeComments",
+      "equivalente": true,
+      "sha256Antes": "5c11c28f7bf10540c86451426c64de1596066862c7764e45ca45a827f0bda8ce",
+      "sha256Despues": "118077e70b57bbaf2ef15ac436c9f2f5e54376453651648199ff60d35789db18"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "Dockerfile.production",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "31e10c48e2c80fd652c40f95678b100422681b548163391902e5227927fdf1c9",
+      "sha256Despues": "f8d59b29688ef379e7ab0316aaff789daaecbab364ebcb57044f5dc607b407d5"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "infra/nginx.production.conf",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "Instrucciones sin comentarios de linea ni saltos vacios",
+      "equivalente": true,
+      "sha256Antes": "d5aeecd3d9532ad57afda93454997803db115d0d015438268f93b189dc837b20",
+      "sha256Despues": "54043fa0bd78d74e69dd028c097f98ad6c7ef4db82a61bc31561b2facd2ca433"
+    },
+    {
+      "repositorio": "frontend",
+      "archivo": "scripts/verificar-origen-dependencias.cjs",
+      "base": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+      "metodo": "AST JavaScript sin posiciones/comentarios",
+      "equivalente": true,
+      "sha256Antes": "bd29a4e61c4108c544ccacee855447a0b4256d1d27da872f73f21858abca7ffd",
+      "sha256Despues": "da42be1165de810f56fb8341bcc9ea69e37d27e1d58f40802899d691f428279e"
+    }
+  ]
+}

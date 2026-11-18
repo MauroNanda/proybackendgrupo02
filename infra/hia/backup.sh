@@ -12,8 +12,10 @@ tmp="/backups/$name.dump.partial"
 if ! mkdir /backups/.lock 2>/dev/null; then echo 'Backup en curso; revisar .lock si el proceso murió' >&2; exit 1; fi
 trap 'rm -f "$tmp"; rmdir /backups/.lock' EXIT HUP INT TERM
 # La copia definitiva se publica después de comprobar su estructura y registrar el hash.
+# Formato custom: pg_restore puede inspeccionar y restaurar la copia.
 pg_dump -Fc --no-owner --no-acl -d "$db" -f "$tmp"
 pg_restore --list "$tmp" >/dev/null
+# El hash detecta cambios de bytes; la integridad funcional se prueba restaurando.
 sha256sum "$tmp" | cut -d ' ' -f 1 > "/backups/$name.sha256"
 psql -X -qAt -v ON_ERROR_STOP=1 -d "$db" -c "SELECT json_build_object('database',current_database(),'version',(SELECT version FROM laboratorio.control_carga),'perfil',(SELECT perfil FROM laboratorio.control_carga),'usuarios',(SELECT count(*) FROM \"Usuarios\"),'eventos',(SELECT count(*) FROM \"Eventos\"),'inscripciones',(SELECT count(*) FROM \"Inscripciones\"),'completado',(SELECT completado FROM laboratorio.control_carga),'servidor',current_setting('server_version'),'fecha',now());" > "/backups/$name.json"
 mv "$tmp" "/backups/$name.dump"

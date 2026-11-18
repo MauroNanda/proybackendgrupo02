@@ -17,6 +17,7 @@ const TOKEN = process.env.N8N_RUNNER_TOKEN || env.N8N_RUNNER_TOKEN || '';
 const PORT = Number(process.env.N8N_RUNNER_PORT || env.N8N_RUNNER_PORT || 5681);
 const HOST = process.env.N8N_RUNNER_HOST || '127.0.0.1';
 const PERFILES = ['piloto'];
+// El webhook no puede elegir un comando arbitrario de la computadora.
 const OPERACIONES = ['backup', 'restore-test', 'informe'];
 const informes = path.join(root, 'infra', 'n8n', 'informes');
 const PROM_URL = process.env.N8N_PROMETHEUS_URL || env.N8N_PROMETHEUS_URL || 'http://host.docker.internal:9090';
@@ -40,6 +41,7 @@ function autorizado(req) {
   const m = /^Bearer (.+)$/.exec(req.headers.authorization || '');
   if (!m) return false;
   const hash = (v) => crypto.createHash('sha256').update(v).digest();
+  // Comparar hashes de igual longitud evita comparar el secreto caracter por caracter.
   return crypto.timingSafeEqual(hash(m[1]), hash(TOKEN));
 }
 function leerJson(req) {
@@ -150,6 +152,7 @@ const server = http.createServer(async (req, res) => {
     }
     const perfil = cuerpo.perfil ?? 'piloto';
     if (!PERFILES.includes(perfil)) { anotar({ evento: 'rechazo', motivo: 'perfil', operacion }); return responder(res, 400, { ok: false, error: 'Perfil no permitido (solo piloto)' }); }
+    // La restauracion necesita aprobacion explicita y solo se hace sobre una base temporal.
     if (operacion === 'restore-test' && cuerpo.aprobado !== true) {
       anotar({ evento: 'rechazo', motivo: 'sin aprobación', operacion });
       return responder(res, 403, { ok: false, error: 'Se requiere aprobación humana (aprobado: true)' });

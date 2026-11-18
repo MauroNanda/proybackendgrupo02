@@ -1,0 +1,41 @@
+{
+  "fecha": "2026-11-18T12:20:50.455Z",
+  "version": "v-84c00adf0acf",
+  "commitBase": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+  "cambiosLocalesDuranteEnsayo": true,
+  "documentos": 39,
+  "archivos": [
+    {
+      "path": "Manuales/Entrega-y-defensa.md",
+      "sha256": "cd534fb5987b0b4e7caf3982ba52c7e3658315c4766ad4213337761d9f331589",
+      "size": 13767
+    },
+    {
+      "path": "Manuales/Arquitectura-final.md",
+      "sha256": "852e5b173b453b7c00c236654bdace93abde211baf69099cd82d58285c84bfda",
+      "size": 1774
+    },
+    {
+      "path": "Informe/Informe-Convoca-G02-A15.pdf",
+      "sha256": "5f09ca516a7d3a7c211afafeb5c2413e8366ba828ce66f68506bbb5470ae3f1d",
+      "size": 2367153,
+      "documentId": "1Clu8vb7rFb_gb4eBezHDBkUEmQ3axdtq-YKUyx16c4Q",
+      "revisionId": "AHj4eMSCE3dQ2CGTdajjIG98teV_6AnovITkhwmS6wy7UHhmchBKJboqr8SIZLkKdB2GobE2p0-3LihDJGtZzpmSidcQvf1hQSfRaYE2v0c"
+    },
+    {
+      "path": "Informe/Guia-actividades-G02.pdf",
+      "sha256": "3fe9e81062924e9b707eee31e81b07823d303c4b390f3b9553c0888e7544a4f6",
+      "size": 442041,
+      "documentId": "1IaWjTOUnN5XXynjCUFT3gS1fPrGEKTDYKYV75K9DVb4",
+      "revisionId": "AHj4eMTmPctyiXWRp53VaiGD49cMHQWDqo1wYYDQj4ziPSdmVrIgNS0KH1B_dLJmNt1aERATOawgt5ASGssxByQQVyrqucbmBLALlWr6t98"
+    },
+    {
+      "path": "Informe/Guia-defensa-G02.pdf",
+      "sha256": "6d3ab6387e6695b89bead39a7670484afa5f8e6b7ec7596f8c6a7ed94d6eaefa",
+      "size": 259854,
+      "documentId": "1L3x7irOQPf3UPhPXYKQznzqA3SrbL3chfSbW9axVdhg",
+      "revisionId": "AHj4eMTbiS9TbeuZ5cmE_pHSqgRA2_Bl_qGmGhmsR5tM5B6DunPHYebqh4QoUbJC4drU8b1oYe7QRHy9aw84C9yac9o3XsuHzHp4xVQ2KPI"
+    }
+  ],
+  "tipo": "Publicacion real de ensayo; el PR identifica la version final tras confirmar los cambios."
+}

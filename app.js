@@ -19,12 +19,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:4200';
 
+// Solo los proxies configurados pueden aportar la IP usada por los limites.
 app.set('trust proxy', trustedProxy());
 
 // ===== Middlewares base =====
 app.use(forwardedHeaders);
 app.use(helmet());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+// CORS limita lectura en el navegador; esta guardia tambien rechaza escrituras ajenas.
 app.use(originGuard);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
@@ -77,6 +79,7 @@ async function start() {
   }
 }
 
+// Importar la app en una prueba no inicia otro servidor ni conecta la base.
 if (require.main === module) start();
 
 module.exports = app;

@@ -1,0 +1,88 @@
+{
+  "fecha": "2026-11-18",
+  "baseBackend": "9c206d4709e8b6b164292c473a71cdeb3b3603d5",
+  "baseFrontend": "75eb62abb87030ce454d88d45ccda37fc7565b3f",
+  "ambiente": "Proyecto Docker nuevo convoca-lab-v2-a15, misma computadora",
+  "operaciones": [
+    {
+      "command": "up",
+      "perfil": "piloto",
+      "inicio": "2026-11-18T11:58:27.531Z",
+      "fin": "2026-11-18T11:59:00.809Z",
+      "resultado": "OK",
+      "segundos": 33.278
+    },
+    {
+      "command": "migrate",
+      "perfil": "piloto",
+      "inicio": "2026-11-18T11:59:01.283Z",
+      "fin": "2026-11-18T11:59:05.190Z",
+      "resultado": "OK",
+      "segundos": 3.907
+    },
+    {
+      "command": "seed",
+      "perfil": "piloto",
+      "inicio": "2026-11-18T11:59:05.661Z",
+      "fin": "2026-11-18T11:59:07.117Z",
+      "resultado": "OK",
+      "segundos": 1.456
+    },
+    {
+      "command": "validate",
+      "perfil": "piloto",
+      "inicio": "2026-11-18T12:09:26.378Z",
+      "fin": "2026-11-18T12:09:27.036Z",
+      "resultado": "OK",
+      "segundos": 0.658
+    },
+    {
+      "command": "backup",
+      "perfil": "piloto",
+      "inicio": "2026-11-18T12:01:47.147Z",
+      "fin": "2026-11-18T12:01:48.544Z",
+      "resultado": "OK",
+      "segundos": 1.397,
+      "backup": "convoca_lab_piloto_v2-20261118T120148-695"
+    },
+    {
+      "command": "restore-test",
+      "perfil": "piloto",
+      "inicio": "2026-11-18T12:01:49.111Z",
+      "fin": "2026-11-18T12:01:51.828Z",
+      "resultado": "OK",
+      "segundos": 2.717,
+      "backup": "convoca_lab_piloto_v2-20261118T120148-695.dump",
+      "restauracion": "OK"
+    }
+  ],
+  "datosConservados": {
+    "Usuarios": 1000,
+    "Eventos": 100,
+    "Inscripciones": 10000
+  },
+  "replica": {
+    "estado": "streaming",
+    "sincronizacion": "async",
+    "pg_is_in_recovery": true
+  },
+  "restauracion": {
+    "sha256": "124f1479d4bbc38a1e2cbd33f7f3a4934ebab6d1fa3354959451f3831cdb0d13",
+    "fecha": "2026-11-18T12:01:51.431Z",
+    "resultado": "OK",
+    "evidencia": "2026-11-18T12-01-49-109Z-restore-test-piloto"
+  },
+  "regresiones": {
+    "backend": 25,
+    "frontend": 4,
+    "lintErrores": 0,
+    "lintAdvertenciasPrevias": 2,
+    "buildFrontend": "OK"
+  },
+  "limites": [
+    "No acredita ensayo grupal ni reproduccion independiente de otro integrante",
+    "No vuelve a medir los ocho casos SQL ni la carga completa",
+    "HTTPS probado desde el navegador de este equipo; no desde otro dispositivo"
+  ],
+  "observacionEdicion": "La herramienta de comentarios introdujo CRLF en shell; se restablecio LF conservando .gitattributes existente. Backup y restore-test repetidos con exito."
+}

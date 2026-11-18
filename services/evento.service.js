@@ -4,6 +4,7 @@ const HttpError = require('../utils/http-error');
 const eventosHooks = require('../integrations/eventos.hooks');
 const notificaciones = require('../integrations/notificaciones');
 
+// Permitir campos concretos impide que el cliente imponga id o fechas internas.
 const CAMPOS_EVENTO_PERMITIDOS = [
   'titulo',
   'descripcion',
@@ -13,6 +14,7 @@ const CAMPOS_EVENTO_PERMITIDOS = [
   'estado',
 ];
 
+// % y _ escritos por el usuario se buscan como texto, no como comodines SQL.
 function escaparLike(texto) {
   return String(texto).replace(/[\\%_]/g, '\\$&');
 }
@@ -60,6 +62,7 @@ class EventoService {
         as: 'inscripciones',
         attributes: ['id', 'estado'],
         required: false,
+        // Sequelize carga las inscripciones aparte para no multiplicar filas del evento.
         separate: true,
       },
     ];

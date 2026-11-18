@@ -1,5 +1,6 @@
 name: Backend CI
 permissions:
+  # El trabajo solo necesita leer codigo; no recibe permiso de escritura al repositorio.
   contents: read
 
 on:
@@ -38,5 +39,6 @@ jobs:
         run: node --test test/lab/*.test.js test/security/*.test.js
 
       - name: Security dependency audit
+        # Bloquea altas/criticas de ejecucion; no oculta los riesgos dev documentados.
         run: npm audit --omit=dev --audit-level=high
         # Solo runtime bloquea por altas/criticas. Los riesgos dev se documentan en A14.

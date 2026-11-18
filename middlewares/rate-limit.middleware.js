@@ -8,6 +8,7 @@ const { positiveInt } = require('../config/security');
 const apiLimiter = rateLimit({
   windowMs: positiveInt(process.env.API_RATE_WINDOW_MS,300000,3600000),
   max: positiveInt(process.env.API_RATE_MAX,300,10000),
+  // La comprobacion de salud sigue disponible aunque un cliente agote su cupo.
   skip: req=>req.path==='/health',
   standardHeaders: true,
   legacyHeaders: false,

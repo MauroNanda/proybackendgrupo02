@@ -11,7 +11,12 @@ exports.sync=async c=>{
   // La lista explícita evita publicar archivos de entorno, claves o respaldos.
   const sources=[['docs/ARQUITECTURA.md','Manuales/Arquitectura.md'],['docs/base-datos.md','Manuales/Base-datos.md'],
     ['docs/GUIA_DEMOSTRACION.md','Manuales/Demostracion.md'],['docs/mantis-a11.md','Manuales/Incidencias.md'],
-    ['docs/nextcloud-a12.md','Manuales/Nextcloud.md'],['infra/nextcloud/compose.yaml','Configuraciones/nextcloud-compose.yaml'],
+    ['docs/nextcloud-a12.md','Manuales/Nextcloud.md'],
+    ['docs/AUTOMATIZACIONES_A13.md','Manuales/Automatizaciones.md'],
+    ['docs/SEGURIDAD_A14.md','Manuales/Seguridad.md'],
+    ['docs/ENTREGA_Y_DEFENSA.md','Manuales/Entrega-y-defensa.md'],
+    ['docs/ARQUITECTURA_FINAL_HIA.md','Manuales/Arquitectura-final.md'],
+    ['infra/nextcloud/compose.yaml','Configuraciones/nextcloud-compose.yaml'],
     ['infra/nextcloud/.env.example','Configuraciones/nextcloud.env.example']];
   for(const rel of ['docs/evidencias/actividad11','docs/evidencias/monitoreo']){
     function walk(p){for(const entry of fs.readdirSync(path.join(c.root,p),{withFileTypes:true})){const r=p+'/'+entry.name;if(entry.isDirectory())walk(r);else sources.push([r,'Evidencias/'+r.slice('docs/evidencias/'.length)]);}}

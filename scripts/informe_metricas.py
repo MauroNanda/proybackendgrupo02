@@ -56,6 +56,7 @@ def main():
 
     if a.simular == "incompleto":  # prueba controlada de datos incompletos
         crudo["postgres_up"] = []
+    # Una serie ausente no significa cero: se informa falta de datos.
     faltantes = [n for n in REQUERIDAS if not crudo.get(n)]
     if faltantes:
         print(json.dumps({"ok": False, "error": "Datos incompletos: sin datos para " + ", ".join(faltantes)}))
@@ -64,6 +65,7 @@ def main():
     if any(not math.isfinite(float(r["value"][1])) for values in crudo.values() for r in values):
         print(json.dumps({"ok": False, "error": "Datos no finitos en Prometheus"}))
         return 2
+    # up mide la recoleccion del target; probe_success comprueba la respuesta de la API.
     destinos = {r["metric"].get("job", "?") + " / " + r["metric"].get("instance", "?"): float(r["value"][1]) for r in crudo["destinos_up"]}
     caidos = sorted(j for j, v in destinos.items() if v < 1)
     api = valor(crudo["api_disponible"])

@@ -22,7 +22,9 @@ services:
     extra_hosts: ["host.docker.internal:host-gateway"]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
+    # Un proceso comprometido no puede modificar los archivos de la imagen.
     read_only: true
+    # Los temporales autorizados viven en memoria y se pierden al recrear el contenedor.
     tmpfs: ["/tmp:rw,noexec,nosuid,size=32m"]
     pids_limit: 128
     mem_limit: 512m

@@ -27,6 +27,7 @@ class InscripcionService {
     const { inscripcionFinal, estadoFinal, evento } = await sequelize.transaction(async (t) => {
       const evento = await Evento.findByPk(eventoId, {
         transaction: t,
+        // Bloquea esta fila del evento: otra inscripcion espera antes de recalcular el cupo.
         lock: t.LOCK.UPDATE,
       });
       if (!evento) {
@@ -62,6 +63,7 @@ class InscripcionService {
       });
 
       const estado = totalConfirmados >= evento.cupo_maximo ? 'ESPERA' : 'CONFIRMADO';
+      // El QR identifica esta inscripcion; no contiene la contrasena ni el JWT del usuario.
       const nuevoQrToken = crypto.randomUUID();
 
       let inscripcion;
@@ -79,6 +81,7 @@ class InscripcionService {
         }, { transaction: t });
       }
 
+      // Al resolver el callback se confirma la transaccion; ante error se revierte.
       return { inscripcionFinal: inscripcion, estadoFinal: estado, evento };
     });
 

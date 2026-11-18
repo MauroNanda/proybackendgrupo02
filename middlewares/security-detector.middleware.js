@@ -12,6 +12,7 @@ const descriptions = {
 };
 const failures = new Map();
 const recent = new Map();
+// Acotar los mapas evita crecimiento ilimitado al recibir muchos origenes distintos.
 const MAX_KEYS = 1024;
 let inFlight = 0;
 let budgetStart = 0;
@@ -59,6 +60,7 @@ async function notificarIncidente(alerta) {
   inFlight++;
   try {
     const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-A14-Token':token},body:JSON.stringify(payload),signal:AbortSignal.timeout(3000),redirect:'error'});
+    // HTTP 403/500 no lanza una excepcion en fetch: tambien cuenta como envio fallido.
     if(!response.ok) {console.error('[SECURITY_DELIVERY]',JSON.stringify({tipo,estado:'pendiente',http:response.status}));return {estado:'pendiente'};}
     return {estado:'aceptado-por-webhook'};
   } catch {
@@ -81,6 +83,7 @@ function securityDetector(req,res,next) {
     void notificarIncidente({...info,tipo:result.dangerous?'PROTOTYPE_POLLUTION_ATTEMPT':'PAYLOAD_COMPLEXITY_EXCEEDED',severidad:'alta',statusCode:400});
     return res.status(400).json({error:{message:'Carga util rechazada por politica de seguridad.'}});
   }
+  // Un patron es una senal para investigar; por si solo no demuestra una inyeccion.
   if(result.suspicious) void notificarIncidente({...info,tipo:'INJECTION_PROBE_DETECTED',severidad:'media',statusCode:400});
   res.on('finish',()=>{if([401,403].includes(res.statusCode)) registrarFallo(req,res);});
   next();

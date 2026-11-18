@@ -76,6 +76,7 @@ async function main() {
     const setup = await fetch('http://127.0.0.1:5680/rest/owner/setup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@convoca.local',firstName:'Convoca',lastName:'G02',password:env.N8N_ADMIN_PASSWORD})});
     if (!setup.ok) throw new Error('No se pudo preparar el propietario n8n: HTTP '+setup.status);
   }
+  // Las exportaciones del flujo referencian IDs; las claves se importan aparte y quedan cifradas.
   const credentials = [
     {id:'a13Webhook',name:'A13 entrada protegida',type:'httpHeaderAuth',data:{name:'X-A13-Token',value:env.N8N_WEBHOOK_TOKEN}},
     {id:'a14Webhook',name:'A14 entrada protegida',type:'httpHeaderAuth',data:{name:'X-A14-Token',value:env.N8N_SECURITY_WEBHOOK_TOKEN}},
