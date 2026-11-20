@@ -108,4 +108,4 @@ Prometheus `9090` vigila la API del piloto de monitoreo `3004`. Para los ensayos
 - [pgAdmin con seis millones de inscripciones](evidencias/defensa-en-vivo/pgadmin-base-completa.png), [alcance de la réplica](evidencias/defensa-en-vivo/replica-a15.json) y [restauración del piloto](evidencias/defensa-en-vivo/restauracion-piloto-a15.json).
 - [Recorrido de la aplicación local](evidencias/defensa-en-vivo/ensayo-local.json) y [recorrido de la aplicación por HTTPS](evidencias/defensa-en-vivo/ensayo-https.json).
 - [Dos caídas y recuperaciones](evidencias/defensa-en-vivo/a13-alertas.json), [backup e informe de n8n](evidencias/defensa-en-vivo/a13-backup-e-informe.json), [fallo SMTP](evidencias/defensa-en-vivo/a14-fallo-smtp.json) y [reenvío confirmado](evidencias/defensa-en-vivo/a14-recuperar-smtp.json).
-- [Cambio visible, prueba por HTTPS y rollback del frontend](https://github.com/MauroNanda/proyfrontendgrupo02/pull/28).
+- [Cambio visible, prueba por HTTPS y rollback del frontend](https://github.com/MauroNanda/proyfrontendgrupo02/pull/30).
