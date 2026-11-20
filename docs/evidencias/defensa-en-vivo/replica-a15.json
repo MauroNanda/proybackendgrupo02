@@ -1,0 +1,11 @@
+﻿{
+  "date": "2026-11-20T02:28:49.004Z",
+  "project": "convoca-lab-v2-a15",
+  "database": "convoca_lab_piloto_v2",
+  "initial": "streaming:async",
+  "firstRowOnStandby": "1",
+  "writeWhileStandbyDown": "1,2",
+  "recovered": "streaming:async",
+  "rowsAfterCatchUp": "1,2",
+  "cleanup": "removed"
+}

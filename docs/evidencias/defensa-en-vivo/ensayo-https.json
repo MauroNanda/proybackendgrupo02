@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-20T02:32:45.656528+00:00",
+  "web": "https://written-analytical-accessible-linked.trycloudflare.com",
+  "tipo": "Navegador y HTTP reales, piloto nuevo y fixture sintetica propia",
+  "resultados": {
+    "login_organizador": 200,
+    "login_asistente": 200,
+    "crear_evento": 201,
+    "inscripcion_confirmada": 201,
+    "qr_generado": true,
+    "checkin": 200,
+    "dashboard_organizador": 200,
+    "dashboard_asistente": 403,
+    "retirar_fixture": 200
+  },
+  "resultado": "OK"
+}

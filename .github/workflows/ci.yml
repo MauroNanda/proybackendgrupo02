@@ -42,3 +42,6 @@ jobs:
         # Bloquea altas/criticas de ejecucion; no oculta los riesgos dev documentados.
         run: npm audit --omit=dev --audit-level=high
         # Solo runtime bloquea por altas/criticas. Los riesgos dev se documentan en A14.
+
+      - name: Build production API image
+        run: docker build --target production -t convoca-api:${{ github.sha }} .
