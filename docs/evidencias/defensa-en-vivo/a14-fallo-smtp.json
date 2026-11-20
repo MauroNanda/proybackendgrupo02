@@ -1,0 +1,20 @@
+{
+  "fecha": "2026-11-20T02:38:10.133Z",
+  "caso": "fallo-smtp",
+  "origen": "Webhook real con evento sintetico de laboratorio",
+  "primero": {
+    "ejecucion": "387",
+    "estado": "success",
+    "nodos": [
+      "Webhook Incidentes Seguridad",
+      "Normalizar y deduplicar incidente",
+      "¿Es incidente nuevo?",
+      "Crear ticket de seguridad en Mantis",
+      "Registrar ID y armar correo",
+      "Notificar incidente por Mailpit",
+      "Registrar aviso pendiente"
+    ],
+    "ticket": 30,
+    "duplicado": false
+  }
+}

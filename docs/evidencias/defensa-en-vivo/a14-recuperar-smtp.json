@@ -1,0 +1,20 @@
+{
+  "fecha": "2026-11-20T02:38:30.598Z",
+  "caso": "recuperar-smtp",
+  "origen": "Webhook real con evento sintetico de laboratorio",
+  "primero": {
+    "ejecucion": "389",
+    "estado": "success",
+    "nodos": [
+      "Webhook Incidentes Seguridad",
+      "Normalizar y deduplicar incidente",
+      "¿Es incidente nuevo?",
+      "Reintentar aviso pendiente?",
+      "Preparar solo reenvio",
+      "Notificar incidente por Mailpit",
+      "Confirmar aviso de seguridad"
+    ],
+    "ticket": 30,
+    "duplicado": true
+  }
+}

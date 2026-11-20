@@ -8,7 +8,7 @@ Responde a la **actividad 15 de HIA**: documentación técnica, reproducción y 
 2. Abrir PowerShell **en la carpeta del backend**. Seguir [GUIA_DEMOSTRACION.md](GUIA_DEMOSTRACION.md): recorrido **A** si ya se conservan migraciones/datos/configuración; **B** si falta preparar la base. No repetir la carga masiva para presentar.
 3. Abrir otra terminal **en el frontend** y seguir su bloque de instalación. SheetJS requiere el verificador y `npm ci --allow-remote=root`, no una excepción global de npm.
 4. Comprobar el login de organizador y asistente. Después levantar los servicios adicionales de los apartados A6/A10/A11/A12/A13/A14 de esa guía, solo para el circuito que se mostrará.
-5. Abrir este recorrido de defensa y el informe de Drive. Las claves de administración se consultan en el registro privado del equipo; no van en pantalla ni en el repositorio.
+5. Abrir la [guía en vivo](DEFENSA_EN_VIVO.md) y el informe de Drive. Tener a mano el acceso privado a las cuentas de demostración.
 
 No hace falta reinstalar PostgreSQL, Python, Nginx ni Mantis en Windows: sus servicios corren en Docker. Abrir Docker Desktop por sí solo no levanta toda la aplicación.
 
@@ -26,7 +26,7 @@ El informe de Drive contiene la resolución de las actividades. Esta tabla orien
 | 6. Migración y carga | [base-datos.md](base-datos.md), migraciones y `infra/hia/dataset.json` |
 | 7. Optimización SQL | Informe A5: ocho casos, planes/tiempos y equivalencia; índices en `migrations/20261109232106-agregar-indices-optimizacion.js` |
 | 8. Replicación | [replicacion-postgresql.md](replicacion-postgresql.md): principal, standby, WAL y prueba directa |
-| 9. CI/CD | `.github/workflows/ci.yml` de ambos repositorios; integración automática y publicación manual, sin atribuirle CD automático |
+| 9. CI/CD | `.github/workflows/ci.yml` de ambos repositorios y [demostración de CD del frontend](DEFENSA_EN_VIVO.md#3-despliegue-automático-de-un-cambio-visible) |
 | 10. Publicación en Internet | Informe A9 y [GUIA_DEMOSTRACION.md](GUIA_DEMOSTRACION.md), alcance de publicación; renovar el túnel antes de presentar |
 | 11. Monitoreo | [monitoreo.md](monitoreo.md), Prometheus y Grafana |
 | 12. Incidencias | [mantis-a11.md](mantis-a11.md), tickets y trazabilidad |
@@ -105,7 +105,7 @@ La verificación automatizada desde esta computadora **no acredita un ensayo gru
 
 - El dataset completo declara 100.000 usuarios, 10.000 eventos y 6.000.000 inscripciones. No afirmar seis millones en cada tabla. La interpretación respecto del enunciado debe quedar explícita.
 - Los ocho casos SQL medidos y los cambios efectivamente incorporados son cosas distintas; el dashboard conserva consultas con `COUNT(id)`.
-- Los workflows actuales integran y verifican automáticamente. La publicación/rollback siguen siendo operaciones manuales; no presentarlos como CD automático.
+- Los workflows verifican y construyen las imágenes. Con el publicador activo, el frontend se actualiza al aprobar CI. La publicación de la API se administra por separado.
 - La réplica es asíncrona y no promueve automáticamente otro principal. Un standby no reemplaza una copia histórica.
 - El HTTPS temporal depende del túnel y de los servicios disponibles. La URL puede cambiar al reiniciarlo; una URL antigua no demuestra disponibilidad actual.
 - Mailpit es correo local. n8n y la API tienen límites de deduplicación/entrega documentados; no hay garantía de entrega exactamente una vez ni de cola durable de la API.

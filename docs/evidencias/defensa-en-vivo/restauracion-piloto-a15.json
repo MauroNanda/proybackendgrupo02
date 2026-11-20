@@ -1,0 +1,11 @@
+{
+  "command": "restore-test",
+  "perfil": "piloto",
+  "database": "convoca_lab_piloto_v2",
+  "inicio": "2026-11-20T02:27:56.464Z",
+  "fin": "2026-11-20T02:27:59.862Z",
+  "resultado": "OK",
+  "segundos": 3.398,
+  "backup": "convoca_lab_piloto_v2-20261118T120148-695.dump",
+  "restauracion": "OK"
+}

@@ -88,6 +88,16 @@ En el navegador, abrir **n8n → flujo → Executions → ejecución**. Mostrar 
 
 Para demostrar el flujo 1, elegir en `docker ps` el contenedor `postgres-exporter` del laboratorio. Detener **solo ese exportador** con `docker stop NOMBRE`, esperar la alerta `ConvocaExportadorCaido` en Prometheus y la siguiente ejecución de n8n. Mostrar el ticket y aviso. Iniciarlo con `docker start NOMBRE`; esperar el siguiente scrape y consulta de n8n y mostrar el mismo ticket resuelto. Puede tomar 45–90 s por las reglas de A10. No detener PostgreSQL ni borrar volúmenes. Si otras alertas reales ya estaban activas, sus tickets aparecen por separado.
 
+El aviso local incluye una acción sugerida según la regla que disparó la alerta. El diagnóstico y cualquier corrección quedan a cargo de la persona responsable.
+
+Para repetir la prueba de defensa sobre la API, conectar **solo** la API de un piloto aislado al destino `api` que monitorea A10. Confirmar que el backend principal de la demostración permanezca en una red separada. Con A10 y los flujos publicados, ejecutar, sustituyendo el nombre si el piloto aislado es otro:
+
+```powershell
+node scripts/validar-defensa-alertas.js convoca-lab-v2-a14-api-1
+```
+
+Este comando detiene y vuelve a iniciar dos veces únicamente la API piloto indicada. En cada ciclo comprueba Prometheus, la ejecución programada de n8n, el alta en Mantis, la recomendación recibida en Mailpit y la resolución con aviso sobre el mismo ticket. Guarda sus resultados en `infra/n8n/resultados/defensa-alertas.json`.
+
 ## 5. Controles y límites
 
 - Entradas con `X-A13-Token` y runner con `Bearer`; claves locales excluidas de Git. Las exportaciones contienen referencias a credenciales, sin valores secretos.

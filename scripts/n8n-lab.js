@@ -18,6 +18,18 @@ function compose(args, capture = false) {
   return docker(['compose','--env-file',envPath,'-f',path.join(dir,'compose.yaml'),...args], capture);
 }
 function read(file) { return fs.existsSync(file) ? dotenv.parse(fs.readFileSync(file)) : {}; }
+async function editor(route, options) {
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    try {
+      // Compose puede haber recreado el servidor entre los pasos de importación.
+      const response = await fetch('http://127.0.0.1:5680/rest/' + route, options);
+      if (![502, 503, 504].includes(response.status) || attempt === 4) return response;
+    } catch (error) {
+      if (attempt === 4) throw new Error('No responde la API local de n8n al consultar ' + route, { cause: error });
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+}
 async function main() {
   const command = process.argv[2];
   if (!['preparar','up','stop','importar'].includes(command)) throw new Error('Usar preparar, up, importar o stop.');
@@ -71,7 +83,7 @@ async function main() {
     return;
   }
   // La API de alta inicial queda inutilizable una vez creado el propietario.
-  const settings = await (await fetch('http://127.0.0.1:5680/rest/settings')).json();
+  const settings = await (await editor('settings')).json();
   if (settings.data?.userManagement?.showSetupOnFirstLoad) {
     const setup = await fetch('http://127.0.0.1:5680/rest/owner/setup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@convoca.local',firstName:'Convoca',lastName:'G02',password:env.N8N_ADMIN_PASSWORD})});
     if (!setup.ok) throw new Error('No se pudo preparar el propietario n8n: HTTP '+setup.status);
@@ -91,14 +103,14 @@ async function main() {
     fs.writeFileSync(file,JSON.stringify(credentials),{mode:0o600});
     compose(['exec','-T','n8n','n8n','import:credentials','--input=/privado/credenciales.json']);
   } finally { if (fs.existsSync(file)) fs.unlinkSync(file); }
-  const login = await fetch('http://127.0.0.1:5680/rest/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emailOrLdapLoginId:'admin@convoca.local',password:env.N8N_ADMIN_PASSWORD})});
+  const login = await editor('login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emailOrLdapLoginId:'admin@convoca.local',password:env.N8N_ADMIN_PASSWORD})});
   if (!login.ok) throw new Error('No se pudo iniciar sesion; no se sobrescriben flujos existentes.');
   const cookie = login.headers.getSetCookie().map(x=>x.split(';')[0]).join('; ');
   const runtimeExports=path.join(privateDir,'flujos'); fs.mkdirSync(runtimeExports,{recursive:true});
   try {
     for (const name of fs.readdirSync(path.join(dir,'flujos'))) {
       const flow=JSON.parse(fs.readFileSync(path.join(dir,'flujos',name)));
-      const existing=await fetch('http://127.0.0.1:5680/rest/workflows/'+flow.id,{headers:{Cookie:cookie}});
+      const existing=await editor('workflows/'+flow.id,{headers:{Cookie:cookie}});
       if(existing.ok) flow.staticData=(await existing.json()).data.staticData;
       else if(existing.status!==404) throw new Error('No se pudo leer el estado del flujo '+flow.id);
       fs.writeFileSync(path.join(runtimeExports,name),JSON.stringify(flow),{mode:0o600});

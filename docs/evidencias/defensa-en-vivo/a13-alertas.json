@@ -1,0 +1,53 @@
+{
+  "fecha": "2026-11-20T02:35:31.093Z",
+  "contenedor": "convoca-lab-v2-a14-api-1",
+  "origen": "Prometheus real, A13-1 programado y Mailpit local",
+  "ciclos": [
+    {
+      "ciclo": 1,
+      "duracionSegundos": 155,
+      "alta": {
+        "ejecucion": "375",
+        "ticket": 28,
+        "recomendacion": "Comprobar el estado de la API y su healthcheck. Si la base figura caida, verificar la conexion a PostgreSQL antes de reiniciar servicios.",
+        "correo": {
+          "recibido": true,
+          "conRecomendacion": true
+        }
+      },
+      "recuperacion": {
+        "ejecucion": "377",
+        "ticket": 28,
+        "recomendacion": "Comprobar el estado de la API y su healthcheck. Si la base figura caida, verificar la conexion a PostgreSQL antes de reiniciar servicios.",
+        "correo": {
+          "recibido": true,
+          "conRecomendacion": false
+        },
+        "estadoTicketConfirmadoEnMantis": "resolved"
+      }
+    },
+    {
+      "ciclo": 2,
+      "duracionSegundos": 148,
+      "alta": {
+        "ejecucion": "380",
+        "ticket": 29,
+        "recomendacion": "Comprobar el estado de la API y su healthcheck. Si la base figura caida, verificar la conexion a PostgreSQL antes de reiniciar servicios.",
+        "correo": {
+          "recibido": true,
+          "conRecomendacion": true
+        }
+      },
+      "recuperacion": {
+        "ejecucion": "382",
+        "ticket": 29,
+        "recomendacion": "Comprobar el estado de la API y su healthcheck. Si la base figura caida, verificar la conexion a PostgreSQL antes de reiniciar servicios.",
+        "correo": {
+          "recibido": true,
+          "conRecomendacion": false
+        },
+        "estadoTicketConfirmadoEnMantis": "resolved"
+      }
+    }
+  ]
+}

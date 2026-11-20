@@ -1,0 +1,191 @@
+{
+  "fecha": "2026-11-20T02:31:11.689Z",
+  "origen": "Webhooks reales de n8n en Docker",
+  "canal": "Mailpit local; no acredita envio externo",
+  "correos": 163,
+  "checks": [
+    {
+      "ruta": "a13-backup",
+      "sinCredencial": 403
+    },
+    {
+      "ruta": "a13-restaurar",
+      "sinCredencial": 403
+    },
+    {
+      "ruta": "a13-informe",
+      "sinCredencial": 403
+    },
+    {
+      "ruta": "a13-flujo1-prometheus",
+      "sinCredencial": 403
+    },
+    {
+      "ruta": "a13-backup",
+      "id": "365",
+      "estado": "success",
+      "nodos": [
+        "Disparador: backup",
+        "Ejecutar backup",
+        "Backup verificado?",
+        "Aviso backup OK"
+      ],
+      "resultados": {
+        "Ejecutar backup": {
+          "ok": true,
+          "codigo": 0,
+          "copia": {
+            "verificada": true,
+            "archivo": "convoca_lab_piloto_v2-20261120T023050-1920.dump",
+            "sha256": "eb720fed3b963de64cb0514b16822dd3a758f3c54e1592aa7aa55ab20e72cc6c",
+            "bytes": 823760,
+            "perfil": "piloto",
+            "usuarios": 1000,
+            "eventos": 100,
+            "inscripciones": 10000
+          }
+        }
+      }
+    },
+    {
+      "ruta": "a13-backup-error",
+      "id": "366",
+      "estado": "success",
+      "nodos": [
+        "Disparador: fallo controlado",
+        "Forzar perfil invalido",
+        "Ejecutar backup",
+        "Backup verificado?",
+        "Aviso backup ERROR"
+      ],
+      "resultados": {
+        "Ejecutar backup": {
+          "ok": false,
+          "error": "Perfil no permitido (solo piloto)"
+        }
+      }
+    },
+    {
+      "ruta": "a13-restaurar",
+      "id": "367",
+      "estado": "success",
+      "nodos": [
+        "Disparador: restaurar",
+        "Restaurar en base temporal",
+        "Restauracion OK?",
+        "Aviso restauracion ERROR"
+      ],
+      "resultados": {
+        "Restaurar en base temporal": {
+          "ok": false,
+          "error": "Se requiere aprobación humana (aprobado: true)"
+        }
+      }
+    },
+    {
+      "ruta": "a13-restaurar",
+      "id": "368",
+      "estado": "success",
+      "nodos": [
+        "Disparador: restaurar",
+        "Restaurar en base temporal",
+        "Restauracion OK?",
+        "Aviso restauracion OK"
+      ],
+      "resultados": {
+        "Restaurar en base temporal": {
+          "ok": true,
+          "codigo": 0,
+          "restauracion": {
+            "copia": "convoca_lab_piloto_v2-20261120T023050-1920.dump",
+            "sha256": "eb720fed3b963de64cb0514b16822dd3a758f3c54e1592aa7aa55ab20e72cc6c",
+            "fecha": "2026-11-20T02:30:57.550Z",
+            "resultado": "OK"
+          }
+        }
+      }
+    },
+    {
+      "ruta": "a13-informe",
+      "id": "369",
+      "estado": "success",
+      "nodos": [
+        "Disparador: informe",
+        "Parametros normales",
+        "Generar informe (Python)",
+        "Informe generado?",
+        "Subir a Nextcloud",
+        "Guardado en Nextcloud?",
+        "Aviso informe OK"
+      ],
+      "resultados": {
+        "Generar informe (Python)": {
+          "ok": true,
+          "codigo": 0,
+          "archivo": "informe-metricas-20261120-023100.md"
+        },
+        "Subir a Nextcloud": {
+          "statusCode": 201
+        },
+        "Guardado en Nextcloud?": {
+          "statusCode": 201
+        }
+      }
+    },
+    {
+      "ruta": "a13-informe-incompleto",
+      "id": "371",
+      "estado": "success",
+      "nodos": [
+        "Disparador: datos incompletos",
+        "Parametros datos incompletos",
+        "Generar informe (Python)",
+        "Informe generado?",
+        "Aviso informe ERROR"
+      ],
+      "resultados": {
+        "Generar informe (Python)": {
+          "ok": false,
+          "codigo": 2,
+          "error": "Datos incompletos: sin datos para postgres_up"
+        }
+      }
+    },
+    {
+      "ruta": "a13-informe-almacenamiento-error",
+      "id": "372",
+      "estado": "success",
+      "nodos": [
+        "Disparador: fallo de almacenamiento",
+        "Parametros carpeta inexistente",
+        "Generar informe (Python)",
+        "Informe generado?",
+        "Subir a Nextcloud",
+        "Guardado en Nextcloud?",
+        "Aviso almacenamiento ERROR"
+      ],
+      "resultados": {
+        "Generar informe (Python)": {
+          "ok": true,
+          "codigo": 0,
+          "archivo": "informe-metricas-20261120-023109.md"
+        },
+        "Subir a Nextcloud": {
+          "statusCode": 404
+        },
+        "Guardado en Nextcloud?": {}
+      }
+    },
+    {
+      "ruta": "a13-flujo1-prometheus",
+      "id": "373",
+      "estado": "error",
+      "nodos": [
+        "Webhook Alertmanager",
+        "Normalizar alertas"
+      ],
+      "error": "Estado invalido [line 8]",
+      "resultados": {}
+    }
+  ]
+}
